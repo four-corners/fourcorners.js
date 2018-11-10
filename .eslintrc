@@ -1,0 +1,23 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "globals": {
+    "before": true,
+    "describe": true,
+    "document": false,
+    "escape": false,
+    "expect": true,
+    "it": true,
+    "navigator": false,
+    "sinon": true,
+    "unescape": false,
+    "window": false
+  },
+  "parser": "babel-eslint",
+  "plugins": [],
+  "rules": {
+  }
+}
