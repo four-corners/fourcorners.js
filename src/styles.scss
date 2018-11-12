@@ -1,8 +1,11 @@
 @import url(https://fonts.googleapis.com/css?family=Noto+Sans:400,400i,700,700i&subset=cyrillic,cyrillic-ext,greek,greek-ext,vietnamese);
-$lightest: #f9f9f9;
-$light: #f3f3f2;
+
+$blue: #80bdff;
+$darkest: #000;
 $medium: #dadad9;
-$darkest: #000000;
+$light: #ccc;
+$lighter: #f5f5f5;
+$lightest: #fff;
 
 .fc_embed {
 	position: relative;
@@ -16,11 +19,11 @@ $darkest: #000000;
 }
 
 .fc_corner {
-	width: 5em;
-	height: 5em;
+	width: 5rem;
+	height: 5rem;
 	position: absolute;
 	z-index: 3;
-	// background-size: 3em;
+	// background-size: 3rem;
 	// background-position: center;
 	// background-repeat: no-repeat;
 	// background-image: url(./svg/corner.svg);
@@ -33,84 +36,84 @@ $darkest: #000000;
 		content: '';
 		background-color: $lightest;
 		// border: 1px solid black;
-		border-radius: 3px;
+		// border-radius: 3px;
 	}
-	&:hover {
+	&:hover, &.fc_active {
 		// border-color: $lightest;
 		cursor: pointer;
 		&::after, &::before {
-			background-color: yellow;
+			background-color: $blue;
 		}
 	}
 	&[data-id='backstory'] {
-		// border-width: .75em 0px 0px .75em;
-		top: -2em;
-		left: -2em;
+		// border-width: .75em 0px 0px .75rem;
+		top: -2rem;
+		left: -2rem;
 		&::before {
-			width: .75em;
-			height: 3em;
-			left: 1em;
-			top: 1em;
+			width: .75rem;
+			height: 3rem;
+			left: 1rem;
+			top: 1rem;
 		}
 		&::after {
-			width: 3em;
-			height: .75em;
-			left: 1em;
-			top: 1em;
+			width: 3rem;
+			height: .75rem;
+			left: 1rem;
+			top: 1rem;
 		}
 	}
 	&[data-id='copyright'] {
 		// border-width: .75em .75em 0px 0px;
-		top: -2em;
-		right: -2em;
+		top: -2rem;
+		right: -2rem;
 		&::before {
-			width: .75em;
-			height: 3em;
-			right: 1em;
-			top: 1em;
+			width: .75rem;
+			height: 3rem;
+			right: 1rem;
+			top: 1rem;
 		}
 		&::after {
-			width: 3em;
-			height: .75em;
-			left: 1em;
-			top: 1em;
+			width: 3rem;
+			height: .75rem;
+			left: 1rem;
+			top: 1rem;
 		}
 	}
 	&[data-id='media'] {
 		// border-width: 0px .75em .75em 0px;
-		bottom: -2em;
-		right: -2em;
+		bottom: -2rem;
+		right: -2rem;
 		&::before {
-			width: .75em;
-			height: 3em;
-			right: 1em;
-			top: 1em;
+			width: .75rem;
+			height: 3rem;
+			right: 1rem;
+			top: 1rem;
 		}
 		&::after {
-			width: 3em;
-			height: .75em;
-			left: 1em;
-			bottom: 1em;
+			width: 3rem;
+			height: .75rem;
+			left: 1rem;
+			bottom: 1rem;
 		}
 	}
 	&[data-id='links'] {
-		// border-width: 0px 0px .75em .75em;
-		bottom: -2em;
-		left: -2em;
+		// border-width: 0px 0px .75em .75rem;
+		bottom: -2rem;
+		left: -2rem;
 		&::before {
-			width: .75em;
-			height: 3em;
-			left: 1em;
-			top: 1em;
+			width: .75rem;
+			height: 3rem;
+			left: 1rem;
+			top: 1rem;
 		}
 		&::after {
-			width: 3em;
-			height: .75em;
-			left: 1em;
-			bottom: 1em;
+			width: 3rem;
+			height: .75rem;
+			left: 1rem;
+			bottom: 1rem;
 		}
 	}
-	.fc_embed:hover & {
+	.fc_embed:hover &, .fc_embed.fc_active & {
 		&[data-id='backstory'] {
 			top: 0;
 			left: 0;
@@ -130,31 +133,46 @@ $darkest: #000000;
 	}
 }
 .fc_panel {
-	width: calc(100% - 3.2em);
-	height: calc(100% - 3.2em);
+	width: calc(100% - 3.5em);
+	height: calc(100% - 3.5em);
 	position: absolute;
-	top: 1.7em;
-	left: 1.7em;
+	top: 1.75rem;
+	left: 1.75rem;
 	z-index: 2;
 	opacity: 0;
-	border-radius: 3px;
+	// border-radius: 3px;
 	background-color: $lightest;
-	box-shadow: 0 0 120px 30px rgba($darkest, .4);
 	visibility: hidden;
 	pointer-events: none;
 	overflow-y: auto;
 	transition: all 100ms ease-in-out;
-	.fc_panel_row {
-		padding: 1em;
-    border-bottom: 1px solid $medium;
-    box-shadow: 0 2px 1px -2px rgba($medium,.8);
+	.fc_row {
+		padding: 1rem;
+		border-bottom: 1px solid $medium;
+		box-shadow: 0 2px 1px -2px rgba($medium,.8);
 	}
-	strong {
+	.fc_label {
+		font-weight: bold;
+		color: $medium;
 		text-transform: uppercase;
 	}
 	.fc_grid {
-		column-count: 4;
-    column-gap: 1em;
+		column-count: 2;
+		column-gap: .5rem;
+		.fc_image {
+			width: 100%;
+			margin: 0 0 .5rem;
+			display: inline-table;
+			box-sizing: border-box;
+			border-radius: 3px;
+		}
+		img {
+			width: 100%;
+			display: table;
+		}
+	}
+	.fc_embed.fc_active & {
+		transition: none;
 	}
 	&.fc_active {
 		opacity: 1;

@@ -4,6 +4,7 @@ const env = require('yargs').argv.env;
 const pkg = require('./package.json');
 const autoprefixer = require('autoprefixer');
 const svgo = require('svgo-loader');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 let mode;
@@ -12,10 +13,12 @@ const libraryName = 'FourCorners'
 
 if (env === 'build') {
 	mode = 'production';
-	outputFile = fileName + '.min.js';
+	outputJS = fileName + '.min.js';
+	outputCSS = 'four-corners.min.css';
 } else {
 	mode = 'development';
-	outputFile = fileName + '.js';
+	outputJS = fileName + '.js';
+	outputCSS = 'four-corners.css';
 }
 
 var config = {
@@ -25,7 +28,7 @@ var config = {
 	devtool: 'source-map',
 	output: {
 		path: __dirname + '/dist',
-		filename: outputFile,
+		filename: outputJS,
 		library: libraryName,
 		libraryTarget: 'umd',
 		umdNamedDefine: true
@@ -78,13 +81,14 @@ var config = {
 	},
 	plugins: [
 		new MiniCssExtractPlugin({
-			filename: 'four-corners.css',
+			filename: outputCSS,
 			chunkFilename: '[id].css'
 		})
 	],
 	optimization: {
 		minimizer: [
-			new OptimizeCSSAssetsPlugin({})
+			new OptimizeCSSAssetsPlugin({}),
+			new UglifyJsPlugin()
 		]
 	}
 };

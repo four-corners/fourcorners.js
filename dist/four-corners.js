@@ -12917,14 +12917,6 @@ function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = 
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 
@@ -12958,25 +12950,16 @@ var initEmbed = function initEmbed(inst) {
 
   if (!embed) {
     return;
-  } // embed = addStyles(embed, {
-  // 	position: 'relative',
-  // 	overflow: 'hidden'
-  // });
-
+  }
 
   return embed;
 };
 
 var addPhoto = function addPhoto(inst) {
-  var imgSrc = inst.data.image.src;
+  var imgSrc = inst.data.img;
   var img = document.createElement('img');
-  img.classList.add(fc('photo'));
-  img.src = imgSrc; // img = addStyles(img, {
-  // 	width: '100%',
-  // 	height: 'auto',
-  // 	display: 'table'
-  // });
-
+  img.classList.add('fc_photo');
+  img.src = imgSrc;
   inst.elems.embed.appendChild(img);
   return img;
 };
@@ -12985,46 +12968,34 @@ var addPanels = function addPanels(inst) {
   var panels = {};
   var embed = inst.elems.embed;
   inst.corners.forEach(function (id, i) {
-    var _panel$classList, _panelInner$classList;
-
     var panel = document.createElement('div');
-
-    (_panel$classList = panel.classList).add.apply(_panel$classList, _toConsumableArray(fc('panel')));
-
-    panel.dataset.id = id; // const margin = parseInt(inst.opts.cornerSize)*2
-    // const len = 'calc(100% - '+margin+'px)';
-    // let panelStyles = {
-    // 	width: len,
-    // 	height: len,
-    // 	position: 'absolute',
-    // 	top: inst.opts.cornerSize,
-    // 	left: inst.opts.cornerSize,
-    // 	zIndex: '2',
-    // 	backgroundColor: 'white',
-    // 	display: 'none',
-    // 	opacity: 0,
-    // };
-    // panel = addStyles(panel, panelStyles);
-
-    var data = inst.data[id]; // let panelInner = '';
-
+    panel.classList.add('fc_panel');
+    panel.dataset.id = id;
+    var data = inst.data[id];
     var panelInner = document.createElement('div');
-
-    (_panelInner$classList = panelInner.classList).add.apply(_panelInner$classList, _toConsumableArray(fc('panel_inner')));
-
+    panelInner.classList.add('fc_inner');
     Object.entries(data).forEach(function (_ref) {
-      var _panelRow$classList;
-
       var _ref2 = _slicedToArray(_ref, 2),
           prop = _ref2[0],
           val = _ref2[1];
 
-      var panelRow = document.createElement('div');
+      var row = document.createElement('div');
+      row.className = 'fc_row';
+      var label = document.createElement('div');
+      label.className = 'fc_label';
+      label.innerHTML = prop;
+      row.appendChild(label);
 
-      (_panelRow$classList = panelRow.classList).add.apply(_panelRow$classList, _toConsumableArray(fc('panel_row')));
+      if (id == 'media') {
+        row.append(addMedia(val));
+      } else if (id == 'links') {
+        row.append(addLinks(val));
+      } else {
+        val = wrapUrls(val);
+        row.innerHTML += val;
+      }
 
-      panelRow.innerHTML = "<strong>".concat(prop, "</strong>&nbsp;<span>").concat(val, "</span>");
-      panelInner.appendChild(panelRow); // panelInner += `<div><strong>${prop}</strong>&nbsp;<span>${val}</span></div>`;
+      panelInner.appendChild(row);
     });
     panel.appendChild(panelInner);
     embed.appendChild(panel);
@@ -13033,83 +13004,34 @@ var addPanels = function addPanels(inst) {
   return panels;
 };
 
+var addMedia = function addMedia(arr) {
+  var grid = document.createElement('div');
+  grid.className = 'fc_grid';
+  arr.forEach(function (obj, index) {
+    if (obj.type == 'image') {
+      var image = document.createElement('div');
+      image.className = 'fc_image';
+      var img = document.createElement('img');
+      img.src = obj.url;
+      image.appendChild(img);
+      grid.appendChild(image);
+    }
+  });
+  return grid;
+};
+
+var addLinks = function addLinks(arr) {};
+
 var addCorners = function addCorners(inst) {
   var corners = {};
   var embed = inst.elems.embed;
   var cornerStroke = inst.opts.cornerStroke;
   var cornerSize = inst.opts.cornerSize;
-  var cornerMargin = inst.opts.cornerMargin; // inst.css = {
-  // 	'backstory': {
-  // 		// edges: ['top','left'],
-  // 		borderWidth: [cornerStroke,0,0,cornerStroke],
-  // 		origin: {
-  // 			top: '-'+cornerSize,
-  // 			left: '-'+cornerSize
-  // 		},
-  // 		hover: {
-  // 			top: cornerMargin,
-  // 			left: cornerMargin
-  // 		}
-  // 	},
-  // 	'copyright': {
-  // 		// edges: ['top','right'],
-  // 		borderWidth: [cornerStroke,cornerStroke,0,0],
-  // 		origin: {
-  // 			top: '-'+cornerSize,
-  // 			right: '-'+cornerSize
-  // 		},
-  // 		hover: {
-  // 			top: cornerMargin,
-  // 			right: cornerMargin
-  // 		}
-  // 	},
-  // 	'media': {
-  // 		// edges: ['bottom','right'],
-  // 		borderWidth: [0,cornerStroke,cornerStroke,0],
-  // 		origin: {
-  // 			bottom: '-'+cornerSize,
-  // 			right: '-'+cornerSize
-  // 		},
-  // 		hover: {
-  // 			bottom: cornerMargin,
-  // 			right: cornerMargin
-  // 		}
-  // 	},
-  // 	'links': {
-  // 		// edges: ['bottom','left'],
-  // 		borderWidth: [0,0,cornerStroke,cornerStroke],
-  // 		origin: {
-  // 			bottom: '-'+cornerSize,
-  // 			left: '-'+cornerSize
-  // 		},
-  // 		hover: {
-  // 			bottom: cornerMargin,
-  // 			left: cornerMargin
-  // 		}
-  // 	}
-  // };
-
+  var cornerMargin = inst.opts.cornerMargin;
   inst.corners.forEach(function (id, i) {
-    var _corner$classList;
-
-    // let cssClone = Object.assign({},inst.css[id]);
     var corner = document.createElement('div');
-
-    (_corner$classList = corner.classList).add.apply(_corner$classList, _toConsumableArray(fc('corner')));
-
-    corner.dataset.id = id; // let cornerStyles = {
-    // 	width: cornerSize,
-    // 	height: cornerSize,
-    // 	position: 'absolute',
-    // 	zIndex: '3',
-    // 	borderStyle: 'solid',
-    // 	borderColor: inst.opts.cornerColor
-    // };
-    // const originClone = Object.assign({}, cssClone.origin);
-    // Object.assign(cornerStyles, originClone);
-    // cornerStyles['borderWidth'] = cssClone.borderWidth.join(' ');
-    // corner = addStyles(corner, cornerStyles);
-
+    corner.classList.add('fc_corner');
+    corner.dataset.id = id;
     embed.addEventListener('mouseenter', function (e) {
       hoverEmbed(e, inst);
     });
@@ -13132,8 +13054,14 @@ var addCorners = function addCorners(inst) {
 };
 
 var parseData = function parseData(inst) {
-  var stringData = inst.elems.embed.dataset.json.replace(/(\')/g, '"');
-  delete inst.elems.embed.dataset.json;
+  var stringData = inst.elems.embed.dataset.fc;
+
+  if (!stringData) {
+    return;
+  }
+
+  stringData = stringData.replace(/(\')/g, '"');
+  delete inst.elems.embed.dataset.fc;
   return JSON.parse(stringData);
 };
 
@@ -13141,106 +13069,54 @@ var hoverEmbed = function hoverEmbed(e, inst) {
   var embed = inst.elems.embed;
   var corners = inst.elems.corners;
   var css = inst.css;
-  var posDur = inst.opts.posDur; // Object.entries(corners).forEach(([id, corner]) => {
-  // 	TweenMax.to(corner, posDur, css[id].hover);
-  // });
+  var posDur = inst.opts.posDur;
 };
 
 var unhoverEmbed = function unhoverEmbed(e, inst) {
   var embed = inst.elems.embed;
   var corners = inst.elems.corners;
   var css = inst.css;
-  var posDur = inst.opts.posDur; // Object.entries(corners).forEach(([id, corner]) => {
-  // 	TweenMax.to(corner, inst.opts.posDur, css[id].origin);
-  // });
+  var posDur = inst.opts.posDur;
 };
 
 var hoverCorner = function hoverCorner(e, inst) {
   var corner = e.target;
-  corner.classList.add(fc('hover')); // corner = addStyles(corner, {cursor: 'pointer'});
-  // const transDur = inst.opts.transDur;
-  // let cornerColor = '';
-  // if(corner.classList.contains(fc('active'))) {
-  // 	cornerColor = inst.opts.cornerColor;
-  // } else {
-  // 	cornerColor = inst.opts.cornerHoverColor;
-  // }
-  // cornerColor = inst.opts.cornerHoverColor;
-  // TweenMax.to(corner, transDur, {
-  // 	borderColor: cornerColor
-  // });
+  corner.classList.add('fc_hover');
 };
 
 var unhoverCorner = function unhoverCorner(e, inst) {
   var corner = e.target;
-  corner.classList.remove(fc('hover')); // corner = addStyles(corner, {cursor: ''});
-  // let transDur = inst.opts.transDur;;
-  // let cornerColor = '';
-  // cornerColor = '';
-  // if(corner.classList.contains(fc('active'))) {
-  // 	cornerColor = inst.opts.cornerActiveColor;
-  // } else {
-  // 	cornerColor = inst.opts.cornerColor;
-  // }
-  // TweenMax.to(corner, transDur, {
-  // 	borderColor: cornerColor
-  // });
+  corner.classList.remove('fc_hover');
 };
 
 var clickCorner = function clickCorner(e, inst) {
   var corner = e.target;
   var id = corner.dataset.id;
-  var isActive = corner.classList.contains(fc('active')); // const transDur = inst.opts.transDur;
-  // let cornerColor = '';
+  var panel = inst.elems.panels[id];
+  corner.classList.toggle('fc_active');
+  panel.classList.toggle('fc_active');
+  var otherPanelSelector = '.fc_panel.fc_active:not([data-id="' + id + '"])';
+  var otherPanel = document.querySelector(otherPanelSelector);
 
-  var activePanelSelector = '.' + fc('panel') + '.' + fc('active');
-  var activePanel = document.querySelector(activePanelSelector);
-
-  if (activePanel) {
-    activePanel.classList.remove(fc('active')); // TweenMax.to(activePanel, transDur, {
-    // 	opacity: 0,
-    // 	onComplete: () => {
-    // 		activePanel = addStyles(activePanel, {display:'none'});
-    // 	}
-    // });
+  if (otherPanel) {
+    otherPanel.classList.remove('fc_active');
   }
 
-  var activeCornerSelector = '.' + fc('corner') + '.' + fc('active');
+  var otherCornerSelector = '.fc_corner.fc_active:not([data-id="' + id + '"])';
+  var otherCorner = document.querySelector(otherCornerSelector);
+
+  if (otherCorner) {
+    otherCorner.classList.remove('fc_active');
+  }
+
+  var activeCornerSelector = '.fc_corner.fc_active';
   var activeCorner = document.querySelector(activeCornerSelector);
 
   if (activeCorner) {
-    activeCorner.classList.remove(fc('active')); // TweenMax.to(activeCorner, transDur, {
-    // 	borderColor: inst.opts.cornerColor,
-    // });
+    inst.elems.embed.classList.add('fc_active');
+  } else {
+    inst.elems.embed.classList.remove('fc_active');
   }
-
-  if (isActive) {
-    return;
-  }
-
-  corner.classList.toggle(fc('active')); // if(corner.classList.contains(fc('active'))) {
-  // 	cornerColor = inst.opts.cornerActiveColor;
-  // } else {
-  // 	cornerColor = inst.opts.cornerColor;
-  // }
-  // TweenMax.to(corner, transDur, {
-  // 	borderColor: cornerColor
-  // });
-
-  var panel = inst.elems.panels[id];
-  panel.classList.toggle(fc('active')); // if(corner.classList.contains(fc('active'))) {
-  // 	panel = addStyles(panel, {display:'block'});
-  // 	TweenMax.to(panel, transDur, {
-  // 		opacity: 1
-  // 	});
-  // } else {
-  // 	TweenMax.to(panel, transDur, {
-  // 		opacity: 0,
-  // 		onComplete: () => {
-  // 			panel = addStyles(panel, {display:'none'});
-  // 		}
-  // 	});
-  // }
 };
 
 var addStyles = function addStyles(elem, styles) {
@@ -13267,6 +13143,15 @@ var fc = function fc(input) {
     output[i] = ns + '_' + str;
   });
   return output;
+};
+
+var wrapUrls = function wrapUrls(str) {
+  var urlPattern = /(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}\-\x{ffff}]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?/ig;
+  return str.replace(urlPattern, function (url) {
+    var protocol_pattern = /^(?:(?:https?|ftp):\/\/)/i;
+    var href = protocol_pattern.test(url) ? url : 'http://' + url;
+    return '<a href="' + href + '" target="_blank">' + url + '</a>';
+  });
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (FourCorners);
