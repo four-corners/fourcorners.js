@@ -2,8 +2,21 @@ import {TweenMax} from 'gsap/all';
 
 class FourCorners {
 
-	constructor(userOptions) {
-		const defaultOptions = {
+	constructor(embed, opts) {
+		this.elems = {};
+		this.opts = opts;
+		this.corners = ['backstory','copyright','media','links'];
+		this.elems.embed = embed;
+		this.data = parseData(this);
+		this.elems.photo = addPhoto(this);
+		this.elems.panels = addPanels(this);
+		this.elems.corners = addCorners(this);
+	}
+
+	// const init = () => {
+	init(userOpts) {
+		window.FOURCORNERS = [];
+		const defaultOpts = {
 			selector: '.fc_embed',
 			cornerStroke: '6px',
 			cornerSize: '25px',
@@ -13,18 +26,16 @@ class FourCorners {
 			posDur: 0.2,
 			transDur: 0.1,
 		};
-		this.elems = {};
-		this.opts = Object.assign(defaultOptions, userOptions);
-		this.opts.cornerMargin = parseInt(this.opts.cornerSize)/2+'px'
-		this.corners = ['backstory','copyright','media','links'];
-		this.elems.embed = initEmbed(this);
-		this.data = parseData(this);
-		this.elems.photo = addPhoto(this);
-		this.elems.panels = addPanels(this);
-		this.elems.corners = addCorners(this);
+		const opts = Object.assign(defaultOpts, userOpts);
+		const embeds = Array.from(document.querySelectorAll(opts.selector));
+		embeds.forEach(function(embed, i) {
+			const inst = new FourCorners(embed, opts);
+			FOURCORNERS.push(inst);
+		});
 	}
 
 }
+
 
 const initEmbed = (inst) => {
 	let embed = document.querySelector(inst.opts.selector);

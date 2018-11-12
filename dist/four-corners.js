@@ -12919,31 +12919,54 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
-var FourCorners = function FourCorners(userOptions) {
-  _classCallCheck(this, FourCorners);
 
-  var defaultOptions = {
-    selector: '.fc_embed',
-    cornerStroke: '6px',
-    cornerSize: '25px',
-    cornerColor: 'white',
-    cornerActiveColor: 'blue',
-    cornerHoverColor: 'red',
-    posDur: 0.2,
-    transDur: 0.1
-  };
-  this.elems = {};
-  this.opts = Object.assign(defaultOptions, userOptions);
-  this.opts.cornerMargin = parseInt(this.opts.cornerSize) / 2 + 'px';
-  this.corners = ['backstory', 'copyright', 'media', 'links'];
-  this.elems.embed = initEmbed(this);
-  this.data = parseData(this);
-  this.elems.photo = addPhoto(this);
-  this.elems.panels = addPanels(this);
-  this.elems.corners = addCorners(this);
-};
+var FourCorners =
+/*#__PURE__*/
+function () {
+  function FourCorners(embed, opts) {
+    _classCallCheck(this, FourCorners);
+
+    this.elems = {};
+    this.opts = opts;
+    this.corners = ['backstory', 'copyright', 'media', 'links'];
+    this.elems.embed = embed;
+    this.data = parseData(this);
+    this.elems.photo = addPhoto(this);
+    this.elems.panels = addPanels(this);
+    this.elems.corners = addCorners(this);
+  } // const init = () => {
+
+
+  _createClass(FourCorners, [{
+    key: "init",
+    value: function init(userOpts) {
+      window.FOURCORNERS = [];
+      var defaultOpts = {
+        selector: '.fc_embed',
+        cornerStroke: '6px',
+        cornerSize: '25px',
+        cornerColor: 'white',
+        cornerActiveColor: 'blue',
+        cornerHoverColor: 'red',
+        posDur: 0.2,
+        transDur: 0.1
+      };
+      var opts = Object.assign(defaultOpts, userOpts);
+      var embeds = Array.from(document.querySelectorAll(opts.selector));
+      embeds.forEach(function (embed, i) {
+        var inst = new FourCorners(embed, opts);
+        FOURCORNERS.push(inst);
+      });
+    }
+  }]);
+
+  return FourCorners;
+}();
 
 var initEmbed = function initEmbed(inst) {
   var embed = document.querySelector(inst.opts.selector);
