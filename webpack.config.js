@@ -7,12 +7,13 @@ const svgo = require('svgo-loader');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-let mode;
+let mode, devtool, outputJS, outputCSS;
 let fileName = pkg.name;
 const libraryName = 'FourCorners'
 
 if (env === 'build') {
 	mode = 'production';
+	devtool = 'source-map';
 	outputJS = fileName + '.min.js';
 	outputCSS = 'four-corners.min.css';
 } else {
@@ -21,11 +22,11 @@ if (env === 'build') {
 	outputCSS = 'four-corners.css';
 }
 
-var config = {
+const config = {
 	mode: mode,
 	// entry: [__dirname + '/index.js', __dirname + '/src/styles.scss'],
 	entry: [__dirname + '/index.js'],
-	devtool: 'source-map',
+	devtool: devtool,
 	output: {
 		path: __dirname + '/dist',
 		filename: outputJS,

@@ -1,23 +1,21 @@
-import {TweenMax} from 'gsap/all';
-
 class FourCorners {
 
 	constructor(embed, opts) {
 		this.elems = {};
 		this.opts = opts;
-		this.corners = ['backstory','copyright','media','links'];
+		this.corners = ['context','links','copyright','backstory'];
 		this.elems.embed = embed;
+		this.elems.embed.classList.add('fc-init');
 		this.data = parseData(this);
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
 		this.elems.corners = addCorners(this);
 	}
 
-	// const init = () => {
 	init(userOpts) {
 		window.FOURCORNERS = [];
 		const defaultOpts = {
-			selector: '.fc_embed',
+			selector: '.fc-embed:not(.fc-init)',
 			cornerStroke: '6px',
 			cornerSize: '25px',
 			cornerColor: 'white',
@@ -30,10 +28,43 @@ class FourCorners {
 		const embeds = Array.from(document.querySelectorAll(opts.selector));
 		embeds.forEach(function(embed, i) {
 			const inst = new FourCorners(embed, opts);
-			FOURCORNERS.push(inst);
+			window.FOURCORNERS.push(inst);
+		});
+		return window.FOURCORNERS;
+	}
+
+	openCorner(slug) {
+		const inst = this;
+		const corners = this.corners;
+		const embed = this.elems.embed;
+		const corner = this.elems.corners[slug];
+		const panel = this.elems.panels[slug];
+		if(corner && panel) {
+			embed.dataset.active = slug;
+			embed.classList.add('fc-active');
+			corner.classList.add('fc-active');
+			panel.classList.add('fc-active');
+		}
+		corners.forEach(function(_slug, i) {
+			if(_slug!=slug) {
+				inst.closeCorner(_slug);
+			}
 		});
 	}
 
+	closeCorner(slug) {
+		const inst = this;
+		const embed = inst.elems.embed;
+		if(!slug) { slug = embed.data.active; }
+		const corner = inst.elems.corners[slug];
+		const panel = inst.elems.panels[slug];
+		if(slug==embed.dataset.active) {
+			embed.dataset.active = '';
+			embed.classList.remove('fc-active');
+		}
+		if(corner){ corner.classList.remove('fc-active'); }
+		if(panel) { panel.classList.remove('fc-active'); }
+	}
 }
 
 
@@ -44,9 +75,10 @@ const initEmbed = (inst) => {
 }
 
 const addPhoto = (inst)  => {
+	if(!inst.data){return}
 	const imgSrc = inst.data.img;
 	let img = document.createElement('img');
-	img.classList.add('fc_photo');
+	img.classList.add('fc-photo');
 	img.src = imgSrc;
 	inst.elems.embed.appendChild(img);
 	return img;
@@ -55,69 +87,115 @@ const addPhoto = (inst)  => {
 const addPanels = (inst) => {
 	let panels = {};
 	let embed = inst.elems.embed;
-	inst.corners.forEach(function(id, i) {
-		let panel = document.createElement('div');
-		panel.classList.add('fc_panel');
-		panel.dataset.id = id;
-		const data = inst.data[id];
-		let panelInner = document.createElement('div');
-		panelInner.classList.add('fc_inner');
-		Object.entries(data).forEach(([prop, val]) => {
-			let row = document.createElement('div');
-			row.className = 'fc_row';
-			let label = document.createElement('div');
-			label.className = 'fc_label';
-			label.innerHTML = prop;
-			row.appendChild(label);
-
-			if(id == 'media') {
-				row.append(addMedia(val));
-			} else if(id == 'links') {
-				row.append(addLinks(val));
-			} else {
-				val = wrapUrls(val);
-				row.innerHTML += val;
+	inst.corners.forEach(function(slug, i) {
+		let panel = '';
+		const panelSelector = '.fc-panel[data-slug="'+slug+'"]';
+		if(!embed.querySelector(panelSelector)) {
+			panel = document.createElement('div');
+			panel.classList.add('fc-panel');
+			panel.dataset.slug = slug;
+			let panelInner = document.createElement('div');
+			panelInner.classList.add('fc-inner');
+			let panelTitle = document.createElement('div');
+			panelTitle.classList.add('fc-panel-title');
+			panelTitle.innerHTML = slug;
+			panel.appendChild(panelTitle);
+			if(inst.data) {
+				const data = inst.data[slug];
+				Object.entries(data).forEach(([prop, val]) => {
+					if(!val){return}
+					let row = document.createElement('div');
+					row.className = 'fc-row';
+					if(!['media','links'].includes(prop)) {
+						let label = document.createElement('div');
+						label.className = 'fc-label';
+						label.innerHTML = prop;
+						row.appendChild(label);
+					}
+					if(prop == 'media') {
+						row.append(addMedia(val));
+					} else if(prop == 'links') {
+						row.append(addLinks(val));
+					} else {
+						val = wrapUrls(val);
+						row.innerHTML += val;
+					}
+					panelInner.appendChild(row);
+				});
 			}
-			panelInner.appendChild(row);
-		});
-		panel.appendChild(panelInner);
-		embed.appendChild(panel);
-		panels[id] = panel;
+			panel.appendChild(panelInner);
+			embed.appendChild(panel);
+		} else {
+			panel = embed.querySelector(panelSelector);
+		}
+		panels[slug] = panel;
 	});
 	return panels;
 }
 
 const addMedia = (arr) => {
-	let grid = document.createElement('div');
-	grid.className = 'fc_grid';
+	let subRows = document.createElement('div');
+	subRows.className = 'fc-sub-rows';
 	arr.forEach(function(obj, index) {
+		let subRow = document.createElement('div');
+		subRow.className = 'fc-sub-row';
 		if(obj.type == 'image') {
-			let image = document.createElement('div');
-			image.className = 'fc_image';
 			let img = document.createElement('img');
 			img.src = obj.url;
-			image.appendChild(img)
-			grid.appendChild(image);
+			subRow.appendChild(img);
+		} else if(obj.type == 'youtube') {
+			let iframe = '<iframe src="'+obj.url+'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+			subRow.innerHTML = iframe;
 		}
+		if(obj.credit) {
+			let credit = document.createElement('div');
+			credit.className = 'fc-credit';
+			credit.innerHTML = obj.credit;
+			subRow.appendChild(credit);
+		}
+		subRows.appendChild(subRow);
 	});
-	return grid;
+	return subRows;
 }
 
 const addLinks = (arr) => {
-
+	let subRows = document.createElement('div');
+	subRows.className = 'fc-sub-rows';
+	arr.forEach(function(obj, index) {
+		let subRow = document.createElement('a');
+		subRow.className = 'fc-sub-row';
+		subRow.href = obj.url;
+		subRow.target = '_blank'
+		if(obj.title) {
+			let title = document.createElement('div');
+			title.className = 'fc-sub-title';
+			title.innerHTML = obj.title;
+			subRow.appendChild(title);
+		}
+		if(obj.url) {
+			let url = document.createElement('div');
+			url.className = 'fc-sub-url';
+			url.innerHTML = obj.url;
+			subRow.appendChild(url);
+		}
+		subRows.appendChild(subRow);
+	});
+	return subRows;
 }
 
 
 const addCorners = (inst) => {
 	let corners = {};
 	let embed = inst.elems.embed;
-	let cornerStroke = inst.opts.cornerStroke;
-	let cornerSize = inst.opts.cornerSize;
-	let cornerMargin = inst.opts.cornerMargin;
-	inst.corners.forEach(function(id, i) {
+	// let cornerStroke = inst.opts.cornerStroke;
+	// let cornerSize = inst.opts.cornerSize;
+	// let cornerMargin = inst.opts.cornerMargin;
+	inst.corners.forEach(function(slug, i) {
+		const cornerSelector = '.fc-corner[data-slug="'+slug+'"]';
+		if(embed.querySelector(cornerSelector)) {return;}
 		let corner = document.createElement('div');
-		corner.classList.add('fc_corner');
-		corner.dataset.id = id;
+		corner.classList.add('fc-corner');
+		corner.dataset.slug = slug;
 		embed.addEventListener('mouseenter', function(e) {
 			hoverEmbed(e, inst);
 		});
@@ -133,7 +211,7 @@ const addCorners = (inst) => {
 		corner.addEventListener('click', function(e) {
 			clickCorner(e, inst);
 		});
-		corners[id] = corner;
+		corners[slug] = corner;
 		embed.appendChild(corner);
 	});
 
@@ -164,39 +242,25 @@ const unhoverEmbed = (e, inst) => {
 
 const hoverCorner = (e, inst) => {
 	let corner = e.target;
-	corner.classList.add('fc_hover');
+	corner.classList.add('fc-hover');
 }
 
 const unhoverCorner = (e, inst) => {
 	let corner = e.target;
-	corner.classList.remove('fc_hover');
+	corner.classList.remove('fc-hover');
 }
 
 const clickCorner = (e, inst) => {
 	let corner = e.target;
-	const id = corner.dataset.id;
-	let panel = inst.elems.panels[id];
-	
-	corner.classList.toggle('fc_active');
-	panel.classList.toggle('fc_active');	
-
-	const otherPanelSelector = '.fc_panel.fc_active:not([data-id="'+id+'"])';
-	let otherPanel = document.querySelector(otherPanelSelector);
-	if(otherPanel) {
-		otherPanel.classList.remove('fc_active');
-	}
-	const otherCornerSelector = '.fc_corner.fc_active:not([data-id="'+id+'"])';
-	let otherCorner = document.querySelector(otherCornerSelector);
-	if(otherCorner) {
-		otherCorner.classList.remove('fc_active');
-	}
-	const activeCornerSelector = '.fc_corner.fc_active';
-	let activeCorner = document.querySelector(activeCornerSelector);
-	if(activeCorner) {
-		inst.elems.embed.classList.add('fc_active');
+	let slug = corner.dataset.slug;
+	const active = inst.elems.embed.dataset.active;
+	if(!slug) {return}	
+	if(slug==active) {
+		inst.closeCorner(slug);	
 	} else {
-		inst.elems.embed.classList.remove('fc_active');
+		inst.openCorner(slug);
 	}
+	
 }
 
 
