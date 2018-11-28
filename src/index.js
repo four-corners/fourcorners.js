@@ -55,7 +55,9 @@ class FourCorners {
 	closeCorner(slug) {
 		const inst = this;
 		const embed = inst.elems.embed;
-		if(!slug) { slug = embed.data.active; }
+		if(!slug) {
+			slug = embed.dataset.active;
+		}
 		const corner = inst.elems.corners[slug];
 		const panel = inst.elems.panels[slug];
 		if(slug==embed.dataset.active) {
@@ -187,6 +189,7 @@ const addLinks = (arr) => {
 const addCorners = (inst) => {
 	let corners = {};
 	let embed = inst.elems.embed;
+	let photo = inst.elems.photo;
 	// let cornerStroke = inst.opts.cornerStroke;
 	// let cornerSize = inst.opts.cornerSize;
 	// let cornerMargin = inst.opts.cornerMargin;
@@ -210,6 +213,9 @@ const addCorners = (inst) => {
 		});
 		corner.addEventListener('click', function(e) {
 			clickCorner(e, inst);
+		});
+		photo.addEventListener('click', function(e) {
+			clickPhoto(e, inst);
 		});
 		corners[slug] = corner;
 		embed.appendChild(corner);
@@ -259,10 +265,12 @@ const clickCorner = (e, inst) => {
 		inst.closeCorner(slug);	
 	} else {
 		inst.openCorner(slug);
-	}
-	
+	}	
 }
 
+const clickPhoto = (e, inst) => {
+	inst.closeCorner();
+}
 
 const addStyles = (elem, styles) => {
 	Object.entries(styles).forEach(([prop, val]) => {
