@@ -1,6 +1,7 @@
 class FourCorners {
 
 	constructor(embed, opts) {
+		console.log(embed);
 		this.elems = {};
 		this.opts = opts;
 		this.corners = ['context','links','copyright','backstory'];
@@ -27,6 +28,7 @@ class FourCorners {
 		};
 		const opts = Object.assign(defaultOpts, userOpts);
 		const embeds = Array.from(document.querySelectorAll(opts.selector));
+		console.log(document.querySelectorAll('.fc-embed'));
 		embeds.forEach(function(embed, i) {
 			const inst = new FourCorners(embed, opts);
 			proto.embeds.push(inst);
@@ -286,7 +288,7 @@ const addCorners = (inst) => {
 const parseData = (inst) => {
 	let stringData = inst.elems.embed.dataset.fc;
 	if(!stringData){return}
-	stringData = stringData.replace(/(\')/g,'"');
+	stringData = stringData;
 	delete inst.elems.embed.dataset.fc;
 	return JSON.parse(stringData);
 }

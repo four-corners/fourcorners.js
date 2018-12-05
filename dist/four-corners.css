@@ -159,7 +159,8 @@
     font-weight: bold;
     text-transform: capitalize; }
   .fc-panel .fc-value {
-    display: inline; }
+    display: inline;
+    white-space: pre-line; }
   .fc-panel .fc-sub-rows {
     margin: 2% 0 0; }
     .fc-panel .fc-sub-rows .fc-sub-row {
