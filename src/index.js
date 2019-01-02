@@ -1,16 +1,16 @@
 class FourCorners {
 
 	constructor(embed, opts) {
-		console.log(embed);
 		this.elems = {};
 		this.opts = opts;
-		this.corners = ['context','links','copyright','backstory'];
+		this.corners = ['context','links','authorship','backstory'];
 		this.elems.embed = embed;
 		this.elems.embed.classList.add('fc-init');
 		this.data = parseData(this);
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
 		this.elems.corners = addCorners(this);
+		initEmbed(this);
 	}
 
 	init(userOpts) {
@@ -18,6 +18,8 @@ class FourCorners {
 		proto.embeds = [];
 		const defaultOpts = {
 			selector: '.fc-embed:not(.fc-init)',
+			noPanels: false,
+			noCorners: false,
 			cornerStroke: '6px',
 			cornerSize: '25px',
 			cornerColor: 'white',
@@ -28,7 +30,6 @@ class FourCorners {
 		};
 		const opts = Object.assign(defaultOpts, userOpts);
 		const embeds = Array.from(document.querySelectorAll(opts.selector));
-		console.log(document.querySelectorAll('.fc-embed'));
 		embeds.forEach(function(embed, i) {
 			const inst = new FourCorners(embed, opts);
 			proto.embeds.push(inst);
@@ -74,9 +75,50 @@ class FourCorners {
 
 
 const initEmbed = (inst) => {
-	let embed = document.querySelector(inst.opts.selector);
-	if(!embed){return}
-	return embed;
+	const embed = inst.elems.embed;
+	// let embed = document.querySelector(inst.opts.selector);
+	// if(inst.data.dark){embed.classList('fc-dark')}
+	// if(!embed){return}
+	// return embed;
+
+
+	embed.addEventListener('mouseenter', function(e) {
+		hoverEmbed(e, inst);
+	});
+	embed.addEventListener('mouseleave', function(e) {
+		unhoverEmbed(e, inst);
+	});
+
+	window.addEventListener('resize', function(e) {
+		resizeEmbed(e, inst);
+	});
+
+	window.addEventListener('click', function(e) {
+		const onPanels = isChildOf(e.target, inst.elems.panels);
+		const onCorners = isChildOf(e.target, inst.elems.corners);
+		const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
+		if(!onPanels && !onCorners && !inCreator) {
+			inst.closeCorner();
+		}
+	});
+
+	resizeEmbed(null, inst);
+}
+
+const resizeEmbed = (e, inst) => {
+	const panels = inst.elems.panels;
+	Object.keys(panels).forEach(function(slug, i) {
+		resizePanel(panels[slug]);
+	});
+}
+
+const resizePanel = (panel) => {
+	const panelScroll = panel.querySelector('.fc-scroll');
+	if( panelScroll.scrollHeight > panelScroll.clientHeight ) {
+		panel.classList.add('fc-overflow');
+	} else {
+		panel.classList.remove('fc-overflow');
+	}
 }
 
 const addPhoto = (inst)  => {
@@ -110,42 +152,38 @@ const addPanels = (inst) => {
 	let panels = {};
 	let embed = inst.elems.embed;
 	inst.corners.forEach(function(slug, i) {
-		let panel = '';
+		const data = inst.data[slug];
+		if(!data||!Object.keys(data).length) {return}
+		let panel;
 		const panelSelector = '.fc-panel[data-slug="'+slug+'"]';
 		if(!embed.querySelector(panelSelector)) {
 			panel = document.createElement('div');
 			panel.classList.add('fc-panel');
 			panel.dataset.slug = slug;
+			let panelScroll = document.createElement('div');
+			panelScroll.classList.add('fc-scroll');
 			let panelInner = document.createElement('div');
 			panelInner.classList.add('fc-inner');
 			let panelTitle = document.createElement('div');
 			panelTitle.classList.add('fc-panel-title');
+			panelInner.appendChild(panelTitle);
 			panelTitle.innerHTML = slug;
-			panel.appendChild(panelTitle);
-			if(inst.data) {
-				const data = inst.data[slug];
-				Object.entries(data).forEach(([prop, val]) => {
-					if(!val){return}
-					let row = document.createElement('div');
-					row.classList.add('fc-row', 'fc-'+prop);
-					if(!['media','links'].includes(prop)) {
-						let label = document.createElement('div');
-						label.className = 'fc-label';
-						label.innerHTML = prop;
-						row.appendChild(label);
-					}
-					if(prop == 'media') {
-						row.append(addMedia(val));
-					} else if(prop == 'links') {
-						row.append(addLinks(val));
-					} else {
-						val = wrapUrls(val);
-						row.innerHTML += val;
-					}
-					panelInner.appendChild(row);
-				});
-			}
-			panel.appendChild(panelInner);
+			Object.entries(data).forEach(([prop, val]) => {
+				if(!val){return}
+				let row = document.createElement('div');
+				row.classList.add('fc-row', 'fc-'+prop);
+				if(prop == 'media') {
+					row.append(addMedia(val));
+				} else if(prop == 'links') {
+					row.append(addLinks(val));
+				} else {
+					val = wrapUrls(val);
+					row.innerHTML += val;
+				}
+				panelInner.appendChild(row);
+			});
+			panelScroll.appendChild(panelInner);
+			panel.appendChild(panelScroll);
 			embed.appendChild(panel);
 		} else {
 			panel = embed.querySelector(panelSelector);
@@ -162,11 +200,9 @@ const addMedia = (arr) => {
 		let subRow = document.createElement('div');
 		subRow.className = 'fc-sub-row';
 		if(obj.type == 'image') {
-			let img = document.createElement('img');
-			img.src = obj.url;
-			subRow.appendChild(img);
+			embedImage(obj, subRow)
 		} else {
-			getMediaEmbed(obj, subRow)
+			embedIframe(obj, subRow)
 		}
 		if(obj.credit) {
 			let credit = document.createElement('div');
@@ -179,7 +215,19 @@ const addMedia = (arr) => {
 	return subRows;
 }
 
-const getMediaEmbed = (obj, subRow) => {
+const embedImage = (obj, subRow) => {
+	var mediaWrap = document.createElement('div');
+	mediaWrap.className = 'fc-media';
+	let img = document.createElement('img');
+	img.src = obj.url;
+	console.log(img);
+	mediaWrap.appendChild(img);
+	// subRow.appendChild(mediaWrap);
+	subRow.prepend(mediaWrap);
+}
+
+
+const embedIframe = (obj, subRow) => {
 	let req = '';
 	switch(obj.type) {
 		case 'youtube':
@@ -195,14 +243,20 @@ const getMediaEmbed = (obj, subRow) => {
 			return false;
 			break;
 	}
-	fetch(req)
+	const headers = new Headers();
+	fetch(req, {
+			method: 'GET',
+			headers: headers,
+			mode: 'cors',
+			cache: 'default'
+		})
 		.then(res => {
 			if (!res.ok) {throw Error(res.statusText)}
 			return res.json();
 		})
 		.then(res => {
 			var mediaWrap = document.createElement('div');
-			mediaWrap.className = 'fc-media-wrap';
+			mediaWrap.className = 'fc-media';
 			mediaWrap.innerHTML =  res.html;
 			if(Number.isInteger(res.width,res.height)) {
 				const ratio = res.height/res.width;
@@ -212,6 +266,7 @@ const getMediaEmbed = (obj, subRow) => {
 			subRow.prepend(mediaWrap);
 		})
 		.catch(function(err) {
+			subRow.remove();
 			console.log(err);
 		});
 }
@@ -222,25 +277,60 @@ const addLinks = (arr) => {
 	let subRows = document.createElement('div');
 	subRows.className = 'fc-sub-rows';
 	arr.forEach(function(obj, index) {
-		let subRow = document.createElement('a');
+		let subRow = document.createElement('div');
 		subRow.className = 'fc-sub-row';
-		subRow.href = obj.url;
-		subRow.target = '_blank'
+		let a = document.createElement('a');
+		a.href = obj.url;
+		a.target = '_blank';
 		if(obj.title) {
-			let title = document.createElement('div');
-			title.className = 'fc-sub-title';
-			title.innerHTML = obj.title;
-			subRow.appendChild(title);
+			a.innerHTML = obj.title;
 		}
-		if(obj.url) {
+		subRow.appendChild(a);
+		let rootUrl = extractRootDomain(obj.url);
+		if(rootUrl) {
 			let url = document.createElement('div');
 			url.className = 'fc-sub-url';
-			url.innerHTML = obj.url;
+			url.innerHTML = rootUrl;
 			subRow.appendChild(url);
 		}
 		subRows.appendChild(subRow);
 	});
 	return subRows;
+}
+
+const extractHostname = (url) => {
+  let hostname;
+  if (url.indexOf("//") > -1) {
+    hostname = url.split('/')[2];
+  } else {
+    hostname = url.split('/')[0];
+  }
+  hostname = hostname.split(':')[0];
+  hostname = hostname.split('?')[0];
+  return hostname;
+}
+
+const extractRootDomain = (url)  => {
+	let domain = extractHostname(url);
+	let splitArr = domain.split('.');
+	let arrLen = splitArr.length;
+	if (arrLen > 2) {
+		domain = splitArr[arrLen - 2] + '.' + splitArr[arrLen - 1];
+		if (splitArr[arrLen - 2].length == 2 && splitArr[arrLen - 1].length == 2) {
+			domain = splitArr[arrLen - 3] + '.' + domain;
+		}
+	}
+	return domain;
+}
+
+const isChildOf = (target, ref) => {
+	let answer = false;
+	Object.entries(ref).forEach(([key, elem]) => {
+	  if(elem.contains(target)) {
+	  	answer = true;
+	  }
+	});
+	return answer;
 }
 
 
@@ -249,26 +339,16 @@ const addCorners = (inst) => {
 	let embed = inst.elems.embed;
 	let photo = inst.elems.photo;
 
-	embed.addEventListener('mouseenter', function(e) {
-		hoverEmbed(e, inst);
-	});
-	embed.addEventListener('mouseleave', function(e) {
-		unhoverEmbed(e, inst);
-	});
-
-	if(photo) {
-		photo.addEventListener('click', function(e) {
-			clickPhoto(e, inst);
-		});
-	}
-
 	inst.corners.forEach(function(slug, i) {
 		const cornerSelector = '.fc-corner[data-slug="'+slug+'"]';
-		if(embed.querySelector(cornerSelector)) {return;}
+		if(embed.querySelector(cornerSelector)) {return}
+		const data = inst.data[slug];
 		let corner = document.createElement('div');
-		if(!corner) {return;}
-		corner.classList.add('fc-corner');
 		corner.dataset.slug = slug;
+		corner.classList.add('fc-corner');
+		if(!data||!Object.keys(data).length) {
+			corner.classList.add('fc-inactive');
+		}
 		corner.addEventListener('mouseenter', function(e) {
 			hoverCorner(e, inst);
 		});
@@ -332,24 +412,6 @@ const clickCorner = (e, inst) => {
 const clickPhoto = (e, inst) => {
 	inst.closeCorner();
 }
-
-// const addStyles = (elem, styles) => {
-// 	Object.entries(styles).forEach(([prop, val]) => {
-// 		elem.style[prop] = val;
-// 	});
-// 	return elem;
-// }
-
-//Adds namespace to all classes
-// const fc = (input) => {
-// 	const ns = 'fc';
-// 	let output = [];
-// 	if(!Array.isArray(input)){input = [input];}
-// 	input.forEach(function(str, i) {
-// 		output[i] = ns+'_'+str;
-// 	});
-// 	return output;
-// }
 
 var wrapUrls = function (str) {
 	var urlPattern = /(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}\-\x{ffff}]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?/ig;
