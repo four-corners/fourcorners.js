@@ -18,6 +18,9 @@ $radius: 3px;
 $stroke: 1em;
 $pad: 0;
 
+$sm-fs: .8em;
+$sm-lh: 1.2em;
+
 .fc-embed {
 	position: relative;
 	overflow: hidden;
@@ -41,7 +44,9 @@ $pad: 0;
 		opacity: 1;
 	}
 }
-
+.fc-dark .fc-corner::before, .fc-dark .fc-corner::after {
+	background-color: $dark;
+}
 .fc-corner {
 	width: 5em;
 	height: 5em;
@@ -53,9 +58,6 @@ $pad: 0;
 		position: absolute;
 		content: '';
 		background-color: $lightest;
-		.fc-dark & {
-			
-		}
 	}
 	&:not(:hover) {
 		transition: all 100ms linear, opacity 0;
@@ -357,9 +359,9 @@ $pad: 0;
 .fc-sub-title {
 
 }
-.fc-sub-credit, .fc-sub-url {
-	font-size: .8em;
-	line-height: 1.2em;
+.fc-sub-credit, .fc-sub-url, .fc-caption {
+	font-size: $sm-fs;
+	line-height: $sm-lh;
 }
 .fc-sub-url {
 	opacity: .8;
@@ -390,4 +392,7 @@ $pad: 0;
 		left: 0;
 		top: 0;
 	}
+}
+.fc-caption {
+	text-align: right;
 }

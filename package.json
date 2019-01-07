@@ -51,7 +51,13 @@
   },
   "scripts": {
     "start": "npm run watch & browser-sync start --server --port 9000 --no-notify --no-open --files 'src/*.js' 'dist/*.js' '*.html'",
+    "watch": "webpack --progress --colors --watch --env dev",
     "build": "webpack --env build --optimize-minimize -p",
-    "watch": "webpack --progress --colors --watch --env dev"
+    "copy-js": "cp dist/*.min.js ../four-corners-wp/wp-content/themes/four-corners-wp-theme/assets/js",
+    "copy-css": "cp dist/*.min.css ../four-corners-wp/wp-content/themes/four-corners-wp-theme/assets/css",
+    "copy": "npm run copy-js & npm run copy-css",
+    "copy-prod-js": "cp dist/four-corners.js ../four-corners-wp/wp-content/themes/four-corners-wp-theme/assets/js/four-corners.min.js",
+    "copy-prod-css": "cp dist/four-corners.css ../four-corners-wp/wp-content/themes/four-corners-wp-theme/assets/css/four-corners.min.css",
+    "copy-prod": "npm run copy-prod-js & npm run copy-prod-css"
   }
 }

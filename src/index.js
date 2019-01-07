@@ -5,11 +5,11 @@ class FourCorners {
 		this.opts = opts;
 		this.corners = ['context','links','authorship','backstory'];
 		this.elems.embed = embed;
-		this.elems.embed.classList.add('fc-init');
 		this.data = parseData(this);
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
 		this.elems.corners = addCorners(this);
+		this.elems.caption = addCaption(this);
 		initEmbed(this);
 	}
 
@@ -76,11 +76,10 @@ class FourCorners {
 
 const initEmbed = (inst) => {
 	const embed = inst.elems.embed;
-	// let embed = document.querySelector(inst.opts.selector);
-	// if(inst.data.dark){embed.classList('fc-dark')}
-	// if(!embed){return}
-	// return embed;
-
+	embed.classList.add('fc-init');
+	if(inst.data.dark){
+		embed.classList.add('fc-dark');
+	}
 
 	embed.addEventListener('mouseenter', function(e) {
 		hoverEmbed(e, inst);
@@ -107,6 +106,7 @@ const initEmbed = (inst) => {
 
 const resizeEmbed = (e, inst) => {
 	const panels = inst.elems.panels;
+	if(!panels){return}
 	Object.keys(panels).forEach(function(slug, i) {
 		resizePanel(panels[slug]);
 	});
@@ -114,6 +114,7 @@ const resizeEmbed = (e, inst) => {
 
 const resizePanel = (panel) => {
 	const panelScroll = panel.querySelector('.fc-scroll');
+	if(!panelScroll){return}
 	if( panelScroll.scrollHeight > panelScroll.clientHeight ) {
 		panel.classList.add('fc-overflow');
 	} else {
@@ -149,13 +150,14 @@ const addPhoto = (inst)  => {
 }
 
 const addPanels = (inst) => {
-	let panels = {};
+	let data, panels = {};
 	let embed = inst.elems.embed;
 	inst.corners.forEach(function(slug, i) {
-		const data = inst.data[slug];
-		if(!data||!Object.keys(data).length) {return}
-		let panel;
-		const panelSelector = '.fc-panel[data-slug="'+slug+'"]';
+		if(inst.data) {
+			const data = inst.data[slug];
+			if(!data||!Object.keys(data).length) {return}
+		}
+		let panel, panelSelector = '.fc-panel[data-slug="'+slug+'"]';
 		if(!embed.querySelector(panelSelector)) {
 			panel = document.createElement('div');
 			panel.classList.add('fc-panel');
@@ -168,20 +170,22 @@ const addPanels = (inst) => {
 			panelTitle.classList.add('fc-panel-title');
 			panelInner.appendChild(panelTitle);
 			panelTitle.innerHTML = slug;
-			Object.entries(data).forEach(([prop, val]) => {
-				if(!val){return}
-				let row = document.createElement('div');
-				row.classList.add('fc-row', 'fc-'+prop);
-				if(prop == 'media') {
-					row.append(addMedia(val));
-				} else if(prop == 'links') {
-					row.append(addLinks(val));
-				} else {
-					val = wrapUrls(val);
-					row.innerHTML += val;
-				}
-				panelInner.appendChild(row);
-			});
+			if(data) {
+				Object.entries(data).forEach(([prop, val]) => {
+					if(!val){return}
+					let row = document.createElement('div');
+					row.classList.add('fc-row', 'fc-'+prop);
+					if(prop == 'media') {
+						row.append(addMedia(val));
+					} else if(prop == 'links') {
+						row.append(addLinks(val));
+					} else {
+						val = wrapUrls(val);
+						row.innerHTML += val;
+					}
+					panelInner.appendChild(row);
+				});
+			}
 			panelScroll.appendChild(panelInner);
 			panel.appendChild(panelScroll);
 			embed.appendChild(panel);
@@ -220,7 +224,6 @@ const embedImage = (obj, subRow) => {
 	mediaWrap.className = 'fc-media';
 	let img = document.createElement('img');
 	img.src = obj.url;
-	console.log(img);
 	mediaWrap.appendChild(img);
 	// subRow.appendChild(mediaWrap);
 	subRow.prepend(mediaWrap);
@@ -323,31 +326,21 @@ const extractRootDomain = (url)  => {
 	return domain;
 }
 
-const isChildOf = (target, ref) => {
-	let answer = false;
-	Object.entries(ref).forEach(([key, elem]) => {
-	  if(elem.contains(target)) {
-	  	answer = true;
-	  }
-	});
-	return answer;
-}
-
-
 const addCorners = (inst) => {
-	let corners = {};
+	let data, corners = {};
 	let embed = inst.elems.embed;
 	let photo = inst.elems.photo;
-
 	inst.corners.forEach(function(slug, i) {
 		const cornerSelector = '.fc-corner[data-slug="'+slug+'"]';
 		if(embed.querySelector(cornerSelector)) {return}
-		const data = inst.data[slug];
 		let corner = document.createElement('div');
 		corner.dataset.slug = slug;
 		corner.classList.add('fc-corner');
-		if(!data||!Object.keys(data).length) {
-			corner.classList.add('fc-inactive');
+		if(inst.data) {
+			data = inst.data[slug];
+			if(!data||!Object.keys(data).length) {
+				corner.classList.add('fc-inactive');
+			}
 		}
 		corner.addEventListener('mouseenter', function(e) {
 			hoverCorner(e, inst);
@@ -363,6 +356,27 @@ const addCorners = (inst) => {
 	});
 
 	return corners;
+}
+
+const addCaption = (inst) => {
+	if(!inst.data) {return}
+	const data = inst.data['authorship'];
+	if(!data||!Object.keys(data).length) {return}
+	const embed = inst.elems.embed
+	let caption = document.createElement('div');
+	caption.classList.add('fc-caption');
+	let captionArray = [];
+	if(data.credit) {
+		captionArray.push(data.credit);
+	}
+	if(data.copyright) {
+		captionArray.push('&copy;');
+	}
+	const fcLink = '<a href="#">Four Corners</a>';
+	captionArray.push(fcLink);
+	const captionText = captionArray.join(' ');
+	caption.innerHTML = captionText;
+	embed.parentNode.insertBefore(caption, embed.nextSibling);
 }
 
 const parseData = (inst) => {
@@ -411,6 +425,16 @@ const clickCorner = (e, inst) => {
 
 const clickPhoto = (e, inst) => {
 	inst.closeCorner();
+}
+
+const isChildOf = (target, ref) => {
+	let answer = false;
+	Object.entries(ref).forEach(([key, elem]) => {
+	  if(elem.contains(target)) {
+	  	answer = true;
+	  }
+	});
+	return answer;
 }
 
 var wrapUrls = function (str) {

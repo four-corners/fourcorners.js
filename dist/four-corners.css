@@ -19,6 +19,9 @@
   .fc-photo.fc-loaded img {
     opacity: 1; }
 
+.fc-dark .fc-corner::before, .fc-dark .fc-corner::after {
+  background-color: #262225; }
+
 .fc-corner {
   width: 5em;
   height: 5em;
@@ -219,8 +222,8 @@
     border-bottom: none;
     box-shadow: none; }
 
-.fc-sub-credit, .fc-sub-url {
-  font-size: .8em;
+.fc-sub-credit, .fc-sub-url, .fc-caption {
+  font-size: 0.8em;
   line-height: 1.2em; }
 
 .fc-sub-url {
@@ -249,4 +252,7 @@
     position: absolute;
     left: 0;
     top: 0; }
+
+.fc-caption {
+  text-align: right; }
 
