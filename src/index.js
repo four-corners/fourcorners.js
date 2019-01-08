@@ -77,7 +77,7 @@ class FourCorners {
 const initEmbed = (inst) => {
 	const embed = inst.elems.embed;
 	embed.classList.add('fc-init');
-	if(inst.data.dark){
+	if(inst.data&&inst.data.dark) {
 		embed.classList.add('fc-dark');
 	}
 
@@ -132,7 +132,9 @@ const addPhoto = (inst)  => {
 		photo = document.createElement('div');
 		photo.classList.add('fc-photo');
 		const pseudoImg = new Image();
-		const src = inst.data.img;
+		const photoData = inst.data.photo;
+		if(!photoData) {return}
+		const src = photoData.file;
 		pseudoImg.onload = (e) => {
 			img.src = src;
 			photo.classList.add('fc-loaded');
@@ -153,9 +155,11 @@ const addPanels = (inst) => {
 	let data, panels = {};
 	let embed = inst.elems.embed;
 	inst.corners.forEach(function(slug, i) {
+		let data = null;
 		if(inst.data) {
-			const data = inst.data[slug];
-			if(!data||!Object.keys(data).length) {return}
+			data = inst.data[slug];
+			const dataKeys = Object.keys(data);
+			if(!data||!dataKeys.length) {return;}
 		}
 		let panel, panelSelector = '.fc-panel[data-slug="'+slug+'"]';
 		if(!embed.querySelector(panelSelector)) {
