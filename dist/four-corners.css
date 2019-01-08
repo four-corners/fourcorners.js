@@ -184,6 +184,9 @@
 .fc-row {
   padding: .5em;
   border-bottom: 1px solid #9e9e9e; }
+  .fc-row img, .fc-row iframe {
+    width: 100%;
+    height: auto; }
   .fc-row.fc-media, .fc-row.fc-links {
     padding: .5em 0; }
   .fc-row:last-of-type {
@@ -237,9 +240,6 @@
 .fc-media {
   width: calc(100% + 1em);
   margin: 0 -.5em; }
-  .fc-media img, .fc-media iframe {
-    width: 100%;
-    height: auto; }
 
 .fc-empty {
   display: none !important; }

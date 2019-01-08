@@ -183,6 +183,8 @@ const addPanels = (inst) => {
 						row.append(addMedia(val));
 					} else if(prop == 'links') {
 						row.append(addLinks(val));
+					} else if(prop == 'license') {
+						row.append(addLicense(val));
 					} else {
 						val = wrapUrls(val);
 						row.innerHTML += val;
@@ -221,6 +223,43 @@ const addMedia = (arr) => {
 		subRows.appendChild(subRow);
 	});
 	return subRows;
+}	
+
+const addLinks = (arr) => {
+	let subRows = document.createElement('div');
+	subRows.className = 'fc-sub-rows';
+	arr.forEach(function(obj, index) {
+		let subRow = document.createElement('div');
+		subRow.className = 'fc-sub-row';
+		let a = document.createElement('a');
+		a.href = obj.url;
+		a.target = '_blank';
+		if(obj.title) {
+			a.innerHTML = obj.title;
+		}
+		subRow.appendChild(a);
+		let rootUrl = extractRootDomain(obj.url);
+		if(rootUrl) {
+			let url = document.createElement('div');
+			url.className = 'fc-sub-url';
+			url.innerHTML = rootUrl;
+			subRow.appendChild(url);
+		}
+		subRows.appendChild(subRow);
+	});
+	return subRows;
+}
+
+const addLicense = (val) => {
+	let a = document.createElement('a');
+	a.href = val;
+	a.target = '_blank';
+	a.innerHTML = val;
+	let text = document.createTextNode('License this photo: ');
+	let span = document.createElement('span');
+	span.append(text);
+	span.append(a);
+	return span;
 }
 
 const embedImage = (obj, subRow) => {
@@ -276,33 +315,6 @@ const embedIframe = (obj, subRow) => {
 			subRow.remove();
 			console.log(err);
 		});
-}
-
-	
-
-const addLinks = (arr) => {
-	let subRows = document.createElement('div');
-	subRows.className = 'fc-sub-rows';
-	arr.forEach(function(obj, index) {
-		let subRow = document.createElement('div');
-		subRow.className = 'fc-sub-row';
-		let a = document.createElement('a');
-		a.href = obj.url;
-		a.target = '_blank';
-		if(obj.title) {
-			a.innerHTML = obj.title;
-		}
-		subRow.appendChild(a);
-		let rootUrl = extractRootDomain(obj.url);
-		if(rootUrl) {
-			let url = document.createElement('div');
-			url.className = 'fc-sub-url';
-			url.innerHTML = rootUrl;
-			subRow.appendChild(url);
-		}
-		subRows.appendChild(subRow);
-	});
-	return subRows;
 }
 
 const extractHostname = (url) => {
