@@ -396,4 +396,7 @@ $sm-lh: 1.2em;
 }
 .fc-caption {
 	text-align: right;
+	a {
+		white-space: nowrap;
+	}
 }

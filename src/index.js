@@ -18,6 +18,9 @@ class FourCorners {
 		proto.embeds = [];
 		const defaultOpts = {
 			selector: '.fc-embed:not(.fc-init)',
+			interactive: true,
+			active: null,
+			cutline: true,
 			noPanels: false,
 			noCorners: false,
 			cornerStroke: '6px',
@@ -81,25 +84,29 @@ const initEmbed = (inst) => {
 		embed.classList.add('fc-dark');
 	}
 
-	embed.addEventListener('mouseenter', function(e) {
-		hoverEmbed(e, inst);
-	});
-	embed.addEventListener('mouseleave', function(e) {
-		unhoverEmbed(e, inst);
-	});
+	if(inst.opts.interactive) {
 
-	window.addEventListener('resize', function(e) {
-		resizeEmbed(e, inst);
-	});
+		embed.addEventListener('mouseenter', function(e) {
+			hoverEmbed(e, inst);
+		});
+		embed.addEventListener('mouseleave', function(e) {
+			unhoverEmbed(e, inst);
+		});
 
-	window.addEventListener('click', function(e) {
-		const onPanels = isChildOf(e.target, inst.elems.panels);
-		const onCorners = isChildOf(e.target, inst.elems.corners);
-		const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
-		if(!onPanels && !onCorners && !inCreator) {
-			inst.closeCorner();
-		}
-	});
+		window.addEventListener('resize', function(e) {
+			resizeEmbed(e, inst);
+		});
+
+		window.addEventListener('click', function(e) {
+			const onPanels = isChildOf(e.target, inst.elems.panels);
+			const onCorners = isChildOf(e.target, inst.elems.corners);
+			const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
+			if(!onPanels && !onCorners && !inCreator) {
+				inst.closeCorner();
+			}
+		});
+
+	}
 
 	resizeEmbed(null, inst);
 }
@@ -124,6 +131,8 @@ const resizePanel = (panel) => {
 
 const addPhoto = (inst)  => {
 	let embed = inst.elems.embed;
+	let data = inst.data;
+	if(!data) {return}
 	let img = document.createElement('img');
 	img.classList.add('fc-img');
 	let photo = '';
@@ -132,7 +141,7 @@ const addPhoto = (inst)  => {
 		photo = document.createElement('div');
 		photo.classList.add('fc-photo');
 		const pseudoImg = new Image();
-		const photoData = inst.data.photo;
+		const photoData = data.photo;
 		if(!photoData) {return}
 		const src = photoData.file;
 		pseudoImg.onload = (e) => {
@@ -161,10 +170,12 @@ const addPanels = (inst) => {
 			const dataKeys = Object.keys(data);
 			if(!data||!dataKeys.length) {return;}
 		}
+		const active = inst.opts.active;
 		let panel, panelSelector = '.fc-panel[data-slug="'+slug+'"]';
 		if(!embed.querySelector(panelSelector)) {
 			panel = document.createElement('div');
 			panel.classList.add('fc-panel');
+			if(slug==active) {panel.classList.add('fc-active')}
 			panel.dataset.slug = slug;
 			let panelScroll = document.createElement('div');
 			panelScroll.classList.add('fc-scroll');
@@ -346,27 +357,34 @@ const addCorners = (inst) => {
 	let data, corners = {};
 	let embed = inst.elems.embed;
 	let photo = inst.elems.photo;
+	const active = inst.opts.active;
 	inst.corners.forEach(function(slug, i) {
 		const cornerSelector = '.fc-corner[data-slug="'+slug+'"]';
 		if(embed.querySelector(cornerSelector)) {return}
 		let corner = document.createElement('div');
 		corner.dataset.slug = slug;
 		corner.classList.add('fc-corner');
+		if(slug==active) {corner.classList.add('fc-active')}
 		if(inst.data) {
 			data = inst.data[slug];
 			if(!data||!Object.keys(data).length) {
 				corner.classList.add('fc-inactive');
 			}
 		}
-		corner.addEventListener('mouseenter', function(e) {
-			hoverCorner(e, inst);
-		});
-		corner.addEventListener('mouseleave', function(e) {
-			unhoverCorner(e, inst);
-		});
-		corner.addEventListener('click', function(e) {
-			clickCorner(e, inst);
-		});
+
+		if(inst.opts.interactive) {
+
+			corner.addEventListener('mouseenter', function(e) {
+				hoverCorner(e, inst);
+			});
+			corner.addEventListener('mouseleave', function(e) {
+				unhoverCorner(e, inst);
+			});
+			corner.addEventListener('click', function(e) {
+				clickCorner(e, inst);
+			});
+
+		}
 		corners[slug] = corner;
 		embed.appendChild(corner);
 	});
@@ -375,7 +393,7 @@ const addCorners = (inst) => {
 }
 
 const addCaption = (inst) => {
-	if(!inst.data) {return}
+	if(!inst.data||!inst.opts.cutline) {return}
 	const data = inst.data['authorship'];
 	if(!data||!Object.keys(data).length) {return}
 	const embed = inst.elems.embed

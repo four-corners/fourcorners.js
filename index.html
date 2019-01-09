@@ -57,7 +57,11 @@
 </body>
 <script type="text/javascript">
 	window.onload = function() {
-		var fc = FourCorners.default.prototype.init();
+		var fc = FourCorners.default.prototype.init({
+			interactive: false,
+			active: 'authorship',
+			cutline: false
+		});
 		// fc[0].openCorner('backstory');
 	};
 </script>

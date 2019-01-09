@@ -255,4 +255,6 @@
 
 .fc-caption {
   text-align: right; }
+  .fc-caption a {
+    white-space: nowrap; }
 
