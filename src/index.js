@@ -431,7 +431,7 @@ const addCutline = (inst) => {
 	// if(data.copyright) {
 	// 	cutlineArray.push('&copy;');
 	// }
-	const fcLink = '<a href="#">Four Corners</a>';
+	const fcLink = '<a href="#" class="fc">Four Corners</a>';
 	cutlineArray.push(fcLink);
 	const cutlineText = cutlineArray.join(' ');
 	cutline.innerHTML = cutlineText;

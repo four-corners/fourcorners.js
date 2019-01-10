@@ -4,6 +4,8 @@
   overflow: hidden;
   font-size: 13px;
   line-height: 1.5em; }
+  .fc-embed a {
+    transition: opacity 100ms linear; }
 
 .fc-photo {
   width: 100%;
@@ -132,8 +134,7 @@
     box-shadow: 0 2px 1px -2px rgba(158, 158, 158, 0.8); }
   .fc-panel a, .fc-panel a:visited {
     color: inherit;
-    text-decoration: underline;
-    transition: color 100ms linear, opacity 100ms linear; }
+    text-decoration: underline; }
     .fc-panel a:hover, .fc-panel a:visited:hover {
       color: inherit;
       opacity: .8; }
@@ -263,7 +264,23 @@
     top: 0; }
 
 .fc-cutline {
-  text-align: right; }
-  .fc-cutline a {
-    white-space: nowrap; }
+  text-align: right;
+  margin: .2em 0 0 0; }
+  .fc-cutline a, .fc-cutline a:hover, .fc-cutline a:visited, .fc-cutline a:focus {
+    white-space: nowrap;
+    text-decoration: none;
+    opacity: .5;
+    transition: opacity 100ms linear; }
+  .fc-cutline a:hover {
+    opacity: 1; }
+  .fc-cutline .fc::before {
+    width: .8em;
+    height: .8em;
+    margin: .2em .4em 0 0;
+    display: inline-block;
+    background-image: url("data:image/svg+xml,%3C?xml version='1.0' encoding='utf-8'?%3E %3C!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='20px' height='20px' viewBox='140 140 20 20' enable-background='new 140 140 20 20' xml:space='preserve'%3E %3Cpolygon fill='%2380BDFF' points='152,156.923 152,160 160,160 160,152 156.923,152 156.923,156.923 '/%3E %3Cpolygon fill='%2380BDFF' points='156.923,143.077 156.923,148 160,148 160,140 152,140 152,143.077 '/%3E %3Cpolygon fill='%2380BDFF' points='140,148 143.077,148 143.077,143.077 148,143.077 148,140 140,140 '/%3E %3Cpolygon fill='%2380BDFF' points='148,160 148,156.923 143.077,156.923 143.077,152 140,152 140,160 '/%3E %3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    content: ''; }
 

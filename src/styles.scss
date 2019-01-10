@@ -27,6 +27,9 @@ $sm-lh: 1.2em;
 	overflow: hidden;
 	font-size: 13px;
 	line-height: 1.5em;
+	a {
+		transition: opacity 100ms linear;
+	}
 }
 .fc-photo {
 	width: 100%;
@@ -220,7 +223,6 @@ $sm-lh: 1.2em;
 	a, a:visited {
 		color: inherit;
 		text-decoration: underline;
-		transition: color 100ms linear, opacity 100ms linear;
 		&:hover {
 			color: inherit;
 			opacity: .8;
@@ -407,7 +409,25 @@ $sm-lh: 1.2em;
 }
 .fc-cutline {
 	text-align: right;
-	a {
+	margin: .2em 0 0 0;
+	a, a:hover, a:visited, a:focus {
 		white-space: nowrap;
+		text-decoration: none;
+		opacity: .5;
+		transition: opacity 100ms linear;
+	}
+	a:hover {
+		opacity: 1;
+	}
+	.fc::before {
+		width: .8em;
+		height: .8em;
+		margin: .2em .4em 0 0;
+		display: inline-block;
+		background-image: url(./icon.svg);
+		background-repeat: no-repeat;
+		background-position: center;
+		background-size: contain;
+		content: '';
 	}
 }
