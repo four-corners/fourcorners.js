@@ -9,7 +9,7 @@ class FourCorners {
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
 		this.elems.corners = addCorners(this);
-		this.elems.caption = addCaption(this);
+		this.elems.caption = addCutline(this);
 		initEmbed(this);
 	}
 
@@ -196,6 +196,10 @@ const addPanels = (inst) => {
 						row.append(addLinks(val));
 					} else if(prop == 'license') {
 						row.append(addLicense(val));
+					} else if(prop == 'ethics') {
+						row.innerHTML = '<strong>Code of ethics</strong>: '+val;
+					} else if(prop == 'copyright') {
+						row.innerHTML = '&copy; '+val;
 					} else {
 						val = wrapUrls(val);
 						row.innerHTML += val;
@@ -244,6 +248,27 @@ const addLinks = (arr) => {
 		subRow.className = 'fc-sub-row';
 		let a = document.createElement('a');
 		a.href = obj.url;
+
+		// const headers = new Headers();
+		// const req = obj.url;
+		// fetch(req, {
+		// 	method: 'GET',
+		// 	headers: headers,
+		// 	mode: 'cors',
+		// 	cache: 'default'
+		// })
+		// .then(res => {
+		// 	if (!res.ok) {throw Error(res.statusText)}
+		// 	console.log(res);
+		// 	return res.json();
+		// })
+		// .then(res => {
+		// 	console.log(res);
+		// })
+		// .catch(function(err) {
+		// 	console.log(err);
+		// });
+
 		a.target = '_blank';
 		if(obj.title) {
 			a.innerHTML = obj.title;
@@ -392,25 +417,25 @@ const addCorners = (inst) => {
 	return corners;
 }
 
-const addCaption = (inst) => {
+const addCutline = (inst) => {
 	if(!inst.data||!inst.opts.cutline) {return}
 	const data = inst.data['authorship'];
 	if(!data||!Object.keys(data).length) {return}
 	const embed = inst.elems.embed
-	let caption = document.createElement('div');
-	caption.classList.add('fc-caption');
-	let captionArray = [];
+	let cutline = document.createElement('div');
+	cutline.classList.add('fc-cutline');
+	let cutlineArray = [];
 	if(data.credit) {
-		captionArray.push(data.credit);
+		cutlineArray.push(data.credit);
 	}
-	if(data.copyright) {
-		captionArray.push('&copy;');
-	}
+	// if(data.copyright) {
+	// 	cutlineArray.push('&copy;');
+	// }
 	const fcLink = '<a href="#">Four Corners</a>';
-	captionArray.push(fcLink);
-	const captionText = captionArray.join(' ');
-	caption.innerHTML = captionText;
-	embed.parentNode.insertBefore(caption, embed.nextSibling);
+	cutlineArray.push(fcLink);
+	const cutlineText = cutlineArray.join(' ');
+	cutline.innerHTML = cutlineText;
+	embed.parentNode.insertBefore(cutline, embed.nextSibling);
 }
 
 const parseData = (inst) => {

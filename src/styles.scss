@@ -65,7 +65,6 @@ $sm-lh: 1.2em;
 	}
 	&:hover {
 		cursor: pointer;
-		// transform: scale(1.05);
 		opacity: 1;
 	}
 	&.fc-active {
@@ -141,19 +140,19 @@ $sm-lh: 1.2em;
 		}
 	}
 	.fc-embed:hover & {
-		&[data-slug='context'] {
+		&[data-slug='context']:not(.fc-active) {
 			top: 0em;
 			left: 0em;
 		}
-		&[data-slug='links'] {
+		&[data-slug='links']:not(.fc-active) {
 			top: 0em;
 			right: 0em;
 		}
-		&[data-slug='authorship'] {
+		&[data-slug='authorship']:not(.fc-active) {
 			bottom: 0em;
 			right: 0em;
 		}
-		&[data-slug='backstory'] {
+		&[data-slug='backstory']:not(.fc-active) {
 			bottom: 0em;
 			left: 0em;
 		}
@@ -347,6 +346,18 @@ $sm-lh: 1.2em;
 	// 	border-bottom-color: $light;
 	// 	box-shadow: 0 2px 1px -2px rgba($light,.8);
 	// }
+	a {
+		transition: all 200ms ease-in-out;
+		&:hover, &:visited, &:focus, & {
+			padding: .5em;
+			margin: -.5em;
+			display: block;
+			text-decoration: underline;
+		}	
+		&:hover {
+			opacity: .6;
+		}
+	}
 	.fc-links & {
 		a {
 			padding: .5em;
@@ -364,7 +375,7 @@ $sm-lh: 1.2em;
 .fc-sub-title {
 
 }
-.fc-sub-credit, .fc-sub-url, .fc-caption {
+.fc-sub-credit, .fc-sub-url, .fc-cutline {
 	font-size: $sm-fs;
 	line-height: $sm-lh;
 }
@@ -394,7 +405,7 @@ $sm-lh: 1.2em;
 		top: 0;
 	}
 }
-.fc-caption {
+.fc-cutline {
 	text-align: right;
 	a {
 		white-space: nowrap;
