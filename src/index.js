@@ -23,11 +23,6 @@ class FourCorners {
 			cutline: true,
 			noPanels: false,
 			noCorners: false,
-			cornerStroke: '6px',
-			cornerSize: '25px',
-			cornerColor: 'white',
-			cornerActiveColor: 'blue',
-			cornerHoverColor: 'red',
 			posDur: 0.2,
 			transDur: 0.1,
 		};
@@ -46,6 +41,7 @@ class FourCorners {
 		const embed = this.elems.embed;
 		const corner = this.elems.corners[slug];
 		const panel = this.elems.panels[slug];
+		embed.classList.remove('fc-full');
 		if(corner && panel) {
 			embed.dataset.active = slug;
 			embed.classList.add('fc-active');
@@ -175,16 +171,35 @@ const addPanels = (inst) => {
 		if(!embed.querySelector(panelSelector)) {
 			panel = document.createElement('div');
 			panel.classList.add('fc-panel');
+			panel.classList.add('fc-'+slug);
 			if(slug==active) {panel.classList.add('fc-active')}
-			panel.dataset.slug = slug;
+			panel.dataset.fcSlug = slug;			
 			let panelScroll = document.createElement('div');
 			panelScroll.classList.add('fc-scroll');
 			let panelInner = document.createElement('div');
 			panelInner.classList.add('fc-inner');
 			let panelTitle = document.createElement('div');
 			panelTitle.classList.add('fc-panel-title');
-			panelInner.appendChild(panelTitle);
-			panelTitle.innerHTML = slug;
+			let panelTitleSpan = document.createElement('span');
+			panelTitleSpan.innerHTML = slug;
+			panelTitle.appendChild(panelTitleSpan);
+
+			let panelExpand = document.createElement('div');
+			panelExpand.className = 'fc-icon fc-expand';
+			panelExpand.addEventListener('click', function(e) {
+				toggleExpandPanel(e, inst);
+			});
+			panelTitle.appendChild(panelExpand);
+
+			let panelClose = document.createElement('div');
+			panelClose.className = 'fc-icon fc-close';
+			panelClose.addEventListener('click', function(e) {
+				closePanel(e, inst);
+			});
+			panelTitle.appendChild(panelClose);
+
+			panelInner.appendChild(panelTitle);	
+			
 			if(data) {
 				Object.entries(data).forEach(([prop, val]) => {
 					if(!val){return}
@@ -329,7 +344,7 @@ const embedIframe = (obj, subRow) => {
 	fetch(req, {
 			method: 'GET',
 			headers: headers,
-			mode: 'cors',
+			mode: 'no-cors',
 			cache: 'default'
 		})
 		.then(res => {
@@ -355,7 +370,8 @@ const embedIframe = (obj, subRow) => {
 
 const extractHostname = (url) => {
   let hostname;
-  if (url.indexOf("//") > -1) {
+  if(!url){return false}
+  if(url.indexOf('//') > -1) {
     hostname = url.split('/')[2];
   } else {
     hostname = url.split('/')[0];
@@ -366,6 +382,7 @@ const extractHostname = (url) => {
 }
 
 const extractRootDomain = (url)  => {
+	if(!url){return false}
 	let domain = extractHostname(url);
 	let splitArr = domain.split('.');
 	let arrLen = splitArr.length;
@@ -384,11 +401,17 @@ const addCorners = (inst) => {
 	let photo = inst.elems.photo;
 	const active = inst.opts.active;
 	inst.corners.forEach(function(slug, i) {
-		const cornerSelector = '.fc-corner[data-slug="'+slug+'"]';
+		const cornerSelector = '.fc-corner[data-fc-slug="'+slug+'"]';
 		if(embed.querySelector(cornerSelector)) {return}
 		let corner = document.createElement('div');
-		corner.dataset.slug = slug;
+		corner.dataset.fcSlug = slug;
 		corner.classList.add('fc-corner');
+		corner.classList.add('fc-'+slug);
+
+		// let cornerShadow = document.createElement('div');
+		// cornerShadow.classList.add('fc-shadow');
+		// corner.appendChild(cornerShadow);
+
 		if(slug==active) {corner.classList.add('fc-active')}
 		if(inst.data) {
 			data = inst.data[slug];
@@ -472,7 +495,7 @@ const unhoverCorner = (e, inst) => {
 
 const clickCorner = (e, inst) => {
 	let corner = e.target;
-	let slug = corner.dataset.slug;
+	let slug = corner.dataset.fcSlug;
 	const active = inst.elems.embed.dataset.active;
 	if(!slug) {return}	
 	if(slug==active) {
@@ -483,6 +506,13 @@ const clickCorner = (e, inst) => {
 }
 
 const clickPhoto = (e, inst) => {
+	inst.closeCorner();
+}
+
+const toggleExpandPanel = (e, inst) => {
+	inst.elems.embed.classList.toggle('fc-full');
+}
+const closePanel = (e, inst) => {
 	inst.closeCorner();
 }
 
