@@ -70,6 +70,12 @@ class FourCorners {
 		if(corner){ corner.classList.remove('fc-active'); }
 		if(panel) { panel.classList.remove('fc-active'); }
 	}
+
+	toggleExpandPanel() {
+		const inst = this;
+		inst.elems.embed.classList.toggle('fc-full');
+	}
+
 }
 
 
@@ -187,7 +193,7 @@ const addPanels = (inst) => {
 			let panelExpand = document.createElement('div');
 			panelExpand.className = 'fc-icon fc-expand';
 			panelExpand.addEventListener('click', function(e) {
-				toggleExpandPanel(e, inst);
+				inst.toggleExpandPanel(e, inst);
 			});
 			panelTitle.appendChild(panelExpand);
 
@@ -328,7 +334,8 @@ const embedIframe = (obj, subRow) => {
 	let req = '';
 	switch(obj.type) {
 		case 'youtube':
-			req = 'https://www.youtube.com/oembed?url='+obj.url;
+			// req = 'https://www.youtube.com/oembed?url='+obj.url;
+			req = 'https://noembed.com/embed?url='+obj.url;
 			break;
 		case 'vimeo':
 			req = 'https://vimeo.com/api/oembed.json?url='+obj.url;
@@ -340,18 +347,25 @@ const embedIframe = (obj, subRow) => {
 			return false;
 			break;
 	}
-	const headers = new Headers();
+	// const headers = new Headers();
+	console.log(req);
 	fetch(req, {
 			method: 'GET',
-			headers: headers,
-			mode: 'no-cors',
-			cache: 'default'
+			// headers: headers,
+			// mode: 'no-cors',
+			// cache: 'default',
+			// referrer: 'no-referrer', //'client'
+			// credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json'
+			},
 		})
 		.then(res => {
 			if (!res.ok) {throw Error(res.statusText)}
 			return res.json();
 		})
 		.then(res => {
+			console.log(res);
 			var mediaWrap = document.createElement('div');
 			mediaWrap.className = 'fc-media';
 			mediaWrap.innerHTML =  res.html;
@@ -509,9 +523,6 @@ const clickPhoto = (e, inst) => {
 	inst.closeCorner();
 }
 
-const toggleExpandPanel = (e, inst) => {
-	inst.elems.embed.classList.toggle('fc-full');
-}
 const closePanel = (e, inst) => {
 	inst.closeCorner();
 }
