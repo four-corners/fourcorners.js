@@ -546,4 +546,8 @@ var wrapUrls = function (str) {
 	});
 };
 
+window.onload = function() {
+	FourCorners.prototype.init();
+}
+
 export default FourCorners;
