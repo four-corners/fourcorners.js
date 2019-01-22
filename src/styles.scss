@@ -160,6 +160,11 @@
 			left: 0;
 		}
 	}
+	.fc-full.fc-active & {
+		opacity: 0;
+		pointer-events: none;
+		@include noTrans;
+	}
 	&.fc-active, .fc-embed:hover &.fc-active {
 		&.fc-context {
 			// top: #{-$corner-gap*3};

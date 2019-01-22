@@ -212,11 +212,11 @@ const addPanels = (inst) => {
 					let row = document.createElement('div');
 					row.classList.add('fc-row', 'fc-'+prop);
 					if(prop == 'media') {
-						row.append(addMedia(val));
+						row.appendChild(addMedia(val));
 					} else if(prop == 'links') {
-						row.append(addLinks(val));
+						row.appendChild(addLinks(val));
 					} else if(prop == 'license') {
-						row.append(addLicense(val));
+						row.appendChild(addLicense(val));
 					} else if(prop == 'ethics') {
 						row.innerHTML = '<strong>Code of ethics</strong>: '+val;
 					} else if(prop == 'copyright') {

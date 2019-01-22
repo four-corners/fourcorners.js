@@ -35,9 +35,9 @@ $lighten: rgba($lightest,.5);
 $radius: 3px;
 $panel-gap: .5em;
 
-$corner-width: .6em;
-$corner-len: 2.5em;
-$corner-gap: .5em;
+$corner-width: 10px;
+$corner-len: 40px;
+$corner-gap: 10px;
 
 
 @mixin medText {

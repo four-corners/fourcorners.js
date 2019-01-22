@@ -50,57 +50,57 @@
     opacity: .5;
     pointer-events: none; }
   .fc-corner.fc-authorship {
-    bottom: -1.5em;
-    right: -1.5em; }
+    bottom: -30px;
+    right: -30px; }
     .fc-corner.fc-authorship::before, .fc-corner.fc-authorship .fc-shadow::before {
-      width: 0.6em;
-      height: 2.5em;
-      right: 0.5em;
-      bottom: 0.5em; }
+      width: 10px;
+      height: 40px;
+      right: 10px;
+      bottom: 10px; }
     .fc-corner.fc-authorship::after, .fc-corner.fc-authorship .fc-shadow::after {
-      width: 2.5em;
-      height: 0.6em;
-      right: 0.5em;
-      bottom: 0.5em; }
+      width: 40px;
+      height: 10px;
+      right: 10px;
+      bottom: 10px; }
   .fc-corner.fc-backstory {
-    bottom: -1.5em;
-    left: -1.5em; }
+    bottom: -30px;
+    left: -30px; }
     .fc-corner.fc-backstory::before, .fc-corner.fc-backstory .fc-shadow::before {
-      width: 0.6em;
-      height: 2.5em;
-      left: 0.5em;
-      bottom: 0.5em; }
+      width: 10px;
+      height: 40px;
+      left: 10px;
+      bottom: 10px; }
     .fc-corner.fc-backstory::after, .fc-corner.fc-backstory .fc-shadow::after {
-      width: 2.5em;
-      height: 0.6em;
-      left: 0.5em;
-      bottom: 0.5em; }
+      width: 40px;
+      height: 10px;
+      left: 10px;
+      bottom: 10px; }
   .fc-corner.fc-context {
-    top: -1.5em;
-    left: -1.5em; }
+    top: -30px;
+    left: -30px; }
     .fc-corner.fc-context::before, .fc-corner.fc-context .fc-shadow::before {
-      width: 0.6em;
-      height: 2.5em;
-      left: 0.5em;
-      top: 0.5em; }
+      width: 10px;
+      height: 40px;
+      left: 10px;
+      top: 10px; }
     .fc-corner.fc-context::after, .fc-corner.fc-context .fc-shadow::after {
-      width: 2.5em;
-      height: 0.6em;
-      left: 0.5em;
-      top: 0.5em; }
+      width: 40px;
+      height: 10px;
+      left: 10px;
+      top: 10px; }
   .fc-corner.fc-links {
-    top: -1.5em;
-    right: -1.5em; }
+    top: -30px;
+    right: -30px; }
     .fc-corner.fc-links::before, .fc-corner.fc-links .fc-shadow::before {
-      width: 0.6em;
-      height: 2.5em;
-      right: 0.5em;
-      top: 0.5em; }
+      width: 10px;
+      height: 40px;
+      right: 10px;
+      top: 10px; }
     .fc-corner.fc-links::after, .fc-corner.fc-links .fc-shadow::after {
-      width: 2.5em;
-      height: 0.6em;
-      right: 0.5em;
-      top: 0.5em; }
+      width: 40px;
+      height: 10px;
+      right: 10px;
+      top: 10px; }
   .fc-embed:hover .fc-corner.fc-context {
     top: 0;
     left: 0; }
@@ -113,6 +113,10 @@
   .fc-embed:hover .fc-corner.fc-backstory {
     bottom: 0;
     left: 0; }
+  .fc-full.fc-active .fc-corner {
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0; }
 
 .fc-shadow {
   width: 100%;
