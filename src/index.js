@@ -314,8 +314,8 @@ const addLicense = (val) => {
 	a.innerHTML = val;
 	let text = document.createTextNode('License this photo: ');
 	let span = document.createElement('span');
-	span.append(text);
-	span.append(a);
+	span.appendChild(text);
+	span.appendChild(a);
 	return span;
 }
 
