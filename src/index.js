@@ -21,8 +21,6 @@ class FourCorners {
 			interactive: true,
 			active: null,
 			cutline: true,
-			noPanels: false,
-			noCorners: false,
 			posDur: 0.2,
 			transDur: 0.1,
 		};
@@ -43,7 +41,7 @@ class FourCorners {
 		const panel = this.elems.panels[slug];
 		embed.classList.remove('fc-full');
 		if(corner && panel) {
-			embed.dataset.active = slug;
+			embed.dataset.fcActive = slug;
 			embed.classList.add('fc-active');
 			corner.classList.add('fc-active');
 			panel.classList.add('fc-active');
@@ -59,15 +57,15 @@ class FourCorners {
 		const inst = this;
 		const embed = inst.elems.embed;
 		if(!slug) {
-			slug = embed.dataset.active;
+			slug = embed.dataset.fcActive;
 		}
 		const corner = inst.elems.corners[slug];
 		const panel = inst.elems.panels[slug];
-		if(slug==embed.dataset.active) {
-			embed.dataset.active = '';
+		if(slug==embed.dataset.fcActive) {
+			embed.dataset.fcActive = '';
 			embed.classList.remove('fc-active');
 		}
-		if(corner){ corner.classList.remove('fc-active'); }
+		if(corner) { corner.classList.remove('fc-active'); }
 		if(panel) { panel.classList.remove('fc-active'); }
 	}
 
@@ -88,12 +86,12 @@ const initEmbed = (inst) => {
 
 	if(inst.opts.interactive) {
 
-		embed.addEventListener('mouseenter', function(e) {
-			hoverEmbed(e, inst);
-		});
-		embed.addEventListener('mouseleave', function(e) {
-			unhoverEmbed(e, inst);
-		});
+		// embed.addEventListener('mouseenter', function(e) {
+		// 	hoverEmbed(e, inst);
+		// });
+		// embed.addEventListener('mouseleave', function(e) {
+		// 	unhoverEmbed(e, inst);
+		// });
 
 		window.addEventListener('resize', function(e) {
 			resizeEmbed(e, inst);
@@ -173,13 +171,14 @@ const addPanels = (inst) => {
 			if(!data||!dataKeys.length) {return;}
 		}
 		const active = inst.opts.active;
-		let panel, panelSelector = '.fc-panel[data-slug="'+slug+'"]';
-		if(!embed.querySelector(panelSelector)) {
+		let panelSelector = '.fc-panel[data-fc-slug="'+slug+'"]';
+		let panel = embed.querySelector(panelSelector);
+		if(!panel) {
 			panel = document.createElement('div');
+			panel.dataset.fcSlug = slug;
 			panel.classList.add('fc-panel');
 			panel.classList.add('fc-'+slug);
 			if(slug==active) {panel.classList.add('fc-active')}
-			panel.dataset.fcSlug = slug;			
 			let panelScroll = document.createElement('div');
 			panelScroll.classList.add('fc-scroll');
 			let panelInner = document.createElement('div');
@@ -222,8 +221,7 @@ const addPanels = (inst) => {
 					} else if(prop == 'copyright') {
 						row.innerHTML = '&copy; '+val;
 					} else {
-						val = wrapUrls(val);
-						row.innerHTML += val;
+						row.innerHTML += wrapUrls(val);
 					}
 					panelInner.appendChild(row);
 				});
@@ -231,8 +229,6 @@ const addPanels = (inst) => {
 			panelScroll.appendChild(panelInner);
 			panel.appendChild(panelScroll);
 			embed.appendChild(panel);
-		} else {
-			panel = embed.querySelector(panelSelector);
 		}
 		panels[slug] = panel;
 	});
@@ -250,11 +246,11 @@ const addMedia = (arr) => {
 		} else {
 			embedIframe(obj, subRow)
 		}
-		if(obj.credit) {
-			let credit = document.createElement('div');
-			credit.className = 'fc-sub-credit';
-			credit.innerHTML = obj.credit;
-			subRow.appendChild(credit);
+		if(obj.caption) {
+			let caption = document.createElement('div');
+			caption.className = 'fc-sub-caption';
+			caption.innerHTML = obj.caption;
+			subRow.appendChild(caption);
 		}
 		subRows.appendChild(subRow);
 	});
@@ -325,8 +321,7 @@ const embedImage = (obj, subRow) => {
 	let img = document.createElement('img');
 	img.src = obj.url;
 	mediaWrap.appendChild(img);
-	// subRow.appendChild(mediaWrap);
-	subRow.prepend(mediaWrap);
+	subRow.appendChild(mediaWrap);
 }
 
 
@@ -348,7 +343,6 @@ const embedIframe = (obj, subRow) => {
 			break;
 	}
 	// const headers = new Headers();
-	console.log(req);
 	fetch(req, {
 			method: 'GET',
 			// headers: headers,
@@ -365,7 +359,6 @@ const embedIframe = (obj, subRow) => {
 			return res.json();
 		})
 		.then(res => {
-			console.log(res);
 			var mediaWrap = document.createElement('div');
 			mediaWrap.className = 'fc-media';
 			mediaWrap.innerHTML =  res.html;
@@ -374,7 +367,12 @@ const embedIframe = (obj, subRow) => {
 				mediaWrap.classList.add('fc-responsive')
 				mediaWrap.style.paddingBottom = (ratio*100)+'%';
 			}
-			subRow.prepend(mediaWrap);
+			if(subRow.childNodes) {
+				subRow.insertBefore(mediaWrap, subRow.childNodes[0]);
+			} else {
+				subRow.prepend(mediaWrap);
+			}
+			
 		})
 		.catch(function(err) {
 			subRow.remove();
@@ -483,19 +481,19 @@ const parseData = (inst) => {
 	return JSON.parse(stringData);
 }
 
-const hoverEmbed = (e, inst) => {
-	let embed = inst.elems.embed;
-	let corners = inst.elems.corners;
-	const css = inst.css;
-	const posDur = inst.opts.posDur;
-}
+// const hoverEmbed = (e, inst) => {
+// 	let embed = inst.elems.embed;
+// 	let corners = inst.elems.corners;
+// 	const css = inst.css;
+// 	const posDur = inst.opts.posDur;
+// }
 
-const unhoverEmbed = (e, inst) => {
-	let embed = inst.elems.embed;
-	let corners = inst.elems.corners;
-	const css = inst.css;
-	const posDur = inst.opts.posDur;
-}
+// const unhoverEmbed = (e, inst) => {
+// 	let embed = inst.elems.embed;
+// 	let corners = inst.elems.corners;
+// 	const css = inst.css;
+// 	const posDur = inst.opts.posDur;
+// }
 
 const hoverCorner = (e, inst) => {
 	let corner = e.target;
@@ -510,7 +508,7 @@ const unhoverCorner = (e, inst) => {
 const clickCorner = (e, inst) => {
 	let corner = e.target;
 	let slug = corner.dataset.fcSlug;
-	const active = inst.elems.embed.dataset.active;
+	const active = inst.elems.embed.dataset.fcActive;
 	if(!slug) {return}	
 	if(slug==active) {
 		inst.closeCorner(slug);	

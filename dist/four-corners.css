@@ -32,8 +32,9 @@
   width: 5em;
   height: 5em;
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
+  transform: translate3d(0, 0, 0);
   transition: all 200ms ease; }
   .fc-corner::after, .fc-corner::before {
     position: absolute;
@@ -137,7 +138,7 @@
   width: 60%;
   max-height: 60%;
   position: absolute;
-  z-index: 4;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -289,7 +290,7 @@
     border-bottom: none;
     box-shadow: none; }
 
-.fc-sub-credit, .fc-sub-url, .fc-cutline {
+.fc-sub-caption, .fc-sub-url, .fc-cutline {
   font-size: .8em;
   line-height: 1.2em; }
 
@@ -298,8 +299,8 @@
   text-decoration: none;
   cursor: default; }
 
-.fc-sub-credit {
-  padding: .5em 0; }
+.fc-sub-caption {
+  padding: .5em 0 0 0; }
 
 .fc-empty {
   display: none !important; }
