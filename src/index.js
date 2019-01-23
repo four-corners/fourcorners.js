@@ -9,7 +9,7 @@ class FourCorners {
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
 		this.elems.corners = addCorners(this);
-		this.elems.caption = addCutline(this);
+		// this.elems.caption = addCutline(this);
 		initEmbed(this);
 	}
 
@@ -246,11 +246,11 @@ const addMedia = (arr) => {
 		} else {
 			embedIframe(obj, subRow)
 		}
-		if(obj.caption) {
-			let caption = document.createElement('div');
-			caption.className = 'fc-sub-caption';
-			caption.innerHTML = obj.caption;
-			subRow.appendChild(caption);
+		if(obj.credit) {
+			let credit = document.createElement('div');
+			credit.className = 'fc-sub-credit';
+			credit.innerHTML = obj.credit;
+			subRow.appendChild(credit);
 		}
 		subRows.appendChild(subRow);
 	});
