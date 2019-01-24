@@ -160,7 +160,7 @@ const addPhoto = (inst)  => {
 	return photo;
 }
 
-const addPanels = (inst) => {
+const addPanels = (inst) => {	
 	let data, panels = {};
 	let embed = inst.elems.embed;
 	inst.corners.forEach(function(slug, i) {
@@ -211,11 +211,14 @@ const addPanels = (inst) => {
 					let row = document.createElement('div');
 					row.classList.add('fc-row', 'fc-'+prop);
 					if(prop == 'media') {
-						row.appendChild(addMedia(val));
+						const mediaElems = addMedia(val);
+						if(mediaElems) { row.appendChild(mediaElems) }
 					} else if(prop == 'links') {
-						row.appendChild(addLinks(val));
+						const linkElems = addLinks(val);
+						if(linkElems) { row.appendChild(linkElems) }
 					} else if(prop == 'license') {
-						row.appendChild(addLicense(val));
+						const licenseElems = addLicense(val);
+						if(licenseElems) { row.appendChild(licenseElems) }
 					} else if(prop == 'ethics') {
 						row.innerHTML = '<strong>Code of ethics</strong>: '+val;
 					} else if(prop == 'copyright') {
@@ -223,7 +226,9 @@ const addPanels = (inst) => {
 					} else {
 						row.innerHTML += wrapUrls(val);
 					}
-					panelInner.appendChild(row);
+					if(row.childNodes.length) {
+						panelInner.appendChild(row);
+					}
 				});
 			}
 			panelScroll.appendChild(panelInner);
@@ -239,6 +244,7 @@ const addMedia = (arr) => {
 	let subRows = document.createElement('div');
 	subRows.className = 'fc-sub-rows';
 	arr.forEach(function(obj, index) {
+		if(!Object.keys(obj).length) {return}
 		let subRow = document.createElement('div');
 		subRow.className = 'fc-sub-row';
 		if(obj.type == 'image') {
@@ -254,7 +260,9 @@ const addMedia = (arr) => {
 		}
 		subRows.appendChild(subRow);
 	});
-	return subRows;
+	if(subRows.childNodes.length) {
+		return subRows;
+	}
 }	
 
 const addLinks = (arr) => {
