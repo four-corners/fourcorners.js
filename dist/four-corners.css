@@ -3,8 +3,9 @@
   position: relative;
   overflow: hidden;
   font-size: 15px;
-  line-height: 1.2em; }
+  line-height: 1.4em; }
   .fc-embed a {
+    border: 0;
     transition: color 200ms ease-in-out; }
     .fc-embed a:hover, .fc-embed a:visited, .fc-embed a:focus, .fc-embed a {
       display: block;

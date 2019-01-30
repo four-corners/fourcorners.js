@@ -9,7 +9,7 @@ class FourCorners {
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
 		this.elems.corners = addCorners(this);
-		// this.elems.caption = addCutline(this);
+		this.elems.caption = addCutline(this);
 		initEmbed(this);
 	}
 
@@ -40,7 +40,7 @@ class FourCorners {
 		const corner = this.elems.corners[slug];
 		const panel = this.elems.panels[slug];
 		embed.classList.remove('fc-full');
-		if(corner && panel) {
+		if(embed && corner && panel) {
 			embed.dataset.fcActive = slug;
 			embed.classList.add('fc-active');
 			corner.classList.add('fc-active');
@@ -80,7 +80,7 @@ class FourCorners {
 const initEmbed = (inst) => {
 	const embed = inst.elems.embed;
 	embed.classList.add('fc-init');
-	if(inst.data&&inst.data.dark) {
+	if(inst.data&&inst.data.opts&&inst.data.opts.dark) {
 		embed.classList.add('fc-dark');
 	}
 
@@ -147,12 +147,13 @@ const addPhoto = (inst)  => {
 		pseudoImg.onload = (e) => {
 			img.src = src;
 			photo.classList.add('fc-loaded');
+			photo.appendChild(img);
 		}
 		pseudoImg.onerror = (e) => {
+			console.warn('Four Corners cannot load this as an image: '+src+'');
 			console.log(e);
 		}
 		pseudoImg.src = src;
-		photo.appendChild(img);
 	} else {
 		photo = embed.querySelector(photoSelector);
 	}
@@ -241,16 +242,17 @@ const addPanels = (inst) => {
 }
 
 const addMedia = (arr) => {
+	const iframeSources = ['youtube','vimeo','soundcloud'];
 	let subRows = document.createElement('div');
 	subRows.className = 'fc-sub-rows';
 	arr.forEach(function(obj, index) {
 		if(!Object.keys(obj).length) {return}
 		let subRow = document.createElement('div');
 		subRow.className = 'fc-sub-row';
-		if(obj.type == 'image') {
-			embedImage(obj, subRow)
+		if(iframeSources.indexOf(obj.source) >= 0) {
+			embedIframe(obj, subRow);
 		} else {
-			embedIframe(obj, subRow)
+			embedImage(obj, subRow)
 		}
 		if(obj.credit) {
 			let credit = document.createElement('div');
@@ -269,6 +271,7 @@ const addLinks = (arr) => {
 	let subRows = document.createElement('div');
 	subRows.className = 'fc-sub-rows';
 	arr.forEach(function(obj, index) {
+		if(!obj){return}
 		let subRow = document.createElement('div');
 		subRow.className = 'fc-sub-row';
 		let a = document.createElement('a');
@@ -384,6 +387,7 @@ const embedIframe = (obj, subRow) => {
 		})
 		.catch(function(err) {
 			subRow.remove();
+			console.warn('Four Corners cannot load this media source: '+src+'');
 			console.log(err);
 		});
 }
@@ -482,6 +486,7 @@ const addCutline = (inst) => {
 }
 
 const parseData = (inst) => {
+	if(!inst.elems.embed) {return}
 	let stringData = inst.elems.embed.dataset.fc;
 	if(!stringData){return}
 	stringData = stringData;
@@ -551,9 +556,5 @@ var wrapUrls = function (str) {
 		return '<a href="' + href + '" target="_blank">' + url + '</a>';
 	});
 };
-
-window.onload = function() {
-	FourCorners.prototype.init();
-}
 
 export default FourCorners;

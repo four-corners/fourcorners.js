@@ -5,6 +5,7 @@
 	overflow: hidden;
 	@include medText;
 	a {
+		border: 0;
 		transition: color 200ms ease-in-out;
 		&:hover, &:visited, &:focus, & {
 			display: block;
