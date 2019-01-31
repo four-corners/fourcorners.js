@@ -150,8 +150,7 @@ const addPhoto = (inst)  => {
 			photo.appendChild(img);
 		}
 		pseudoImg.onerror = (e) => {
-			console.warn('Four Corners cannot load this as an image: '+src+'');
-			console.log(e);
+			console.warn('Four Corners cannot load this as an image: '+src, e);
 		}
 		pseudoImg.src = src;
 	} else {
@@ -165,12 +164,6 @@ const addPanels = (inst) => {
 	let data, panels = {};
 	let embed = inst.elems.embed;
 	inst.corners.forEach(function(slug, i) {
-		let data = null;
-		if(inst.data) {
-			data = inst.data[slug];
-			const dataKeys = Object.keys(data);
-			if(!data||!dataKeys.length) {return;}
-		}
 		const active = inst.opts.active;
 		let panelSelector = '.fc-panel[data-fc-slug="'+slug+'"]';
 		let panel = embed.querySelector(panelSelector);
@@ -204,10 +197,13 @@ const addPanels = (inst) => {
 			});
 			panelTitle.appendChild(panelClose);
 
-			panelInner.appendChild(panelTitle);	
+			panelInner.appendChild(panelTitle);
 			
-			if(data) {
-				Object.entries(data).forEach(([prop, val]) => {
+			if(inst.data) {
+				const panelData = inst.data[slug];
+				const dataKeys = Object.keys(panelData);
+				
+				Object.entries(panelData).forEach(([prop, val]) => {
 					if(!val){return}
 					let row = document.createElement('div');
 					row.classList.add('fc-row', 'fc-'+prop);
@@ -224,13 +220,19 @@ const addPanels = (inst) => {
 						row.innerHTML = '<strong>Code of ethics</strong>: '+val;
 					} else if(prop == 'copyright') {
 						row.innerHTML = '&copy; '+val;
+					} else if(prop == 'text') {
+						const paraElems = wrapParagraphs(val);
+						if(paraElems) { row.appendChild(paraElems) }
 					} else {
-						row.innerHTML += wrapUrls(val);
+						row.innerHTML += val;
 					}
 					if(row.childNodes.length) {
 						panelInner.appendChild(row);
 					}
 				});
+				if(!Object.keys(panelData).length) {
+					panel.classList.add('fc-inactive');
+				}
 			}
 			panelScroll.appendChild(panelInner);
 			panel.appendChild(panelScroll);
@@ -243,8 +245,8 @@ const addPanels = (inst) => {
 
 const addMedia = (arr) => {
 	const iframeSources = ['youtube','vimeo','soundcloud'];
-	let subRows = document.createElement('div');
-	subRows.className = 'fc-sub-rows';
+	let rowInner = document.createElement('div');
+	rowInner.className = 'fc-row-inner';
 	arr.forEach(function(obj, index) {
 		if(!Object.keys(obj).length) {return}
 		let subRow = document.createElement('div');
@@ -254,22 +256,22 @@ const addMedia = (arr) => {
 		} else {
 			embedImage(obj, subRow)
 		}
-		if(obj.credit) {
-			let credit = document.createElement('div');
-			credit.className = 'fc-sub-credit';
-			credit.innerHTML = obj.credit;
-			subRow.appendChild(credit);
+		if(obj.caption) {
+			let caption = document.createElement('div');
+			caption.className = 'fc-sub-caption';
+			caption.innerHTML = obj.caption;
+			subRow.appendChild(caption);
 		}
-		subRows.appendChild(subRow);
+		rowInner.appendChild(subRow);
 	});
-	if(subRows.childNodes.length) {
-		return subRows;
+	if(rowInner.childNodes.length) {
+		return rowInner;
 	}
 }	
 
 const addLinks = (arr) => {
-	let subRows = document.createElement('div');
-	subRows.className = 'fc-sub-rows';
+	let rowInner = document.createElement('div');
+	rowInner.className = 'fc-sub-rows';
 	arr.forEach(function(obj, index) {
 		if(!obj){return}
 		let subRow = document.createElement('div');
@@ -309,9 +311,9 @@ const addLinks = (arr) => {
 			url.innerHTML = rootUrl;
 			subRow.appendChild(url);
 		}
-		subRows.appendChild(subRow);
+		rowInner.appendChild(subRow);
 	});
-	return subRows;
+	return rowInner;
 }
 
 const addLicense = (val) => {
@@ -329,16 +331,29 @@ const addLicense = (val) => {
 const embedImage = (obj, subRow) => {
 	var mediaWrap = document.createElement('div');
 	mediaWrap.className = 'fc-media';
+	if(!obj.url){ return }
 	let img = document.createElement('img');
-	img.src = obj.url;
-	mediaWrap.appendChild(img);
-	subRow.appendChild(mediaWrap);
+	const pseudoImg = new Image();
+	pseudoImg.onload = (e) => {
+		img.src = src;
+		mediaWrap.appendChild(img);
+		subRow.appendChild(mediaWrap);
+		if(subRow.childNodes) {
+			subRow.insertBefore(mediaWrap, subRow.childNodes[0]);
+		} else {
+			subRow.appendChild(mediaWrap);
+		}
+	}
+	pseudoImg.onerror = (e) => {
+		console.warn('Four Corners cannot load this as an image: '+obj.url, e);
+	}
+	pseudoImg.src = obj.url;
 }
 
 
 const embedIframe = (obj, subRow) => {
 	let req = '';
-	switch(obj.type) {
+	switch(obj.source) {
 		case 'youtube':
 			// req = 'https://www.youtube.com/oembed?url='+obj.url;
 			req = 'https://noembed.com/embed?url='+obj.url;
@@ -353,14 +368,8 @@ const embedIframe = (obj, subRow) => {
 			return false;
 			break;
 	}
-	// const headers = new Headers();
 	fetch(req, {
 			method: 'GET',
-			// headers: headers,
-			// mode: 'no-cors',
-			// cache: 'default',
-			// referrer: 'no-referrer', //'client'
-			// credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -381,14 +390,13 @@ const embedIframe = (obj, subRow) => {
 			if(subRow.childNodes) {
 				subRow.insertBefore(mediaWrap, subRow.childNodes[0]);
 			} else {
-				subRow.prepend(mediaWrap);
+				subRow.appendChild(mediaWrap);
 			}
 			
 		})
 		.catch(function(err) {
 			subRow.remove();
-			console.warn('Four Corners cannot load this media source: '+src+'');
-			console.log(err);
+			console.warn('Four Corners cannot load this media source: '+src, err);
 		});
 }
 
@@ -548,7 +556,21 @@ const isChildOf = (target, ref) => {
 	return answer;
 }
 
-var wrapUrls = function (str) {
+const wrapParagraphs = (val) => {
+	let array = val.split(/\n/g);
+	let text = '';
+	if(array.length <= 1){return val;}
+	let rowInner = document.createElement('div');
+	rowInner.className = 'fc-row-inner';
+	array.forEach(function(str, i) {
+		let p = document.createElement('p');
+		p.innerHTML = str;
+		rowInner.appendChild(p);
+	});
+	return rowInner;
+}
+
+const wrapUrls = (str) => {
 	var urlPattern = /(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}\-\x{ffff}]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?/ig;
 	return str.replace(urlPattern, function (url) {
 		var protocol_pattern = /^(?:(?:https?|ftp):\/\/)/i;
