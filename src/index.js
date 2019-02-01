@@ -4,6 +4,7 @@ class FourCorners {
 		this.elems = {};
 		this.opts = opts;
 		this.corners = ['context','links','authorship','backstory'];
+		this.cornerTitles = ['Image Context','Links','Authorship','Backstory'];
 		this.elems.embed = embed;
 		this.data = parseData(this);
 		this.elems.photo = addPhoto(this);
@@ -133,30 +134,38 @@ const addPhoto = (inst)  => {
 	let embed = inst.elems.embed;
 	let data = inst.data;
 	if(!data) {return}
-	let img = document.createElement('img');
-	img.classList.add('fc-img');
-	let photo = '';
+	let photo, img;
 	const photoSelector = '.fc-photo';
 	if(!embed.querySelector(photoSelector)) {
 		photo = document.createElement('div');
 		photo.classList.add('fc-photo');
-		const pseudoImg = new Image();
-		const photoData = data.photo;
-		if(!photoData) {return}
-		const src = photoData.file;
-		pseudoImg.onload = (e) => {
-			img.src = src;
-			photo.classList.add('fc-loaded');
-			photo.appendChild(img);
-		}
-		pseudoImg.onerror = (e) => {
-			console.warn('Four Corners cannot load this as an image: '+src, e);
-		}
-		pseudoImg.src = src;
+		embed.appendChild(photo);
+	// 	const pseudoImg = new Image();
+	// 	const photoData = data.photo;
+	// 	if(!photoData) {return}
+	// 	const src = photoData.file;
+	// 	pseudoImg.onload = (e) => {
+	// 		img.src = src;
+	// 		photo.classList.add('fc-loaded');
+	// 		photo.appendChild(img);
+	// 	}
+	// 	pseudoImg.onerror = (e) => {
+	// 		console.warn('Four Corners cannot load this as an image: '+src, e);
+	// 	}
+	// 	pseudoImg.src = src;
 	} else {
 		photo = embed.querySelector(photoSelector);
 	}
-	embed.appendChild(photo);
+	const imgSelector = '.fc-img';
+	if(img = embed.querySelector(imgSelector)) {
+		photo.classList.add('fc-loaded');
+		photo.appendChild(img)
+	} else {
+		// img = document.createElement('img');
+		// img.classList.add('fc-img');
+		// photo.classList.add('fc-loaded');
+	}
+	
 	return photo;
 }
 
@@ -180,7 +189,8 @@ const addPanels = (inst) => {
 			let panelTitle = document.createElement('div');
 			panelTitle.classList.add('fc-panel-title');
 			let panelTitleSpan = document.createElement('span');
-			panelTitleSpan.innerHTML = slug;
+			let panelTitleStr = inst.cornerTitles[inst.corners.indexOf(slug)];
+			panelTitleSpan.innerHTML = panelTitleStr;
 			panelTitle.appendChild(panelTitleSpan);
 
 			let panelExpand = document.createElement('div');
@@ -217,7 +227,7 @@ const addPanels = (inst) => {
 						const licenseElems = addLicense(val);
 						if(licenseElems) { row.appendChild(licenseElems) }
 					} else if(prop == 'ethics') {
-						row.innerHTML = '<strong>Code of ethics</strong>: '+val;
+						row.innerHTML = val;
 					} else if(prop == 'copyright') {
 						row.innerHTML = '&copy; '+val;
 					} else if(prop == 'text') {
@@ -226,12 +236,30 @@ const addPanels = (inst) => {
 					} else {
 						row.innerHTML += val;
 					}
+
+					const labels = {
+						'credit': 'Photography by',
+						'ethics': 'Code of ethics',
+						'caption': 'Caption',
+					}
+
+					let labelText = labels[prop];
 					if(row.childNodes.length) {
+						if(labelText) {
+							let label = document.createElement('div');
+							label.classList.add('fc-row-label');
+							label.innerHTML = labelText;
+							if(row.childNodes) {
+								row.insertBefore(label, row.childNodes[0]);
+							} else {
+								row.appendChild(label);
+							}
+						}
 						panelInner.appendChild(row);
 					}
 				});
 				if(!Object.keys(panelData).length) {
-					panel.classList.add('fc-inactive');
+					panel.classList.add('fc-empty');
 				}
 			}
 			panelScroll.appendChild(panelInner);
@@ -448,7 +476,7 @@ const addCorners = (inst) => {
 		if(inst.data) {
 			data = inst.data[slug];
 			if(!data||!Object.keys(data).length) {
-				corner.classList.add('fc-inactive');
+				corner.classList.add('fc-empty');
 			}
 		}
 

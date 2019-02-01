@@ -25,14 +25,14 @@
 	&:not(.fc-loaded) {
 		padding-bottom: 60%;
 	}
-	img {
-		width: 100%;
-		height: auto;
-		display: table;
-		opacity: 0;
-		transition: all 200ms ease-in-out;
-	}
-	&.fc-loaded img {
+}
+img.fc-img {
+	width: 100%;
+	height: auto;
+	display: table;
+	opacity: 0;
+	transition: all 200ms ease-in-out;
+	.fc-loaded & {
 		opacity: 1;
 	}
 }
@@ -64,13 +64,13 @@
 		cursor: pointer;
 		opacity: 1;
 	}
+	&.fc-empty {
+		opacity: .5;
+	}
 	&.fc-active {
 		opacity: 0;
+		pointer-events: none;
 		@include noTrans;
-	}
-	&.fc-inactive {
-		opacity: .5;
-		// pointer-events: none;
 	}
 	&.fc-authorship {
 		bottom: -#{$corner-gap*3};
@@ -144,7 +144,7 @@
 			// border-radius: 0 $radius 0 0;
 		}
 	}
-	.fc-embed:hover & {
+	.fc-embed:not(.fc-full):hover & {
 		&.fc-context {
 			top: 0;
 			left: 0;
@@ -162,10 +162,10 @@
 			left: 0;
 		}
 	}
-	.fc-full.fc-active & {
-		opacity: 0;
-		pointer-events: none;
-		@include noTrans;
+	.fc-full & {
+		// opacity: 0;
+		// pointer-events: none;
+		@include fastestTrans;
 	}
 	&.fc-active, .fc-embed:hover &.fc-active {
 		&.fc-context {
@@ -268,8 +268,8 @@
 	&.fc-active {
 		opacity: 1;
 		pointer-events: all;
-		&.fc-inactive {
-			// opacity: .8;
+		&.fc-empty {
+			opacity: .5;
 		}
 	}
 	&.fc-authorship {
@@ -293,6 +293,8 @@
 		// border-radius: 0 0 0 $radius;
 	}
 	.fc-full & {
+		transition-delay: 3000ms;
+		transition: all 0ms linear; 
 		width: calc(100% - 1em);
 		height: calc(100% - 1em);
 		max-height: unset;
@@ -370,6 +372,7 @@
 		}
 	}
 }
+
 .fc-close {
 	right: .5em;
 	background-image: url(./svg/close.svg);
@@ -397,10 +400,17 @@
 	display: inline-block;
 	font-weight: bold;
 	font-size: 1.2em;
-	text-transform: capitalize;
+}
+.fc-row-label {
+	font-size: .6em;
+	line-height: 1em;
+  margin: -.5em 0 .5em 0;
+  text-transform: uppercase;
+	opacity: .5;
 }
 .fc-row {
 	padding: 1em .5em;
+	position: relative;
 	border-top: 1px solid $medium;
 	img, iframe {
 		width: 100%;
@@ -471,9 +481,7 @@
 	// margin: 0 -.5em;
 }
 
-.fc-empty {
-	display: none !important;
-}
+
 .fc-responsive {
 	position: relative;
 	iframe {

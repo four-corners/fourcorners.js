@@ -51,14 +51,18 @@ $corner-gap: 10px;
 }
 
 
+@mixin fastestTrans {
+	transition: all 50ms ease;
+}
+
 @mixin fastTrans {
-	transition: all 200ms ease;
+	transition: all 250ms ease;
 }
 
 @mixin medTrans {
-	transition: all 400ms ease;
+	transition: all 600ms ease;
 }
 
 @mixin noTrans {
-	transition: all 0;
+	transition: none;
 }
