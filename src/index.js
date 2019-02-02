@@ -360,10 +360,10 @@ const embedImage = (obj, subRow) => {
 	var mediaWrap = document.createElement('div');
 	mediaWrap.className = 'fc-media';
 	if(!obj.url){ return }
-	let img = document.createElement('img');
 	const pseudoImg = new Image();
 	pseudoImg.onload = (e) => {
-		img.src = src;
+		let img = document.createElement('img');
+		img.src = obj.url;
 		mediaWrap.appendChild(img);
 		subRow.appendChild(mediaWrap);
 		if(subRow.childNodes) {
