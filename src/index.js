@@ -587,7 +587,6 @@ const isChildOf = (target, ref) => {
 const wrapParagraphs = (val) => {
 	let array = val.split(/\n/g);
 	let text = '';
-	if(array.length <= 1){return val;}
 	let rowInner = document.createElement('div');
 	rowInner.className = 'fc-row-inner';
 	array.forEach(function(str, i) {
