@@ -81,6 +81,7 @@ class FourCorners {
 const initEmbed = (inst) => {
 	const embed = inst.elems.embed;
 	embed.classList.add('fc-init');
+	console.log(inst.data, inst.data.opts, inst.data.opts.dark);
 	if(inst.data&&inst.data.opts&&inst.data.opts.dark) {
 		embed.classList.add('fc-dark');
 	}
@@ -514,7 +515,7 @@ const addCutline = (inst) => {
 	// if(data.copyright) {
 	// 	cutlineArray.push('&copy;');
 	// }
-	const fcLink = '<a href="#" class="fc">Four Corners</a>';
+	const fcLink = '<a href="https://fourcornersproject.org" target="_blank">Four Corners</a>';
 	cutlineArray.push(fcLink);
 	const cutlineText = cutlineArray.join(' ');
 	cutline.innerHTML = cutlineText;

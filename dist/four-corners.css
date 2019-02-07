@@ -4,14 +4,6 @@
   overflow: hidden;
   font-size: 15px;
   line-height: 1.4em; }
-  .fc-embed a {
-    border: 0;
-    transition: color 200ms ease-in-out; }
-    .fc-embed a:hover, .fc-embed a:visited, .fc-embed a:focus, .fc-embed a {
-      display: block;
-      text-decoration: underline; }
-    .fc-embed a:hover {
-      color: #c4c4c4; }
   .fc-embed * {
     text-rendering: optimizeLegibility; }
 
@@ -38,11 +30,15 @@ img.fc-img {
   filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.5));
   transform: translate3d(0, 0, 0);
   transition: all 250ms ease; }
+  .fc-dark .fc-corner {
+    filter: none; }
   .fc-corner::after, .fc-corner::before {
     position: absolute;
     z-index: 4;
     content: '';
     background-color: #f6f6f6; }
+    .fc-dark .fc-corner::after, .fc-dark .fc-corner::before {
+      background-color: #262225; }
   .fc-corner:hover {
     cursor: pointer;
     opacity: 1; }
@@ -156,11 +152,16 @@ img.fc-img {
     border-color: #c4c4c4;
     filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5)); }
   .fc-panel a, .fc-panel a:visited {
+    display: inline;
     color: inherit;
-    text-decoration: underline; }
+    border-bottom: 1px solid #c4c4c4;
+    transition: border 200ms ease-in-out;
+    text-decoration: none; }
+    .fc-panel a:hover, .fc-panel a:visited, .fc-panel a:focus, .fc-panel a, .fc-panel a:visited:hover, .fc-panel a:visited:visited, .fc-panel a:visited:focus, .fc-panel a:visited {
+      text-decoration: none; }
     .fc-panel a:hover, .fc-panel a:visited:hover {
       color: inherit;
-      opacity: .8; }
+      border-bottom-color: rgba(0, 0, 0, 0.5); }
   .fc-panel.fc-active {
     opacity: 1;
     pointer-events: all; }
@@ -259,9 +260,12 @@ img.fc-img {
   font-size: 1.2em; }
 
 .fc-row-label {
-  font-size: .6em;
-  line-height: 1em;
   margin: -.5em 0 .5em 0;
+  font-family: sans-serif;
+  font-size: .8em;
+  line-height: 1.2em;
+  line-height: 1em;
+  letter-spacing: 1px;
   text-transform: uppercase;
   opacity: .5; }
 
@@ -272,11 +276,11 @@ img.fc-img {
   .fc-row img, .fc-row iframe {
     width: 100%;
     height: auto;
+    margin: 1em 0;
     border-radius: 3px;
     border: 1px solid #c4c4c4; }
   .fc-row.fc-media, .fc-row.fc-links {
-    padding-left: 0;
-    padding-right: 0; }
+    padding: 1em 0; }
   .fc-row:last-of-type {
     padding-bottom: 1em; }
 
@@ -293,6 +297,9 @@ img.fc-img {
   display: inline;
   white-space: pre-line; }
 
+.fc-row-inner {
+  clear: both; }
+
 .fc-sub-row {
   width: 100%;
   padding: .5em;
@@ -300,10 +307,10 @@ img.fc-img {
   box-sizing: border-box;
   border-bottom: 1px solid #c4c4c4; }
   .fc-sub-row:last-of-type {
-    margin: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-    box-shadow: none; }
+    border-bottom: none; }
+  .fc-full .fc-sub-row {
+    width: 50%;
+    float: left; }
 
 .fc-sub-caption, .fc-sub-url, .fc-cutline {
   font-size: .8em;
@@ -315,7 +322,7 @@ img.fc-img {
   cursor: default; }
 
 .fc-sub-caption {
-  padding: .5em 0 0 0; }
+  padding: .5em 0; }
 
 .fc-responsive {
   position: relative; }
@@ -336,10 +343,10 @@ img.fc-img {
     transition: opacity 100ms linear; }
   .fc-cutline a:hover {
     opacity: 1; }
-  .fc-cutline .fc::before {
-    width: .8em;
-    height: .8em;
-    margin: .2em .4em 0 0;
+  .fc-cutline a::after {
+    width: 10px;
+    height: 10px;
+    margin: .2em 0 0 .4em;
     display: inline-block;
     background-image: url("data:image/svg+xml,%3C?xml version='1.0' encoding='utf-8'?%3E %3C!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='20px' height='20px' viewBox='140 140 20 20' enable-background='new 140 140 20 20' xml:space='preserve'%3E %3Cpolygon fill='%2380BDFF' points='152,156.923 152,160 160,160 160,152 156.923,152 156.923,156.923 '/%3E %3Cpolygon fill='%2380BDFF' points='156.923,143.077 156.923,148 160,148 160,140 152,140 152,143.077 '/%3E %3Cpolygon fill='%2380BDFF' points='140,148 143.077,148 143.077,143.077 148,143.077 148,140 140,140 '/%3E %3Cpolygon fill='%2380BDFF' points='148,160 148,156.923 143.077,156.923 143.077,152 140,152 140,160 '/%3E %3C/svg%3E");
     background-repeat: no-repeat;
