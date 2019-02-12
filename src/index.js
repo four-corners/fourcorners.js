@@ -196,16 +196,16 @@ const addPanels = (inst) => {
 				const panelData = inst.data[slug];
 				switch(slug) {
 					case 'authorship':
-						panelContent = buildAuthorship(panelData);
+						panelContent = buildAuthorship(inst, panelData);
 						break;
 					case 'backstory':
-						panelContent = buildBackstory(panelData);
+						panelContent = buildBackstory(inst, panelData);
 						break;
 					case 'imagery':
-						panelContent = buildImagery(panelData);
+						panelContent = buildImagery(inst, panelData);
 						break;
 					case 'links':
-						panelContent = buildLinks(panelData);
+						panelContent = buildLinks(inst, panelData);
 						break;
 				}
 			}
@@ -287,19 +287,7 @@ const createCard = (panelData, obj, includeLabel) => {
 
 }
 
-const buildAuthorship = (panelData) => {
-	/*add authorship photo data*/
-	// const photoLabels = [
-	// 	{'prop':'caption', 'label':''},
-	// 	{'prop':'credit', 'label':'Photography by'},
-	// 	{'prop':'ethics', 'label':'Code of ethics: '},		
-	// ];
-	// let html = `
-	// 	${photoLabels.map(obj =>
-	// 		createRow(panelData, obj, true)
-	// 	).join('')}`;
-
-	/*add authorship photographer data*/
+const buildAuthorship = (inst, panelData) => {
 	const html = `
 		<div class="fc-row">
 			
@@ -356,15 +344,37 @@ const buildAuthorship = (panelData) => {
 	return html;
 }
 
-const buildBackstory = (panelData) => {
-	return '';
+const buildBackstory = (inst, panelData) => {
+	const html = `
+			${panelData['text'] ?
+				`<div class="fc-row">
+					<div class="fc-field">
+						${panelData['text']}
+					</div>
+				</div>`:''}`
+	return html;
 }
 
-const buildImagery = (panelData) => {
-	return '';
+const buildImagery = (inst, panelData) => {
+	if(!panelData.media){return}
+	let html = 
+		`<div class="fc-row fc-media">
+			${panelData.media.map((obj,i) => {
+				obj.source=='image'||!obj.source?
+				embedImage(inst,obj,i):embedIframe(inst,obj,i);
+				return `<div class="fc-sub-row">
+					<div class="fc-sub-media">
+					</div>
+					${obj.caption?
+					`<div class="fc-sub-caption">${obj.caption}</div>`
+					:''}
+				</div>`
+			}).join('')}
+		</div>`;
+	return html;
 }
 
-const buildLinks = (panelData) => {
+const buildLinks = (inst, panelData) => {
 	if(!panelData.links){return}
 	let html = panelData.links.map(obj => {
 		let rootUrl = extractRootDomain(obj.url);
@@ -375,34 +385,6 @@ const buildLinks = (panelData) => {
 	}).join('');
 	return html;
 }
-
-
-
-const addMedia = (arr) => {
-	const iframeSources = ['youtube','vimeo','soundcloud'];
-	let rowInner = document.createElement('div');
-	rowInner.className = 'fc-row-inner';
-	arr.forEach(function(obj, index) {
-		if(!Object.keys(obj).length) {return}
-		let subRow = document.createElement('div');
-		subRow.className = 'fc-sub-row';
-		if(iframeSources.indexOf(obj.source) >= 0) {
-			embedIframe(obj, subRow);
-		} else {
-			embedImage(obj, subRow)
-		}
-		if(obj.caption) {
-			let caption = document.createElement('div');
-			caption.className = 'fc-sub-caption';
-			caption.innerHTML = obj.caption;
-			subRow.appendChild(caption);
-		}
-		rowInner.appendChild(subRow);
-	});
-	if(rowInner.childNodes.length) {
-		return rowInner;
-	}
-}	
 
 // const addLinks = (arr) => {
 // 	let rowInner = document.createElement('div');
@@ -430,42 +412,23 @@ const addMedia = (arr) => {
 // 	return rowInner;
 // }
 
-const addLicense = (val) => {
-	let a = document.createElement('a');
-	a.href = val;
-	a.target = '_blank';
-	a.innerHTML = val;
-	let text = document.createTextNode('License this photo: ');
-	let span = document.createElement('span');
-	span.appendChild(text);
-	span.appendChild(a);
-	return span;
-}
-
-const embedImage = (obj, subRow) => {
-	var mediaWrap = document.createElement('div');
-	mediaWrap.className = 'fc-media';
+const embedImage = (inst, obj, index) => {
 	if(!obj.url){ return }
 	const pseudoImg = new Image();
 	pseudoImg.onload = (e) => {
-		let img = document.createElement('img');
-		img.src = obj.url;
-		mediaWrap.appendChild(img);
-		subRow.appendChild(mediaWrap);
-		if(subRow.childNodes) {
-			subRow.insertBefore(mediaWrap, subRow.childNodes[0]);
-		} else {
-			subRow.appendChild(mediaWrap);
-		}
+		const img = `<img src="${obj.url}"/>`;
+		const panel = inst.elems.panels['imagery'];
+		let subMedia = panel.querySelectorAll('.fc-sub-media')[index];
+		subMedia.innerHTML += img;
 	}
 	pseudoImg.onerror = (e) => {
 		console.warn('Four Corners cannot load this as an image: '+obj.url, e);
 	}
 	pseudoImg.src = obj.url;
+	return;
 }
 
-
-const embedIframe = (obj, subRow) => {
+const embedIframe = (inst, obj, index) => {
 	//requests third party APIs to retrieve embed data
 	let req = '';
 	switch(obj.source) {
@@ -494,23 +457,16 @@ const embedIframe = (obj, subRow) => {
 			return res.json();
 		})
 		.then(res => {
-			var mediaWrap = document.createElement('div');
-			mediaWrap.className = 'fc-media';
-			mediaWrap.innerHTML =  res.html;
+			const panel = inst.elems.panels['imagery'];
+			let subMedia = panel.querySelectorAll('.fc-sub-media')[index];
 			if(Number.isInteger(res.width,res.height)) {
 				const ratio = res.height/res.width;
-				mediaWrap.classList.add('fc-responsive')
-				mediaWrap.style.paddingBottom = (ratio*100)+'%';
+				subMedia.classList.add('fc-responsive')
+				subMedia.style.paddingBottom = (ratio*100)+'%';
 			}
-			if(subRow.childNodes) {
-				subRow.insertBefore(mediaWrap, subRow.childNodes[0]);
-			} else {
-				subRow.appendChild(mediaWrap);
-			}
-			
+			subMedia.innerHTML = res.html;
 		})
 		.catch(function(err) {
-			subRow.remove();
 			console.warn('Four Corners cannot load this media source: '+src, err);
 		});
 }
@@ -527,10 +483,6 @@ const addCorners = (inst) => {
 		corner.dataset.fcSlug = slug;
 		corner.classList.add('fc-corner');
 		corner.classList.add('fc-'+slug);
-
-		// let cornerShadow = document.createElement('div');
-		// cornerShadow.classList.add('fc-shadow');
-		// corner.appendChild(cornerShadow);
 
 		if(slug==active) {corner.classList.add('fc-active')}
 		if(inst.data) {
@@ -650,6 +602,7 @@ const isChildOf = (target, ref) => {
 
 const createLink = (href, text, classes = []) => {
 	if(!text){text=extractRootDomain(href)}
+	if(href.indexOf('@')>-1){href='mailto:'+href}
 	return `<a href="${href}" target="_blank" class="${classes.join(' ')}">${text}</a>`;
 }
 

@@ -81,15 +81,15 @@ img.fc-img {
       height: 10px;
       left: 10px;
       bottom: 10px; }
-  .fc-corner.fc-context {
+  .fc-corner.fc-imagery {
     top: -30px;
     left: -30px; }
-    .fc-corner.fc-context::before, .fc-corner.fc-context .fc-shadow::before {
+    .fc-corner.fc-imagery::before, .fc-corner.fc-imagery .fc-shadow::before {
       width: 10px;
       height: 40px;
       left: 10px;
       top: 10px; }
-    .fc-corner.fc-context::after, .fc-corner.fc-context .fc-shadow::after {
+    .fc-corner.fc-imagery::after, .fc-corner.fc-imagery .fc-shadow::after {
       width: 40px;
       height: 10px;
       left: 10px;
@@ -107,7 +107,7 @@ img.fc-img {
       height: 10px;
       right: 10px;
       top: 10px; }
-  .fc-embed:not(.fc-full):hover .fc-corner.fc-context {
+  .fc-embed:not(.fc-full):hover .fc-corner.fc-imagery {
     top: 0;
     left: 0; }
   .fc-embed:not(.fc-full):hover .fc-corner.fc-links {
@@ -169,7 +169,7 @@ img.fc-img {
   .fc-panel.fc-backstory {
     left: 0.5em;
     bottom: 0.5em; }
-  .fc-panel.fc-context {
+  .fc-panel.fc-imagery {
     left: 0.5em;
     top: 0.5em; }
   .fc-panel.fc-links {
@@ -219,9 +219,9 @@ img.fc-img {
     transform: rotate(90deg); }
     .fc-full .fc-backstory .fc-expand {
       transform: rotate(-90deg); }
-  .fc-context .fc-expand {
+  .fc-imagery .fc-expand {
     transform: rotate(180deg); }
-    .fc-full .fc-context .fc-expand {
+    .fc-full .fc-imagery .fc-expand {
       transform: rotate(0deg); }
   .fc-links .fc-expand {
     transform: rotate(-90deg); }
@@ -290,7 +290,6 @@ img.fc-img {
   .fc-row img, .fc-row iframe {
     width: 100%;
     height: auto;
-    margin: 1em 0;
     border-radius: 3px;
     border: 1px solid #c4c4c4; }
   .fc-row.fc-media, .fc-row.fc-links {
@@ -359,10 +358,9 @@ a.fc-card:hover {
 
 .fc-sub-row {
   width: 100%;
+  margin: 0 0 1em;
   padding: .5em;
-  display: block;
-  box-sizing: border-box;
-  border-bottom: 1px solid #c4c4c4; }
+  display: block; }
   .fc-sub-row:last-of-type {
     border-bottom: none; }
   .fc-full .fc-sub-row {

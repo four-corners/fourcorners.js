@@ -112,7 +112,7 @@ img.fc-img {
 			// border-radius: 0 0 0 $radius;
 		}
 	}
-	&.fc-context {
+	&.fc-imagery {
 		top: -#{$corner-gap*3};
 		left: -#{$corner-gap*3};
 		&::before, .fc-shadow::before {
@@ -149,7 +149,7 @@ img.fc-img {
 		}
 	}
 	.fc-embed:not(.fc-full):hover & {
-		&.fc-context {
+		&.fc-imagery {
 			top: 0;
 			left: 0;
 		}
@@ -172,7 +172,7 @@ img.fc-img {
 		@include fastestTrans;
 	}
 	&.fc-active, .fc-embed:hover &.fc-active {
-		&.fc-context {
+		&.fc-imagery {
 			// top: #{-$corner-gap*3};
 			// left: #{-$corner-gap*3};
 		}
@@ -190,7 +190,7 @@ img.fc-img {
 		}
 	}
 	// .fc-embed.fc-active &, .fc-embed:hover.fc-active & {
-	// 	&.fc-context {
+	// 	&.fc-imagery {
 	// 		top: -$corner-width;
 	// 		left: -$corner-width;
 	// 	}
@@ -279,7 +279,7 @@ img.fc-img {
 		bottom: $panel-gap;
 		// border-radius: 0 $radius 0 0;
 	}
-	&.fc-context {
+	&.fc-imagery {
 		left: $panel-gap;
 		top: $panel-gap;
 		// border-radius: 0 0 $radius 0;
@@ -356,7 +356,7 @@ img.fc-img {
 			transform: rotate(-90deg);
 		}
 	}
-	.fc-context & {
+	.fc-imagery & {
 		transform: rotate(180deg);
 		.fc-full & {
 			transform: rotate(0deg);
@@ -444,7 +444,7 @@ img.fc-img {
 	img, iframe {
 		width: 100%;
 		height: auto;
-		margin: 1em 0;
+		// margin: 0 0 1em 0;
 		border-radius: $radius;
 		border: 1px solid $medium;
 	}
@@ -528,25 +528,11 @@ a.fc-card:hover {
 }
 .fc-sub-row {
 	width: 100%;
-	// margin: 0 0 1em;
+	margin: 0 0 1em;
 	padding: .5em;
 	display: block;
-	box-sizing: border-box;
-	border-bottom: 1px solid $medium;
-	// box-shadow: 0 2px 1px -2px rgba($light,.8);
-	// .fc-dark & {
-	// 	border-bottom-color: $light;
-	// 	box-shadow: 0 2px 1px -2px rgba($light,.8);
-	// }
-	// &:first-of-type {
-	// 	margin: 0;
-	// 	padding-top: 0;
-	// }
 	&:last-of-type {
 		border-bottom: none;
-	// 	margin: 0;
-	// 	padding-bottom: 0;
-	// 	// box-shadow: none;
 	}
 	.fc-full & {
 		width: 50%;
@@ -566,9 +552,8 @@ a.fc-card:hover {
 .fc-sub-caption {
 	padding: .5em 0;
 }
-.fc-media {
-	// width: calc(100% + 1em);
-	// margin: 0 -.5em;
+.fc-sub-media {
+
 }
 
 
