@@ -6,6 +6,16 @@
 	* {
 		text-rendering: optimizeLegibility;
 	}
+	a, a:hover, a:visited, a:focus {
+		color: inherit;
+		font-family: inherit;
+		font-weight: normal;
+		text-decoration: none;
+		border: none;
+		transition: color 200ms ease-in-out,
+								background-color 200ms ease-in-out,
+								border-color 200ms ease-in-out;
+	}
 }
 .fc-photo {
 	width: 100%;
@@ -240,6 +250,7 @@ img.fc-img {
 	border: 1px solid $lightest;
 	border-radius: $radius;
 	transition: opacity 150ms ease-in-out;
+	// ADD A CUSTOM SCROLLBAR—VERY MINIMAL
 	.fc-dark & {
 		color: $lightest;
 		background-color: rgba($dark, .7);
@@ -248,21 +259,6 @@ img.fc-img {
 		filter: drop-shadow(0 0 1px $lighten);
 	}
 	//links
-	a, a:visited {
-		display: inline;
-		color: inherit;
-		border-bottom: 1px solid $medium;
-		transition: border 200ms ease-in-out;
-		text-decoration: none;
-		&:hover, &:visited, &:focus, & {
-			text-decoration: none;
-		}	
-		&:hover {
-			color: inherit;
-			border-bottom-color: $darken;
-			// opacity: .8;
-		}
-	}
 	.fc-embed.fc-active & {
 		// transition: none;
 	}
@@ -390,6 +386,7 @@ img.fc-img {
 }
 .fc-inner {
 	width: 100%;
+	margin: .5em 0;
 	height: auto;
 	overflow: hidden;
 	overflow-y: hidden;
@@ -397,24 +394,53 @@ img.fc-img {
 	position: relative;
 }
 .fc-panel-title {
-	margin: .5em 0 .5em .4em;
-	display: inline-block;
+	width: 100%;
+	padding: .325em 0 .325em .4em;
+	position: absolute;
+	left: 0;
+	top: 0;
+	background-color: rgba($lightest, .95);
 	font-weight: bold;
 	font-size: 1.2em;
+	z-index: 5;
+	@include shadow;
 }
-.fc-row-label {
-	margin: -.5em 0 .5em 0;
-	font-family: sans-serif;
-	@include smallText;
-	line-height: 1em;
-	letter-spacing: 1px;
-  text-transform: uppercase;
-	opacity: .5;
+.fc-pseudo {
+	opacity: 0;
+	position: unset;
+	left: unset;
+	right: unset;
+	z-index: unset;
+}
+.fc-label {
+	// color: $dark;
+	// display: inline-block;
+	// font-family: sans-serif;
+		// margin: 0 .05rem 0 0;
+    // padding: .05rem .25rem;
+		display: inline-block;
+		// @include shadow;
+		// background-color: $medium-blue;
+    border-radius: 4px;
+    color: #443c42;
+    @include smallText;
+    font-weight: bold;
+	&::after {
+		content: ' ';
+	}
+}
+.fc-about-label {
+	color: $dark;
+	font-weight: bold;
+	padding: 0 0 .5em 0;
+}
+.fc-about {
+	// background-color: $medium-blue;
 }
 .fc-row {
-	padding: 1em .5em;
+	padding: .75em .5em;
 	position: relative;
-	border-top: 1px solid $medium;
+	// border-top: 1px solid $medium;
 	img, iframe {
 		width: 100%;
 		height: auto;
@@ -423,20 +449,74 @@ img.fc-img {
 		border: 1px solid $medium;
 	}
 	&.fc-media, &.fc-links {
-		padding: 1em 0;
+		padding: 0;
 	}
+	// &:first-of-type {
+	// 	padding-top: 0em;
+	// }
 	&:last-of-type {
-		padding-bottom: 1em;
+		// padding-bottom: 1em;
 	}
 }
-.fc-label {
-	display: inline;
-	padding-right: .5em;
-	color: $dark;
-	font-weight: bold;
-	text-transform: capitalize;
-	.fc-dark & {
-		color: $lightest;
+.fc-field {
+	margin-bottom: .5em;
+	a, a:visited {
+		margin: 0;
+		padding: 0;
+		display: inline;
+		color: inherit;
+		border-bottom: 1px solid $medium;
+		transition: border 200ms ease-in-out;
+		text-decoration: none;
+		&:hover, &:visited, &:focus, & {
+			text-decoration: none;
+		}	
+		&:hover {
+			color: inherit;
+			border-bottom-color: $darken;
+			// opacity: .8;
+		}
+	}
+}
+.fc-caption {
+	font-style: italic;
+}
+.fc-contact {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+.fc-card, a.fc-card {
+	width: 100%;
+	margin: 0;
+	padding: .5rem;
+	display: table;
+	background-color: $light;
+	border-radius: $radius;
+	@include shadow;
+	.fc-label {
+		display: block;
+	}
+}
+a.fc-card:hover {
+	background-color: $light-blue;
+}
+.fc-half {
+	width: calc(50% - .5em);
+	margin-top: 1em;
+	display: inline-block;
+	&:nth-child(odd) {
+		margin-right: 1em;
+	}
+}
+.fc-button {
+	display: inline-block;
+	a, a:visited, a:hover, a:focus {
+		padding: .25em .5em;
+		border-radius: $radius;
+		border: 1px solid $medium;
+		text-decoration: none;
+		background-color: $medium-blue;
 	}
 }
 .fc-value {
@@ -444,7 +524,6 @@ img.fc-img {
 	white-space: pre-line;
 }
 .fc-row-inner {
-	// margin: .5em 0 0;
 	clear: both;
 }
 .fc-sub-row {
@@ -483,7 +562,6 @@ img.fc-img {
 .fc-sub-url {
 	opacity: .8;
 	text-decoration: none;
-	cursor: default;
 }
 .fc-sub-caption {
 	padding: .5em 0;
@@ -527,4 +605,7 @@ img.fc-img {
 		background-size: contain;
 		content: '';
 	}
+}
+.fc-credit {
+	margin-right: .5em;
 }
