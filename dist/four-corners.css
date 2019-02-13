@@ -184,8 +184,10 @@ img.fc-img {
   .fc-panel p {
     font-size: inherit;
     line-height: inherit;
-    margin: 0 0 .5em 0;
-    padding: 0; }
+    margin: 0;
+    padding: 0;
+    word-break: break-word;
+    hyphens: auto; }
     .fc-panel p:last-child {
       margin: 0; }
 
@@ -277,7 +279,9 @@ img.fc-img {
   line-height: 1.2em;
   font-weight: bold; }
   .fc-label::after {
-    content: ' '; }
+    content: '';
+    margin-right: .25em;
+    display: inline-block; }
 
 .fc-about-label {
   color: #443c42;
@@ -292,8 +296,6 @@ img.fc-img {
     height: auto;
     border-radius: 3px;
     border: 1px solid #c4c4c4; }
-  .fc-row.fc-media, .fc-row.fc-links {
-    padding: 0; }
 
 .fc-field {
   margin-bottom: .5em; }
@@ -304,7 +306,8 @@ img.fc-img {
     color: inherit;
     border-bottom: 1px solid #c4c4c4;
     transition: border 200ms ease-in-out;
-    text-decoration: none; }
+    text-decoration: none;
+    word-break: break-word; }
     .fc-field a:hover, .fc-field a:visited, .fc-field a:focus, .fc-field a, .fc-field a:visited:hover, .fc-field a:visited:visited, .fc-field a:visited:focus, .fc-field a:visited {
       text-decoration: none; }
     .fc-field a:hover, .fc-field a:visited:hover {

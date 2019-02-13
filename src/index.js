@@ -69,11 +69,9 @@ class FourCorners {
 	closePanel(slug) {
 		const inst = this;
 		const embed = inst.elems.embed;
-		if(!slug) {
-			slug = embed.dataset.fcActive;
-		}
+		if(!slug) {slug = embed.dataset.fcActive}
+		if(!slug) {return}
 		const corner = inst.elems.corners[slug];
-		// const panel = inst.elems.panels[slug];
 		const panel = inst.getPanel(slug);
 		if(slug==embed.dataset.fcActive) {
 			embed.dataset.fcActive = '';
@@ -100,13 +98,6 @@ const initEmbed = (inst) => {
 
 	if(inst.opts.interactive) {
 
-		// embed.addEventListener('mouseenter', function(e) {
-		// 	hoverEmbed(e, inst);
-		// });
-		// embed.addEventListener('mouseleave', function(e) {
-		// 	unhoverEmbed(e, inst);
-		// });
-
 		window.addEventListener('resize', function(e) {
 			resizeEmbed(e, inst);
 		});
@@ -121,12 +112,10 @@ const initEmbed = (inst) => {
 		});
 
 	}
-
 	resizeEmbed(null, inst);
 }
 
 const resizeEmbed = (e, inst) => {
-	// const panels = inst.elems.panels;
 	const panels = inst.getPanel();
 	if(!panels){return}
 	Object.keys(panels).forEach(function(slug, i) {
@@ -246,33 +235,6 @@ const addPanels = (inst) => {
 	return panels;
 }
 
-// Object.entries(panelData).forEach(([prop, val]) => {
-// 	if(!val){return}
-// 	let row = document.createElement('div');
-// 	row.classList.add('fc-row', 'fc-'+prop);
-// 	if(prop == 'media') {
-// 		const mediaElems = addMedia(val);
-// 		if(mediaElems) { row.appendChild(mediaElems) }
-// 	} else if(prop == 'links') {
-// 		const linkElems = addLinks(val);
-// 		if(linkElems) { row.appendChild(linkElems) }
-// 	} else if(prop == 'license') {
-// 		const licenseElems = addLicense(val);
-// 		if(licenseElems) { row.appendChild(licenseElems) }
-// 	} else if(prop == 'ethics') {
-// 		row.innerHTML = val;
-// 	} else if(prop == 'copyright') {
-// 		row.innerHTML = '&copy; '+val;
-// 	} else if(prop == 'text') {
-// 		const paraElems = wrapParagraphs(val);
-// 		if(paraElems) { row.appendChild(paraElems) }
-// 	} else {
-// 		row.innerHTML += val;
-// 	}
-	// panelInner.appendChild(row);
-// });
-
-
 const createRow = (panelData, obj, includeLabel) => {
 	const label = includeLabel ? `<div class="fc-label">${obj.label}</div>` : '';
 	const content = panelData[obj.prop];
@@ -283,13 +245,11 @@ const createRow = (panelData, obj, includeLabel) => {
 		</div>` : '';
 }
 
-const createCard = (panelData, obj, includeLabel) => {
-
-}
-
 const buildAuthorship = (inst, panelData) => {
 	const html = `
-		<div class="fc-row">
+
+		${panelData['caption']||panelData['credit']||panelData['ethics'] ?
+		`<div class="fc-row">
 			
 			${panelData['caption'] ?
 				`<div class="fc-field">
@@ -308,9 +268,12 @@ const buildAuthorship = (inst, panelData) => {
 					${panelData['ethics']}
 				</div>`: ''}
 
-		</div>
+		</div>`
+		: ''}
 
-		<div class="fc-row fc-about">
+
+		${panelData['bio']||panelData['website']||panelData['info-contact']||panelData['rights-contact'] ?
+		`<div class="fc-row fc-about">
 
 			<div class="fc-about-label">About the photographer</div>
 				${panelData['bio'] ?
@@ -340,77 +303,50 @@ const buildAuthorship = (inst, panelData) => {
 
 			</div>
 
-		</div>`;
+		</div>` : ''
+		}`;
 	return html;
 }
 
 const buildBackstory = (inst, panelData) => {
 	const html = `
 			${panelData['text'] ?
-				`<div class="fc-row">
-					<div class="fc-field">
-						${panelData['text']}
-					</div>
-				</div>`:''}`
+			`<div class="fc-row">
+				${wrapParagraphs(panelData['text'])}
+			</div>`:''}`;
 	return html;
 }
 
 const buildImagery = (inst, panelData) => {
 	if(!panelData.media){return}
 	let html = 
-		`<div class="fc-row fc-media">
-			${panelData.media.map((obj,i) => {
-				obj.source=='image'||!obj.source?
-				embedImage(inst,obj,i):embedIframe(inst,obj,i);
-				return `<div class="fc-sub-row">
-					<div class="fc-sub-media">
-					</div>
-					${obj.caption?
-					`<div class="fc-sub-caption">${obj.caption}</div>`
-					:''}
-				</div>`
-			}).join('')}
-		</div>`;
+		`${panelData.media.map((obj,i) => {
+			obj.source=='image'||!obj.source?
+			embedImage(inst,obj,i):embedIframe(inst,obj,i);
+			return `<div class="fc-row">
+				<div class="fc-media">
+				</div>
+				${obj.caption?
+				`<div class="fc-sub-caption">${obj.caption}</div>`
+				:''}
+			</div>`
+		}).join('')}`
 	return html;
 }
 
 const buildLinks = (inst, panelData) => {
 	if(!panelData.links){return}
 	let html = panelData.links.map(obj => {
+		if(!obj){return null}
 		let rootUrl = extractRootDomain(obj.url);
-		let row = obj.url ?
+		let text = obj.url ?
 			`${obj.title?obj.title:rootUrl}
 			<div class="fc-sub-url">${rootUrl}</div>` : '';
-		return `<div class="fc-row">${createLink(obj.url, row, ['fc-card'])}</div>`
+		return `<div class="fc-row">${createLink(obj.url, text, ['fc-card'])}</div>`
 	}).join('');
 	return html;
 }
 
-// const addLinks = (arr) => {
-// 	let rowInner = document.createElement('div');
-// 	rowInner.className = 'fc-sub-rows';
-// 	arr.forEach(function(obj, index) {
-// 		if(!obj){return}
-// 		let subRow = document.createElement('div');
-// 		subRow.className = 'fc-sub-row';
-// 		let a = document.createElement('a');
-// 		a.href = obj.url;
-// 		a.target = '_blank';
-// 		if(obj.title) {
-// 			a.innerHTML = obj.title;
-// 		}
-// 		subRow.appendChild(a);
-// 		let rootUrl = extractRootDomain(obj.url);
-// 		if(rootUrl) {
-// 			let url = document.createElement('div');
-// 			url.className = 'fc-sub-url';
-// 			url.innerHTML = rootUrl;
-// 			subRow.appendChild(url);
-// 		}
-// 		rowInner.appendChild(subRow);
-// 	});
-// 	return rowInner;
-// }
 
 const embedImage = (inst, obj, index) => {
 	if(!obj.url){ return }
@@ -418,8 +354,8 @@ const embedImage = (inst, obj, index) => {
 	pseudoImg.onload = (e) => {
 		const img = `<img src="${obj.url}"/>`;
 		const panel = inst.elems.panels['imagery'];
-		let subMedia = panel.querySelectorAll('.fc-sub-media')[index];
-		subMedia.innerHTML += img;
+		let media = panel.querySelectorAll('.fc-media')[index];
+		media.innerHTML += img;
 	}
 	pseudoImg.onerror = (e) => {
 		console.warn('Four Corners cannot load this as an image: '+obj.url, e);
@@ -458,7 +394,7 @@ const embedIframe = (inst, obj, index) => {
 		})
 		.then(res => {
 			const panel = inst.elems.panels['imagery'];
-			let subMedia = panel.querySelectorAll('.fc-sub-media')[index];
+			let subMedia = panel.querySelectorAll('.fc-media')[index];
 			if(Number.isInteger(res.width,res.height)) {
 				const ratio = res.height/res.width;
 				subMedia.classList.add('fc-responsive')
@@ -550,20 +486,6 @@ const parseData = (inst) => {
 	return JSON.parse(stringData);
 }
 
-// const hoverEmbed = (e, inst) => {
-// 	let embed = inst.elems.embed;
-// 	let corners = inst.elems.corners;
-// 	const css = inst.css;
-// 	const posDur = inst.opts.posDur;
-// }
-
-// const unhoverEmbed = (e, inst) => {
-// 	let embed = inst.elems.embed;
-// 	let corners = inst.elems.corners;
-// 	const css = inst.css;
-// 	const posDur = inst.opts.posDur;
-// }
-
 const hoverCorner = (e, inst) => {
 	let corner = e.target;
 	corner.classList.add('fc-hover');
@@ -586,10 +508,6 @@ const clickCorner = (e, inst) => {
 	}	
 }
 
-// const closePanel = (e, inst) => {
-// 	inst.closePanel();
-// }
-
 const isChildOf = (target, ref) => {
 	let answer = false;
 	Object.entries(ref).forEach(([key, elem]) => {
@@ -600,32 +518,22 @@ const isChildOf = (target, ref) => {
 	return answer;
 }
 
+const wrapParagraphs = (val) => {
+	let array = val.split(/\n/g);
+	let text = [];
+	let html = 
+		array ?
+		`${array.map((str,i) => {
+			return str ? `<p>${str}</p>` : `<br/>`
+		}).join('')}`
+		: '';
+	return html;
+}
+
 const createLink = (href, text, classes = []) => {
 	if(!text){text=extractRootDomain(href)}
 	if(href.indexOf('@')>-1){href='mailto:'+href}
 	return `<a href="${href}" target="_blank" class="${classes.join(' ')}">${text}</a>`;
-}
-
-const wrapParagraphs = (val) => {
-	let array = val.split(/\n/g);
-	let text = '';
-	let rowInner = document.createElement('div');
-	rowInner.className = 'fc-row-inner';
-	array.forEach(function(str, i) {
-		let p = document.createElement('p');
-		p.innerHTML = str;
-		rowInner.appendChild(p);
-	});
-	return rowInner;
-}
-
-const wrapUrls = (str) => {
-	var urlPattern = /(?:(?:https?|ftp):\/\/)?(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}\-\x{ffff}0-9]+-?)*[a-z\x{00a1}\-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}\-\x{ffff}]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?/ig;
-	return str.replace(urlPattern, function (url) {
-		var protocol_pattern = /^(?:(?:https?|ftp):\/\/)/i;
-		var href = protocol_pattern.test(url) ? url : 'http://' + url;
-		return '<a href="' + href + '" target="_blank">' + url + '</a>';
-	});
 }
 
 const extractHostname = (url) => {
