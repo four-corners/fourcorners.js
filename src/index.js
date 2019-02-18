@@ -140,10 +140,12 @@ const addPhoto = (inst)  => {
 	if(!data) {return}
 	let photo, img;
 	const photoSelector = '.fc-photo';
-	if(!embed.querySelector(photoSelector)) {
-		photo = document.createElement('div');
-		photo.classList.add('fc-photo');
-		embed.appendChild(photo);
+	if(embed.querySelector(photoSelector)) {
+		photo = embed.querySelector(photoSelector);
+		// photo = document.createElement('div');
+		// photo.classList.add('fc-photo');
+	
+	// embed.appendChild(photo);
 	// 	const pseudoImg = new Image();
 	// 	const photoData = data.photo;
 	// 	if(!photoData) {return}
@@ -157,19 +159,19 @@ const addPhoto = (inst)  => {
 	// 		console.warn('Four Corners cannot load this as an image: '+src, e);
 	// 	}
 	// 	pseudoImg.src = src;
-	} else {
-		photo = embed.querySelector(photoSelector);
+	}
+	else {
+		photo = `<div class="fc-photo"></div>`;
+		embed.innerHTML += photo;
 	}
 	const imgSelector = '.fc-img';
 	if(img = embed.querySelector(imgSelector)) {
-		photo.classList.add('fc-loaded');
-		photo.appendChild(img)
-	} else {
-		// img = document.createElement('img');
-		// img.classList.add('fc-img');
-		// photo.classList.add('fc-loaded');
+		embed.classList.add('fc-loaded');
+		embed.appendChild(img);
 	}
-	
+	// else {
+		// img = `<div class="fc-img"></div>`;
+	// }
 	return photo;
 }
 
@@ -246,91 +248,105 @@ const createRow = (panelData, obj, includeLabel) => {
 }
 
 const buildAuthorship = (inst, panelData) => {
-	const html = `
-
-		${panelData['caption']||panelData['credit']||panelData['ethics'] ?
+	const html =
 		`<div class="fc-row">
 			
 			${panelData['caption'] ?
 				`<div class="fc-field">
 					<em>${panelData['caption']}</em>
-				</div>`: ''}
+				</div>` : ''}
 			
 			${panelData['credit'] ?
 				`<div class="fc-field">
 					<span class="fc-label">Photograph by</span>
 					${panelData['credit']}
-				</div>`: ''}
+				</div>` : ''}
+
+			${panelData['copyright'] ?
+				`<div class="fc-field">
+					${panelData['copyright']}
+				</div>` : ''}
 			
 			${panelData['ethics'] ?
 				`<div class="fc-field">
 					<span class="fc-label">Code of ethics</span>
 					${panelData['ethics']}
-				</div>`: ''}
-
-		</div>`
-		: ''}
-
-
-		${panelData['bio']||panelData['website']||panelData['info-contact']||panelData['rights-contact'] ?
-		`<div class="fc-row fc-about">
-
-			<div class="fc-about-label">About the photographer</div>
-				${panelData['bio'] ?
-				`<div class="fc-field">
-					${panelData['bio']}
-				</div>`: ''}
+				</div>` : ''}
+			
+			${panelData['bio'] ?
+			`<div class="fc-field">
+				<span class="fc-label">Bio</span>
+				${panelData['bio']}
+			</div>` : ''}
 
 			<div class="fc-field fc-contact">
 
 				${panelData['website'] ?
-				`<div class="fc-field fc-card fc-half">
+				`<div class="fc-field fc-card">
 					<div class="fc-label">Website</div>
 					${createLink(panelData['website'])}
 				</div>`: ''}
 
-				${panelData['info-contact'] ?
-				`<div class="fc-field fc-card fc-half">
+				${panelData['0-contact'] ?
+				`<div class="fc-field fc-card">
 					<div class="fc-label">For more info contact</div>
-					${createLink(panelData['info-contact'])}
+					${createLink(panelData['0-contact'])}
 				</div>`: ''}
 
-				${panelData['rights-contact'] ?
-				`<div class="fc-field fc-card fc-half">
+				${panelData['1-contact'] ?
+				`<div class="fc-field fc-card">
 					<div class="fc-label">For reproduction rights contact</div>
-					${createLink(panelData['rights-contact'])}
-				</div>`: ''}
+					${createLink(panelData['1-contact'])}
+				</div>` : ''}
 
 			</div>
 
-		</div>` : ''
-		}`;
+		</div>`;
+
 	return html;
 }
 
 const buildBackstory = (inst, panelData) => {
-	const html = `
-			${panelData['text'] ?
-			`<div class="fc-row">
-				${wrapParagraphs(panelData['text'])}
-			</div>`:''}`;
-	return html;
-}
-
-const buildImagery = (inst, panelData) => {
-	if(!panelData.media){return}
 	let html = 
-		`${panelData.media.map((obj,i) => {
-			obj.source=='image'||!obj.source?
-			embedImage(inst,obj,i):embedIframe(inst,obj,i);
+		`${panelData['text'] ?
+		`<div class="fc-row">
+			${wrapParagraphs(panelData['text'])}
+		</div>`:''}
+		${panelData.media?
+			panelData.media.map((obj,i) => {
+			embedIframe(inst,obj,'backstory',i);
 			return `<div class="fc-row">
 				<div class="fc-media">
 				</div>
 				${obj.caption?
 				`<div class="fc-sub-caption">${obj.caption}</div>`
 				:''}
+				${obj.credit?
+				`<div class="fc-sub-credit">${obj.credit}</div>`
+				:''}
 			</div>`
-		}).join('')}`
+		}).join(''):''}`
+	return html;
+}
+
+const buildImagery = (inst, panelData) => {
+	if(!panelData.media){return}
+
+	let html = 
+		`${panelData.media.map((obj,i) => {
+			obj.source=='image'||!obj.source?
+			embedImage(inst,obj,'imagery',i):embedIframe(inst,obj,'imagery',i);
+			return `<div class="fc-row">
+				<div class="fc-media">
+				</div>
+				${obj.caption?
+				`<div class="fc-sub-caption">${obj.caption}</div>`
+				:''}
+				${obj.credit?
+				`<div class="fc-sub-credit">${obj.credit}</div>`
+				:''}
+			</div>`
+		}).join('')}`;
 	return html;
 }
 
@@ -348,12 +364,12 @@ const buildLinks = (inst, panelData) => {
 }
 
 
-const embedImage = (inst, obj, index) => {
+const embedImage = (inst, obj, panelKey, index) => {
 	if(!obj.url){ return }
 	const pseudoImg = new Image();
 	pseudoImg.onload = (e) => {
 		const img = `<img src="${obj.url}"/>`;
-		const panel = inst.elems.panels['imagery'];
+		const panel = inst.elems.panels[panelKey];
 		let media = panel.querySelectorAll('.fc-media')[index];
 		media.innerHTML += img;
 	}
@@ -364,7 +380,7 @@ const embedImage = (inst, obj, index) => {
 	return;
 }
 
-const embedIframe = (inst, obj, index) => {
+const embedIframe = (inst, obj, panelKey, index) => {
 	//requests third party APIs to retrieve embed data
 	let req = '';
 	switch(obj.source) {
@@ -393,7 +409,7 @@ const embedIframe = (inst, obj, index) => {
 			return res.json();
 		})
 		.then(res => {
-			const panel = inst.elems.panels['imagery'];
+			const panel = inst.elems.panels[panelKey];
 			let subMedia = panel.querySelectorAll('.fc-media')[index];
 			if(Number.isInteger(res.width,res.height)) {
 				const ratio = res.height/res.width;
@@ -466,7 +482,6 @@ const addCutline = (inst) => {
 	//add FC link to cutline
 	let link = document.createElement('a');
 	link.classList.add('fc-link');
-	link.innerHTML = 'Four Corners';
 	link.href = 'https://fourcornersproject.org';
 	link.target = '_blank';
 	cutline.appendChild(link);

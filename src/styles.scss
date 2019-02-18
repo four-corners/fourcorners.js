@@ -2,9 +2,14 @@
 .fc-embed {
 	position: relative;
 	overflow: hidden;
+	background-color: $light;
 	@include medText;
+	&:not(.fc-loaded) {
+		padding-bottom: 60%;
+	}
 	* {
 		text-rendering: optimizeLegibility;
+		box-sizing: border-box;
 	}
 	a, a:hover, a:visited, a:focus {
 		color: inherit;
@@ -19,10 +24,6 @@
 }
 .fc-photo {
 	width: 100%;
-	background-color: $light;
-	&:not(.fc-loaded) {
-		padding-bottom: 60%;
-	}
 }
 img.fc-img {
 	width: 100%;
@@ -148,7 +149,7 @@ img.fc-img {
 			// border-radius: 0 $radius 0 0;
 		}
 	}
-	.fc-embed:not(.fc-full):hover & {
+	.fc-embed:not(.fc-full):hover &, .fc-embed:not(.fc-loaded) & {
 		&.fc-imagery {
 			top: 0;
 			left: 0;
@@ -167,8 +168,6 @@ img.fc-img {
 		}
 	}
 	.fc-full & {
-		// opacity: 0;
-		// pointer-events: none;
 		@include fastestTrans;
 	}
 	&.fc-active, .fc-embed:hover &.fc-active {
@@ -415,31 +414,18 @@ img.fc-img {
 	z-index: unset;
 }
 .fc-label {
-	// color: $dark;
-	// display: inline-block;
-	// font-family: sans-serif;
-		// margin: 0 .05rem 0 0;
-    // padding: .05rem .25rem;
-		display: inline-block;
-		// @include shadow;
-		// background-color: $medium-blue;
-    border-radius: 4px;
-    color: #443c42;
-    @include smallText;
-    font-weight: bold;
+	color: $dark;
 	&::after {
-		content: '';
+		content: ': ';
 		margin-right: .25em;
 		display: inline-block;
 	}
 }
-.fc-about-label {
-	color: $dark;
-	font-weight: bold;
-	padding: 0 0 .5em 0;
-}
-.fc-about {
-	// background-color: $medium-blue;
+.fc-content {
+	display: inline-block;
+	&[data-fc-field=""] {
+
+	}
 }
 .fc-row {
 	padding: .75em .5em;
@@ -485,7 +471,7 @@ img.fc-img {
 .fc-card, a.fc-card {
 	width: 100%;
 	margin: 0;
-	padding: .5rem;
+	padding: .5em;
 	display: table;
 	background-color: $light;
 	border-radius: $radius;
@@ -496,6 +482,9 @@ img.fc-img {
 }
 a.fc-card:hover {
 	background-color: $light-blue;
+}
+.fc-card.fc-field:not(:last-child) {
+	margin-bottom: .5em;
 }
 .fc-half {
 	width: calc(50% - .5em);
@@ -538,7 +527,7 @@ a.fc-card:hover {
 .fc-media {
 	
 }
-.fc-sub-caption, .fc-sub-url, .fc-cutline {
+[class^='fc-sub-'], .fc-cutline {
 	@include smallText;
 }
 .fc-sub-url {
@@ -546,7 +535,10 @@ a.fc-card:hover {
 	text-decoration: none;
 }
 .fc-sub-caption {
-	padding: .5em 0;
+	padding: .5em 0 0 0;
+}
+.fc-sub-credit {
+	color: $dark;
 }
 
 
