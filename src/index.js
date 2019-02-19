@@ -262,9 +262,17 @@ const buildAuthorship = (inst, panelData) => {
 					${panelData['credit']}
 				</div>` : ''}
 
-			${panelData['copyright'] ?
-				`<div class="fc-field">
-					${panelData['copyright']}
+			${panelData['license'] ?
+				`<div class="fc-field" data-fc-field="license">
+					<span class="fc-label">License</span>
+					<span class="fc-content">
+						${panelData['license'].type=='copyright'?'© ':''}
+						${panelData['license'].url ?
+						`<a href="${panelData['license'].url}" target="_blank">
+							${panelData['license'].label ? panelData['license'].label : ''}
+						</a>` :
+						panelData['license'].label ? panelData['license'].label : ''}
+					</span>
 				</div>` : ''}
 			
 			${panelData['ethics'] ?
