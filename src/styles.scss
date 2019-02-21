@@ -43,8 +43,8 @@ img.fc-img {
 // 	}
 // }
 .fc-corner {
-	width: 5em;
-	height: 5em;
+	width: $corner-size;
+	height: $corner-size;
 	position: absolute;
 	z-index: 4;
 	filter: drop-shadow(0 0 1px $darken);
@@ -78,8 +78,8 @@ img.fc-img {
 		@include noTrans;
 	}
 	&.fc-authorship {
-		bottom: -#{$corner-gap*3};
-		right: -#{$corner-gap*3};
+		bottom: -#{$corner-size};
+		right: -#{$corner-size};
 		&::before, .fc-shadow::before {
 			width: $corner-width;
 			height: $corner-len;
@@ -96,8 +96,8 @@ img.fc-img {
 		}
 	}
 	&.fc-backstory {
-		bottom: -#{$corner-gap*3};
-		left: -#{$corner-gap*3};
+		bottom: -#{$corner-size};
+		left: -#{$corner-size};
 		&::before, .fc-shadow::before {
 			width: $corner-width;
 			height: $corner-len;
@@ -114,8 +114,8 @@ img.fc-img {
 		}
 	}
 	&.fc-imagery {
-		top: -#{$corner-gap*3};
-		left: -#{$corner-gap*3};
+		top: -#{$corner-size};
+		left: -#{$corner-size};
 		&::before, .fc-shadow::before {
 			width: $corner-width;
 			height: $corner-len;
@@ -132,8 +132,8 @@ img.fc-img {
 		}
 	}
 	&.fc-links {
-		top: -#{$corner-gap*3};
-		right: -#{$corner-gap*3};
+		top: -#{$corner-size};
+		right: -#{$corner-size};
 		&::before, .fc-shadow::before {
 			width: $corner-width;
 			height: $corner-len;
@@ -149,7 +149,7 @@ img.fc-img {
 			// border-radius: 0 $radius 0 0;
 		}
 	}
-	.fc-embed:not(.fc-full):hover &, .fc-embed:not(.fc-loaded) & {
+	.fc-embed:hover:not(.fc-full) &, .fc-embed:not(.fc-loaded) & {
 		&.fc-imagery {
 			top: 0;
 			left: 0;
@@ -168,44 +168,8 @@ img.fc-img {
 		}
 	}
 	.fc-full & {
-		@include fastestTrans;
+		display: none;
 	}
-	&.fc-active, .fc-embed:hover &.fc-active {
-		&.fc-imagery {
-			// top: #{-$corner-gap*3};
-			// left: #{-$corner-gap*3};
-		}
-		&.fc-links {
-			// top: #{-$corner-gap*3};
-			// right: #{-$corner-gap*3};
-		}
-		&.fc-authorship {
-			// bottom: #{-$corner-gap*3};
-			// right: #{-$corner-gap*3};
-		}
-		&.fc-backstory {
-			// bottom: #{-$corner-gap*3};
-			// left: #{-$corner-gap*3};
-		}
-	}
-	// .fc-embed.fc-active &, .fc-embed:hover.fc-active & {
-	// 	&.fc-imagery {
-	// 		top: -$corner-width;
-	// 		left: -$corner-width;
-	// 	}
-	// 	&.fc-links {
-	// 		top: -$corner-width;
-	// 		right: -$corner-width;
-	// 	}
-	// 	&.fc-authorship {
-	// 		bottom: -$corner-width;
-	// 		right: -$corner-width;
-	// 	}
-	// 	&.fc-backstory {
-	// 		bottom: -$corner-width;
-	// 		left: -$corner-width;
-	// 	}
-	// }
 }
 .fc-shadow {
 	width: 100%;
@@ -220,15 +184,8 @@ img.fc-img {
 		background-color: $darkest;
 		z-index: 3;
 		content: '';
-		// box-shadow: 0 0 0 1px $medium;
 		border: 1px solid $medium;
-		// .fc-dark & {
-			
-		// }
 	}
-	// .fc-dark & {
-		
-	// }
 }
 .fc-panel {
 	width: 60%;
@@ -405,6 +362,12 @@ img.fc-img {
 	font-size: 1.2em;
 	z-index: 5;
 	@include shadow;
+	.fc-dark & {
+		color: $lightest;
+		background-color: rgba($dark, .7);
+		// border-color: $medium;
+		// filter: drop-shadow(0 0 1px $lighten);
+	}
 }
 .fc-pseudo {
 	opacity: 0;
@@ -459,6 +422,9 @@ img.fc-img {
 			// opacity: .8;
 		}
 	}
+	&:last-of-type {
+		margin: 0;
+	}
 }
 .fc-caption {
 	font-style: italic;
@@ -467,6 +433,27 @@ img.fc-img {
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
+	&:not(:first-of-type) {
+		margin-top: 1em;
+	}
+}
+.fc-copyright {
+	span {
+		&::before {
+			display: inline-block;
+			content: ' ';
+			white-space: pre;
+		}	
+	}
+	&::before {
+		display: inline-block;
+		content: '\00a9';
+	}
+	&::after {
+		display: inline-block;
+		content: ' ';
+		white-space: pre;
+	}
 }
 .fc-card, a.fc-card {
 	width: 100%;
@@ -525,7 +512,9 @@ a.fc-card:hover {
 	}
 }
 .fc-media {
-	
+	.fc-sub-caption {
+		padding: .5em 0 0 0;
+	}
 }
 [class^='fc-sub-'], .fc-cutline {
 	@include smallText;
@@ -533,9 +522,6 @@ a.fc-card:hover {
 .fc-sub-url {
 	opacity: .8;
 	text-decoration: none;
-}
-.fc-sub-caption {
-	padding: .5em 0 0 0;
 }
 .fc-sub-credit {
 	color: $dark;

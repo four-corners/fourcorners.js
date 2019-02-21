@@ -108,6 +108,7 @@ const initEmbed = (inst) => {
 			const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
 			if(!onPanels && !onCorners && !inCreator) {
 				inst.closePanel();
+				inst.elems.embed.classList.remove('fc-full');
 			}
 		});
 
@@ -232,6 +233,7 @@ const addPanels = (inst) => {
 		const panelClose = panel.querySelector('.fc-close');
 		panelClose.addEventListener('click', function(e) {
 			inst.closePanel(slug);
+			inst.elems.embed.classList.remove('fc-full');
 		});
 	});
 	return panels;
@@ -248,68 +250,86 @@ const createRow = (panelData, obj, includeLabel) => {
 }
 
 const buildAuthorship = (inst, panelData) => {
-	const html =
-		`<div class="fc-row">
-			
-			${panelData['caption'] ?
-				`<div class="fc-field">
-					<em>${panelData['caption']}</em>
-				</div>` : ''}
-			
-			${panelData['credit'] ?
-				`<div class="fc-field">
-					<span class="fc-label">Photograph by</span>
-					${panelData['credit']}
-				</div>` : ''}
+	const hasCopyright = hasField(panelData,'license','label')&&panelData['license'].type=='copyright';
+	let html, innerHtml = ``;
 
-			${panelData['license'] ?
-				`<div class="fc-field" data-fc-field="license">
-					<span class="fc-label">License</span>
-					<span class="fc-content">
-						${panelData['license'].type=='copyright'?'© ':''}
-						${panelData['license'].url ?
-						`<a href="${panelData['license'].url}" target="_blank">
-							${panelData['license'].label ? panelData['license'].label : ''}
-						</a>` :
-						panelData['license'].label ? panelData['license'].label : ''}
-					</span>
-				</div>` : ''}
-			
-			${panelData['ethics'] ?
-				`<div class="fc-field">
-					<span class="fc-label">Code of ethics</span>
-					${panelData['ethics']}
-				</div>` : ''}
-			
-			${panelData['bio'] ?
-			`<div class="fc-field">
-				<span class="fc-label">Bio</span>
-				${panelData['bio']}
+	innerHtml +=
+		panelData['caption'] ? 
+		`<div class="fc-field">
+			<em>${panelData['caption']}</em>
+		</div>` : '';
+
+	innerHtml +=
+		hasField(panelData,'license','credit') || hasCopyright ?
+			`<div class="fc-field" data-fc-field="credit">
+				<div class="fc-content">
+					${hasCopyright ?
+						`<span class="fc-copyright">
+							${hasField(panelData,'license','label') ?
+								`<span>${panelData['license'].label}</span>`
+							: ''}
+						</span>`
+					:''}
+					${hasField(panelData,'credit') ? panelData['credit'] : ''}
+				</div>
+			</div>` : '';
+
+	innerHtml +=
+		panelData['license'] &&
+		panelData['license'].type=='commons' ?
+			`<div class="fc-field" data-fc-field="license">
+				<span class="fc-label">License</span>
+				<span class="fc-content">
+					${panelData['license'].url ?
+					`<a href="${panelData['license'].url}" target="_blank">
+						${panelData['license'].label ? panelData['license'].label : ''}
+					</a>` :
+					panelData['license'].label ? panelData['license'].label : ''}
+				</span>
+			</div>` : '';
+	
+	innerHtml +=
+	panelData['ethics'] ?
+		`<div class="fc-field">
+			<span class="fc-label">Code of ethics</span>
+			${panelData['ethics']}
+		</div>` : '';
+	
+	innerHtml +=
+		panelData['bio'] ?
+		`<div class="fc-field">
+			<span class="fc-label">Bio</span>
+			${panelData['bio']}
+		</div>` : ''
+
+
+	innerHtml +=
+		panelData['website']||panelData['0-contact']||panelData['1-contact'] ?
+		`<div class="fc-field fc-contact">
+
+			${panelData['website'] ?
+			`<div class="fc-field fc-card">
+				<div class="fc-label">Website</div>
+				${createLink(panelData['website'])}
+			</div>`: ''}
+
+			${panelData['0-contact'] ?
+			`<div class="fc-field fc-card">
+				<div class="fc-label">For more info contact</div>
+				${createLink(panelData['0-contact'])}
+			</div>`: ''}
+
+			${panelData['1-contact'] ?
+			`<div class="fc-field fc-card">
+				<div class="fc-label">For reproduction rights contact</div>
+				${createLink(panelData['1-contact'])}
 			</div>` : ''}
 
-			<div class="fc-field fc-contact">
+		</div>` : '';
 
-				${panelData['website'] ?
-				`<div class="fc-field fc-card">
-					<div class="fc-label">Website</div>
-					${createLink(panelData['website'])}
-				</div>`: ''}
-
-				${panelData['0-contact'] ?
-				`<div class="fc-field fc-card">
-					<div class="fc-label">For more info contact</div>
-					${createLink(panelData['0-contact'])}
-				</div>`: ''}
-
-				${panelData['1-contact'] ?
-				`<div class="fc-field fc-card">
-					<div class="fc-label">For reproduction rights contact</div>
-					${createLink(panelData['1-contact'])}
-				</div>` : ''}
-
-			</div>
-
-		</div>`;
+	if(innerHtml.length) {
+		html = `<div class="fc-row">${innerHtml}</div>`
+	}
 
 	return html;
 }
@@ -361,7 +381,7 @@ const buildImagery = (inst, panelData) => {
 const buildLinks = (inst, panelData) => {
 	if(!panelData.links){return}
 	let html = panelData.links.map(obj => {
-		if(!obj){return null}
+		if(!obj||!obj.url){return null}
 		let rootUrl = extractRootDomain(obj.url);
 		let text = obj.url ?
 			`${obj.title?obj.title:rootUrl}
@@ -586,4 +606,20 @@ const extractRootDomain = (url)  => {
 	return domain;
 }
 
+const hasField = (panelData, fieldKey, subFieldKey) => {
+	if(!panelData){return false}
+	if(!panelData[fieldKey]){return false}
+	if(typeof panelData[fieldKey] == 'object') {
+		if(!Object.keys(panelData[fieldKey]).length){return false}	
+	} else {
+		if(!panelData[fieldKey].length){return false}	
+	}
+	if(!subFieldKey||!panelData[fieldKey][subFieldKey]){return false}
+	if(typeof panelData[fieldKey][subFieldKey] == 'object') {
+		if(!Object.keys(panelData[fieldKey][subFieldKey]).length){return false}	
+	} else {
+		if(!panelData[fieldKey][subFieldKey].length){return false}	
+	}
+	return true;
+}
 export default FourCorners;
