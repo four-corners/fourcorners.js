@@ -26,7 +26,7 @@
 	width: 100%;
 }
 img.fc-img {
-	width: 100%;
+	max-width: 100%;
 	height: auto;
 	display: table;
 	opacity: 0;
@@ -391,7 +391,7 @@ img.fc-img {
 	}
 }
 .fc-row {
-	padding: .75em .5em;
+	padding: .5em;
 	position: relative;
 	// border-top: 1px solid $medium;
 	img, iframe {
@@ -439,20 +439,12 @@ img.fc-img {
 }
 .fc-copyright {
 	span {
-		&::before {
-			display: inline-block;
-			content: ' ';
-			white-space: pre;
-		}	
+		margin-right: .25em;
 	}
 	&::before {
 		display: inline-block;
 		content: '\00a9';
-	}
-	&::after {
-		display: inline-block;
-		content: ' ';
-		white-space: pre;
+		margin-right: .25em;
 	}
 }
 .fc-card, a.fc-card {
@@ -468,7 +460,7 @@ img.fc-img {
 	}
 }
 a.fc-card:hover {
-	background-color: $light-blue;
+	background-color: $lightBlue;
 }
 .fc-card.fc-field:not(:last-child) {
 	margin-bottom: .5em;
@@ -488,7 +480,7 @@ a.fc-card:hover {
 		border-radius: $radius;
 		border: 1px solid $medium;
 		text-decoration: none;
-		background-color: $medium-blue;
+		background-color: $mediumBlue;
 	}
 }
 .fc-value {
@@ -512,7 +504,15 @@ a.fc-card:hover {
 	}
 }
 .fc-media {
-	.fc-sub-caption {
+	display: table;
+	margin: auto;
+	&:not([data-fc-source='image']) {
+		width: 100%;
+	}
+	img {
+
+	}
+	& + .fc-sub-caption {
 		padding: .5em 0 0 0;
 	}
 }
@@ -553,7 +553,7 @@ a.fc-card:hover {
 	a::after {
 		width: 10px;
 		height: 10px;
-		margin: .2em 0 0 .4em;
+		margin: .2em 0 0 0;
 		display: inline-block;
 		background-image: url(./svg/icon.svg);
 		background-repeat: no-repeat;
