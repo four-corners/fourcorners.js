@@ -383,6 +383,9 @@ img.fc-img {
 		margin-right: .25em;
 		display: inline-block;
 	}
+	.fc-dark & {
+		color: $light;
+	}
 }
 .fc-content {
 	display: inline-block;
@@ -458,9 +461,15 @@ img.fc-img {
 	.fc-label {
 		display: block;
 	}
+	.fc-dark & {
+		background-color: $dark;
+	}
 }
 a.fc-card:hover {
 	background-color: $lightBlue;
+	.fc-dark &  {
+		background-color: $darken;
+	}
 }
 .fc-card.fc-field:not(:last-child) {
 	margin-bottom: .5em;
