@@ -1,6 +1,6 @@
 {
   "name": "@four-corners/four-corners",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "",
   "license": "ISC",
   "description": "",
@@ -53,11 +53,11 @@
     "start": "npm run watch & browser-sync start --server --port 9000 --no-notify --no-open --files 'src/*.js' 'dist/*.js' '*.html'",
     "watch": "webpack --progress --colors --watch --env dev",
     "build": "webpack --env build --optimize-minimize -p",
-    "copy-js": "cp dist/*.min.js ../four-corners-wp/wp-content/themes/four-corners-wp-theme/assets/js",
-    "copy-css": "cp dist/*.min.css ../four-corners-wp/wp-content/themes/four-corners-wp-theme/assets/css",
+    "copy-js": "cp dist/*.min.js ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/js",
+    "copy-css": "cp dist/*.min.css ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/css",
     "copy": "npm run copy-js & npm run copy-css",
-    "copy-dev-js": "cp dist/four-corners.js ../four-corners-wp/wp-content/themes/four-corners-wp-theme/assets/js/four-corners.min.js",
-    "copy-dev-css": "cp dist/four-corners.css ../four-corners-wp/wp-content/themes/four-corners-wp-theme/assets/css/four-corners.min.css",
+    "copy-dev-js": "cp dist/four-corners.js ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/js/four-corners.min.js",
+    "copy-dev-css": "cp dist/four-corners.css ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/css/four-corners.min.css",
     "copy-dev": "npm run copy-dev-js & npm run copy-dev-css"
   }
 }

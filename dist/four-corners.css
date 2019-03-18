@@ -406,6 +406,8 @@ a.fc-card:hover {
 
 .fc-sub-credit {
   color: #7b7883; }
+  .fc-sub-credit.fc-dark {
+    color: #f4f4f6; }
 
 .fc-responsive {
   position: relative; }

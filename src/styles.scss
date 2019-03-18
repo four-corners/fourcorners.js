@@ -534,6 +534,9 @@ a.fc-card:hover {
 }
 .fc-sub-credit {
 	color: $dark;
+	&.fc-dark {
+		color: $light;
+	}
 }
 
 
