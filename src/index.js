@@ -1,37 +1,30 @@
-class FourCorners {
+class FourCornersPhoto {
 
 	constructor(embed, opts) {
-		this.elems = {};
-		this.opts = opts;
+		const defaultOpts = {
+			selector: '.fc-embed:not(.fc-init)',
+			active: '',
+			interactive: true,
+			cutline: false
+		};
+		this.opts = Object.assign(defaultOpts, opts);
 		this.corners = ['authorship','backstory','imagery','links'];
 		this.cornerTitles = ['Authorship','Backstory','Related Imagery','Links'];
+		this.elems = {};
 		this.elems.embed = embed;
-		this.data = parseData(this);
+		// let selector = this.opts.elem ? this.opts.elem : '.fc-embed';
+		// this.elems.embed = document.querySelector(selector);
+		const data = parseData(this);
+		this.content = {
+			'authorship': data ? data.authorship : {},
+			'backstory': data ? data.backstory : {},
+			'imagery': data ? data.imagery : {},
+			'links': data ? data.links : {}
+		};
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
 		this.elems.corners = addCorners(this);
 		this.elems.caption = addCutline(this);
-		initEmbed(this);
-	}
-
-	init(userOpts) {
-		let proto = this;
-		proto.embeds = [];
-		const defaultOpts = {
-			selector: '.fc-embed:not(.fc-init)',
-			interactive: true,
-			active: null,
-			cutline: true,
-			posDur: 0.2,
-			transDur: 0.1,
-		};
-		const opts = Object.assign(defaultOpts, userOpts);
-		const embeds = Array.from(document.querySelectorAll(opts.selector));
-		embeds.forEach(function(embed, i) {
-			const inst = new FourCorners(embed, opts);
-			proto.embeds.push(inst);
-		});
-		return proto.embeds;
 	}
 
 	getPanel(slug) {
@@ -50,7 +43,7 @@ class FourCorners {
 		const corners = inst.corners;
 		const embed = inst.elems.embed;
 		const corner = inst.elems.corners[slug];
-		// const panel = this.elems.panels[slug];
+
 		let panel = inst.getPanel(slug);
 		embed.classList.remove('fc-full');
 		if(embed && corner && panel) {
@@ -92,16 +85,10 @@ class FourCorners {
 const initEmbed = (inst) => {
 	const embed = inst.elems.embed;
 	embed.classList.add('fc-init');
-	if(inst.data&&inst.data.opts&&inst.data.opts.dark) {
+	if(inst.opts.dark) {
 		embed.classList.add('fc-dark');
 	}
-
 	if(inst.opts.interactive) {
-
-		window.addEventListener('resize', function(e) {
-			resizeEmbed(e, inst);
-		});
-
 		embed.addEventListener('click', function(e) {
 			const onPanels = isChildOf(e.target, inst.getPanel());
 			const onCorners = isChildOf(e.target, inst.elems.corners);
@@ -111,8 +98,10 @@ const initEmbed = (inst) => {
 				inst.elems.embed.classList.remove('fc-full');
 			}
 		});
-
 	}
+	window.addEventListener('resize', function(e) {
+		resizeEmbed(e, inst);
+	});
 	resizeEmbed(null, inst);
 }
 
@@ -137,8 +126,6 @@ const resizePanel = (panel) => {
 
 const addPhoto = (inst)  => {
 	let embed = inst.elems.embed;
-	let data = inst.data;
-	if(!data) {return}
 	let photo, img;
 	const photoSelector = '.fc-photo';
 	if(embed.querySelector(photoSelector)) {
@@ -148,36 +135,38 @@ const addPhoto = (inst)  => {
 		photo = `<div class="fc-photo"></div>`;
 		embed.innerHTML += photo;
 	}
+	const photoElem = embed.querySelector('.fc-photo');
 	const imgSelector = '.fc-img';
 	if(img = embed.querySelector(imgSelector)) {
 		embed.classList.add('fc-loaded');
-		embed.appendChild(img);
+		photoElem.appendChild(img);
 	}
-	return photo;
+	return photoElem;
 }
 
 const addPanels = (inst) => {	
 	let data, panels = {};
 	let embed = inst.elems.embed;
+	if(!embed){return}
 	inst.corners.forEach(function(slug, i) {
 		const active = inst.opts.active;
 		let panel = inst.getPanel(slug);
 		if(!panel) {
-			let panelContent = '';
-			if(inst.data&&inst.data[slug]) {
-				const panelData = inst.data[slug];
+			let panelInner = '';
+			if(inst.content&&inst.content[slug]) {
+				const panelContent = inst.content[slug];
 				switch(slug) {
 					case 'authorship':
-						panelContent = buildAuthorship(inst, panelData);
+						panelInner = buildAuthorship(inst, panelContent);
 						break;
 					case 'backstory':
-						panelContent = buildBackstory(inst, panelData);
+						panelInner = buildBackstory(inst, panelContent);
 						break;
 					case 'imagery':
-						panelContent = buildImagery(inst, panelData);
+						panelInner = buildImagery(inst, panelContent);
 						break;
 					case 'links':
-						panelContent = buildLinks(inst, panelData);
+						panelInner = buildLinks(inst, panelContent);
 						break;
 				}
 			}
@@ -194,10 +183,10 @@ const addPanels = (inst) => {
 					<div class="fc-panel-title fc-pseudo">
 						<span>${inst.corners.indexOf(slug)}</span>
 					</div>
-					${panelContent ?
+					${panelInner ?
 					`<div class="fc-scroll">
 						<div class="fc-inner">
-							${panelContent}
+							${panelInner}
 						</div>
 					</div>` : ''}
 				</div>`;
@@ -221,100 +210,100 @@ const addPanels = (inst) => {
 	return panels;
 }
 
-const createRow = (panelData, obj, includeLabel) => {
+const createRow = (panelContent, obj, includeLabel) => {
 	const label = includeLabel ? `<div class="fc-label">${obj.label}</div>` : '';
-	const content = panelData[obj.prop];
-	return panelData[obj.prop] ?
+	const content = panelContent[obj.prop];
+	return panelContent[obj.prop] ?
 		`<div class="fc-row">
 			${label}
 			${content}
 		</div>` : '';
 }
 
-const buildAuthorship = (inst, panelData) => {
+const buildAuthorship = (inst, panelContent) => {
 	let html, innerHtml = ``;
 
 	innerHtml +=
-		panelData['caption'] ? 
+		panelContent['caption'] ? 
 		`<div class="fc-field">
-			<em>${panelData['caption']}</em>
+			<em>${panelContent['caption']}</em>
 		</div>` : '';
 
 	let creditHtml = [];
-	if(!panelData.license){panelData.license={}}
-	const hasCopyright = panelData.license.type=='copyright';
-	if(panelData.license.year) {
-		creditHtml.push(`<span>${panelData.license.year}</span>`);
+	if(!panelContent.license){panelContent.license={}}
+	const hasCopyright = panelContent.license.type=='copyright';
+	if(panelContent.license.year) {
+		creditHtml.push(`<span>${panelContent.license.year}</span>`);
 	}
-	if(panelData.credit) {
-		creditHtml.push(`<span>${panelData.license.holder ? panelData.credit+'/'+panelData.license.holder : panelData.credit}</span>`);
+	if(panelContent.credit) {
+		creditHtml.push(`<span>${panelContent.license.holder ? panelContent.credit+'/'+panelContent.license.holder : panelContent.credit}</span>`);
 	}
 
 	innerHtml +=
-		hasCopyright||panelData.credit ?
+		hasCopyright||panelContent.credit ?
 			`<div class="fc-field" data-fc-field="credit">
 				<div class="fc-content">
 					${hasCopyright ?
 						`<div class="fc-copyright">
 							${creditHtml.join('')}
 						</div>`
-					: `<div>${panelData.credit}</div>`}
+					: `<div>${panelContent.credit}</div>`}
 				</div>
 			</div>` : '';
 
 	innerHtml +=
-		panelData.license &&
-		panelData.license.label &&
-		panelData.license.type=='commons' ?
+		panelContent.license &&
+		panelContent.license.label &&
+		panelContent.license.type=='commons' ?
 			`<div class="fc-field" data-fc-field="license">
 				<span class="fc-label">License</span>
 				<span class="fc-content">
-					${panelData.license.url ?
-					`<a href="${panelData.license.url}" target="_blank">
-						${panelData.license.label ? panelData.license.label : ''}
+					${panelContent.license.url ?
+					`<a href="${panelContent.license.url}" target="_blank">
+						${panelContent.license.label ? panelContent.license.label : ''}
 					</a>`
-					: panelData.license.label ? panelData.license.label : ''}
+					: panelContent.license.label ? panelContent.license.label : ''}
 				</span>
 			</div>` : '';
 			
 	innerHtml +=
-		panelData.ethics &&
-		panelData.ethics.desc ?
+		panelContent.ethics &&
+		panelContent.ethics.desc ?
 			`<div class="fc-field" data-fc-field="ethics">
 				<span class="fc-label">Code of ethics</span>
 				<span class="fc-content">
-					<div class="fc-sub-caption">${panelData.ethics.desc}</div>
+					<div class="fc-sub-caption">${panelContent.ethics.desc}</div>
 				</span>
 			</div>` : '';
 	
 	innerHtml +=
-		panelData['bio'] ?
+		panelContent['bio'] ?
 		`<div class="fc-field">
 			<span class="fc-label">Bio</span>
-			${panelData['bio']}
+			${panelContent['bio']}
 		</div>` : '';
 
 
 	innerHtml +=
-		panelData['website']||panelData['0-contact']||panelData['1-contact'] ?
+		panelContent['website']||panelContent['0-contact']||panelContent['1-contact'] ?
 		`<div class="fc-field fc-contact">
 
-			${panelData['website'] ?
+			${panelContent['website'] ?
 			`<div class="fc-field fc-card">
 				<div class="fc-label">Website</div>
-				${createLink(panelData['website'])}
+				${createLink(panelContent['website'])}
 			</div>`: ''}
 
-			${panelData['0-contact'] ?
+			${panelContent['0-contact'] ?
 			`<div class="fc-field fc-card">
 				<div class="fc-label">For more info contact</div>
-				${createLink(panelData['0-contact'])}
+				${createLink(panelContent['0-contact'])}
 			</div>`: ''}
 
-			${panelData['1-contact'] ?
+			${panelContent['1-contact'] ?
 			`<div class="fc-field fc-card">
 				<div class="fc-label">For reproduction rights contact</div>
-				${createLink(panelData['1-contact'])}
+				${createLink(panelContent['1-contact'])}
 			</div>` : ''}
 
 		</div>` : '';
@@ -322,18 +311,17 @@ const buildAuthorship = (inst, panelData) => {
 	if(innerHtml.length) {
 		html = `<div class="fc-row">${innerHtml}</div>`
 	}
-
 	return html;
 }
 
-const buildBackstory = (inst, panelData) => {
+const buildBackstory = (inst, panelContent) => {
 	let html = 
-		`${panelData['text'] ?
+		`${panelContent['text'] ?
 		`<div class="fc-row">
-			${wrapParagraphs(panelData['text'])}
+			${wrapParagraphs(panelContent['text'])}
 		</div>`:''}
-		${panelData.media?
-			panelData.media.map((obj,i) => {
+		${panelContent.media?
+			panelContent.media.map((obj,i) => {
 			embedIframe(inst,obj,'backstory',i);
 			return `<div class="fc-row">
 				<div class="fc-media" data-fc-source="${obj.source}">
@@ -349,11 +337,11 @@ const buildBackstory = (inst, panelData) => {
 	return html;
 }
 
-const buildImagery = (inst, panelData) => {
-	if(!panelData.media){return}
+const buildImagery = (inst, panelContent) => {
+	if(!panelContent.media){return}
 
 	let html = 
-		`${panelData.media.map((obj,i) => {
+		`${panelContent.media.map((obj,i) => {
 			obj.source=='image'||!obj.source?
 			embedImage(inst,obj,'imagery',i):embedIframe(inst,obj,'imagery',i);
 			return `<div class="fc-row">
@@ -370,9 +358,9 @@ const buildImagery = (inst, panelData) => {
 	return html;
 }
 
-const buildLinks = (inst, panelData) => {
-	if(!panelData.links){return}
-	let html = panelData.links.map(obj => {
+const buildLinks = (inst, panelContent) => {
+	if(!panelContent.links){return}
+	let html = panelContent.links.map(obj => {
 		if(!obj||!obj.url){return null}
 		let rootUrl = extractRootDomain(obj.url);
 		let text = obj.url ?
@@ -458,8 +446,8 @@ const addCorners = (inst) => {
 		corner.classList.add('fc-'+slug);
 
 		if(slug==active) {corner.classList.add('fc-active')}
-		if(inst.data) {
-			data = inst.data[slug];
+		if(inst.content) {
+			data = inst.content[slug];
 			if(!data||!Object.keys(data).length) {
 				corner.classList.add('fc-empty');
 			}
@@ -487,8 +475,8 @@ const addCorners = (inst) => {
 
 const addCutline = (inst) => {
 	//check if cutline is desired
-	if(!inst.data||!inst.opts.cutline) {return}
-	const data = inst.data['authorship'];
+	if(!inst.content||!inst.opts.cutline) {return}
+	const data = inst.content['authorship'];
 	if(!data) {return}
 	const embed = inst.elems.embed
 	//create cutline elem
@@ -509,7 +497,7 @@ const addCutline = (inst) => {
 
 const parseData = (inst) => {
 	//extracts data string stored in attribute
-	if(!inst.elems.embed) {return}
+	if(!inst.elems||!inst.elems.embed) {return}
 	let stringData = inst.elems.embed.dataset.fc;
 	if(!stringData){return}
 	stringData = stringData;
@@ -596,20 +584,39 @@ const extractRootDomain = (url)  => {
 	return domain;
 }
 
-const hasField = (panelData, fieldKey, subFieldKey) => {
-	if(!panelData){return false}
-	if(!panelData[fieldKey]){return false}
-	if(typeof panelData[fieldKey] == 'object') {
-		if(!Object.keys(panelData[fieldKey]).length){return false}	
+const hasField = (panelContent, fieldKey, subFieldKey) => {
+	if(!panelContent){return false}
+	if(!panelContent[fieldKey]){return false}
+	if(typeof panelContent[fieldKey] == 'object') {
+		if(!Object.keys(panelContent[fieldKey]).length){return false}	
 	} else {
-		if(!panelData[fieldKey].length){return false}	
+		if(!panelContent[fieldKey].length){return false}	
 	}
-	if(!subFieldKey||!panelData[fieldKey][subFieldKey]){return false}
-	if(typeof panelData[fieldKey][subFieldKey] == 'object') {
-		if(!Object.keys(panelData[fieldKey][subFieldKey]).length){return false}	
+	if(!subFieldKey||!panelContent[fieldKey][subFieldKey]){return false}
+	if(typeof panelContent[fieldKey][subFieldKey] == 'object') {
+		if(!Object.keys(panelContent[fieldKey][subFieldKey]).length){return false}	
 	} else {
-		if(!panelData[fieldKey][subFieldKey].length){return false}	
+		if(!panelContent[fieldKey][subFieldKey].length){return false}	
 	}
 	return true;
 }
-export default FourCorners;
+
+class FourCorners {
+
+	constructor(opts = {}) {
+		window.onload = function() {
+			const self = this;
+			const selector = opts.elem || '.fc-embed';
+			const embeds = Array.from(document.querySelectorAll(selector+':not(.fc-init)'));
+			let insts = [];
+			embeds.forEach(function(embed, i) {
+				const inst = new FourCornersPhoto(embed, opts);
+				insts.push(inst);
+			});
+			return insts;
+		}
+	}
+
+}
+
+module.exports = FourCorners;

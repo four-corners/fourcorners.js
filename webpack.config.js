@@ -24,14 +24,14 @@ if (env === 'build') {
 
 const config = {
 	mode: mode,
-	entry: [__dirname + '/index.js'],
+	entry: [__dirname + '/src/index.js'],
 	devtool: devtool,
 	output: {
-		path: __dirname + '/dist',
+		path: path.resolve(__dirname + '/dist'),
 		filename: outputJS,
 		library: libraryName,
 		libraryTarget: 'umd',
-		umdNamedDefine: true
+		umdNamedDefine: true,
 	},
 	module: {
 		rules: [

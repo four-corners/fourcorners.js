@@ -1,2 +1,3 @@
-MATERIAL
-node_modules/
+node_modules
+material
+test

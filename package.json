@@ -1,10 +1,10 @@
 {
   "name": "@four-corners/four-corners",
-  "version": "1.1.1",
-  "author": "",
+  "version": "1.1.2",
+  "author": "Corey Tegeler",
   "license": "ISC",
-  "description": "",
-  "homepage": "https://github.com/four-corners/four-corners.js#readme",
+  "description": "Fourcorners.js allows specific information to be embedded in each of the photograph’s four corners, where it is available for an interested reader to explore. This increased contextualization strengthens both the authorship of the photographer and the credibility of the image.",
+  "homepage": "https://fourcornersproject.org",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/four-corners/four-corners.js.git"
@@ -13,9 +13,6 @@
     "url": "https://github.com/four-corners/four-corners.js/issues"
   },
   "main": "dist/four-corners.js",
-  "dependencies": {
-    "gsap": "^2.0.2"
-  },
   "devDependencies": {
     "@babel/core": "^7.1.2",
     "@babel/preset-env": "^7.1.0",
