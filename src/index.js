@@ -1,3 +1,5 @@
+require('styles.scss');
+
 class FourCornersPhoto {
 
 	constructor(embed, opts) {
@@ -127,21 +129,32 @@ const resizePanel = (panel) => {
 const addPhoto = (inst)  => {
 	let embed = inst.elems.embed;
 	let photo, img;
-	const photoSelector = '.fc-photo';
-	if(embed.querySelector(photoSelector)) {
-		photo = embed.querySelector(photoSelector);
-	}
-	else {
-		photo = `<div class="fc-photo"></div>`;
-		embed.innerHTML += photo;
-	}
-	const photoElem = embed.querySelector('.fc-photo');
+	// embed.classList.add('fc-loading');
+	// const photoSelector = '.fc-photo';
+	// if(embed.querySelector(photoSelector)) {
+		// photo = embed.querySelector(photoSelector);
+	// } else {
+		// photo = `<div class="fc-photo"></div>`;
+		// embed.innerHTML += photo;
+	// }
+	// const photoElem = embed.querySelector('.fc-photo');
 	const imgSelector = '.fc-img';
-	if(img = embed.querySelector(imgSelector)) {
-		embed.classList.add('fc-loaded');
-		photoElem.appendChild(img);
+	img = embed.querySelector(imgSelector);
+	const pseudoImg = new Image();
+	pseudoImg.onload = (e) => {
+		// embed.classList.remove('fc-loading');
+		
 	}
-	return photoElem;
+	pseudoImg.onerror = (e) => {
+		embed.classList.add('fc-empty');
+		console.warn(e);
+	}
+	if(img && img.src) {
+		pseudoImg.src = img.src;
+	} else {
+		embed.classList.add('fc-empty');
+	}
+	return img;
 }
 
 const addPanels = (inst) => {	
@@ -605,11 +618,18 @@ class FourCorners {
 
 	constructor(opts = {}) {
 		window.onload = function() {
-			const self = this;
-			const selector = opts.elem || '.fc-embed';
-			const embeds = Array.from(document.querySelectorAll(selector+':not(.fc-init)'));
-			let insts = [];
+			let embeds = [];
+			if(opts.elem instanceof Element) {
+				embeds = [opts.elem];
+			} else if(NodeList.prototype.isPrototypeOf(opts.elem)) {
+				embeds = Array.from(opts.elem);
+			} else {
+				const selector = (typeof opts.elem=='string' ? opts.elem : '.fc-embed')+':not(.fc-init)';
+				embeds = Array.from(document.querySelectorAll(selector));
+			}
+			let insts = []		
 			embeds.forEach(function(embed, i) {
+				console.log(embed);
 				const inst = new FourCornersPhoto(embed, opts);
 				insts.push(inst);
 			});
@@ -618,5 +638,4 @@ class FourCorners {
 	}
 
 }
-
 module.exports = FourCorners;

@@ -1,12 +1,11 @@
 @import 'vars.scss';
 .fc-embed {
+	max-width: 100%;
+	display: block;
 	position: relative;
 	overflow: hidden;
 	background-color: $light;
 	@include medText;
-	&:not(.fc-loaded) {
-		padding-bottom: 60%;
-	}
 	* {
 		text-rendering: optimizeLegibility;
 		box-sizing: border-box;
@@ -21,27 +20,22 @@
 								background-color 200ms ease-in-out,
 								border-color 200ms ease-in-out;
 	}
-}
-.fc-photo {
-	width: 100%;
-}
-img.fc-img {
-	max-width: 100%;
-	height: auto;
-	display: table;
-	opacity: 0;
-	transition: all 200ms ease-in-out;
-	.fc-loaded & {
-		opacity: 1;
+	&:empty, &.fc-empty {
+		padding-bottom: 60%;
+	}
+	img {
+		max-width: 100%;
+		height: auto;
+		display: table;
+		transition: opacity 200ms ease-in-out;
+	}
+	img.fc-img {
+
+	}
+	&.fc-empty img.fc-img {
+		display: none;
 	}
 }
-// .fc-dark .fc-corner {
-// 	// filter: drop-shadow(0 0 1px $lightest);
-// 	filter: unset;
-// 	&::before, &::after {
-// 		background-color: $dark;
-// 	}
-// }
 .fc-corner {
 	width: $corner-size;
 	height: $corner-size;
@@ -517,9 +511,6 @@ a.fc-card:hover {
 	margin: auto;
 	&:not([data-fc-source='image']) {
 		width: 100%;
-	}
-	img {
-
 	}
 	& + .fc-sub-caption {
 		padding: .5em 0 0 0;
