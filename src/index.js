@@ -3,30 +3,32 @@ require('styles.scss');
 class FourCornersPhoto {
 
 	constructor(embed, opts) {
-		const defaultOpts = {
-			selector: '.fc-embed:not(.fc-init)',
-			active: '',
-			interactive: true,
-			cutline: false
-		};
-		this.opts = Object.assign(defaultOpts, opts);
 		this.corners = ['authorship','backstory','imagery','links'];
 		this.cornerTitles = ['Authorship','Backstory','Related Imagery','Links'];
-		this.elems = {};
-		this.elems.embed = embed;
-		// let selector = this.opts.elem ? this.opts.elem : '.fc-embed';
-		// this.elems.embed = document.querySelector(selector);
+		this.elems = {
+			embed: embed
+		};
 		const data = parseData(this);
+		const defaultOpts = {
+			selector: '.fc-embed:not(.fc-init)',
+			interactive: true,
+			caption: false,
+			credit: false,
+			logo: false,
+			active: '',
+		};
+		this.opts = Object.assign(defaultOpts, opts, data.opts);
 		this.content = {
-			'authorship': data ? data.authorship : {},
-			'backstory': data ? data.backstory : {},
-			'imagery': data ? data.imagery : {},
-			'links': data ? data.links : {}
+			authorship: data ? data.authorship : {},
+			backstory: data ? data.backstory : {},
+			imagery: data ? data.imagery : {},
+			links: data ? data.links : {}
 		};
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
 		this.elems.corners = addCorners(this);
-		this.elems.caption = addCutline(this);
+		this.elems.cutline = addCutline(this);
+		initEmbed(this);
 	}
 
 	getPanel(slug) {
@@ -45,7 +47,6 @@ class FourCornersPhoto {
 		const corners = inst.corners;
 		const embed = inst.elems.embed;
 		const corner = inst.elems.corners[slug];
-
 		let panel = inst.getPanel(slug);
 		embed.classList.remove('fc-full');
 		if(embed && corner && panel) {
@@ -284,9 +285,7 @@ const buildAuthorship = (inst, panelContent) => {
 		panelContent.ethics.desc ?
 			`<div class="fc-field" data-fc-field="ethics">
 				<span class="fc-label">Code of ethics</span>
-				<span class="fc-content">
-					<div class="fc-sub-caption">${panelContent.ethics.desc}</div>
-				</span>
+				<span class="fc-content">${panelContent.ethics.desc}</span>
 			</div>` : '';
 	
 	innerHtml +=
@@ -487,25 +486,26 @@ const addCorners = (inst) => {
 }
 
 const addCutline = (inst) => {
-	//check if cutline is desired
-	if(!inst.content||!inst.opts.cutline) {return}
+	const content = inst.content.authorship;
+	if(!content&&!inst.opts.caption&&!inst.opts.credit&&!inst.opts.logo) {return}
 	const data = inst.content['authorship'];
 	if(!data) {return}
-	const embed = inst.elems.embed
-	//create cutline elem
-	let cutline = document.createElement('div');
-	cutline.classList.add('fc-cutline');
-	//add credit to cutline
-	if(data.credit) {
-		let credit = document.createElement('span');
-		credit.classList.add('fc-credit');
-		credit.innerHTML = data.credit; 
-		cutline.appendChild(credit);
-	}
-	//add FC link to cutline
-	cutline.innerHTML += `<a href="https://fourcornersproject.org" target="_blank" class="fc-link" title="This is a Four Corners photo"></a>`;
-	//add FC link to cutline
-	embed.parentNode.insertBefore(cutline, embed.nextSibling);
+	const embed = inst.elems.embed;
+	const caption = inst.opts.caption && content.caption ? `<span class="fc-caption">${content.caption}</span>`:'';
+	const credit = inst.opts.credit && (content.credit||content.license.holder) ?
+		`<span class="fc-credit">
+			${(content.credit ? `<span>${content.credit}</span>` : '')+(content.license.holder ? `<span>${content.license.holder}</span>` : '')}
+		</span>`
+	: '';
+	const logo = inst.opts.logo ? `<a href="https://fourcornersproject.org" target="_blank" class="fc-logo" title="This is a Four Corners photo"></a>`:'';
+	const cutline =
+		`<div class="fc-cutline">
+			${caption+credit+logo}
+		</div>`;
+	// console.log(typeof cutline);
+	embed.insertAdjacentHTML('afterend', cutline);
+	// inst.elems.embed.innerHTML += cutline;
+	return cutline;
 }
 
 const parseData = (inst) => {
@@ -629,7 +629,6 @@ class FourCorners {
 			}
 			let insts = []		
 			embeds.forEach(function(embed, i) {
-				console.log(embed);
 				const inst = new FourCornersPhoto(embed, opts);
 				insts.push(inst);
 			});

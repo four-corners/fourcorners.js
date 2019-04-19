@@ -381,12 +381,12 @@
 		color: $light;
 	}
 }
-.fc-content {
-	display: inline-block;
-	&[data-fc-field=""] {
+// .fc-content {
+// 	display: inline-block;
+// 	&[data-fc-field=""] {
 
-	}
-}
+// 	}
+// }
 .fc-row {
 	padding: .5em;
 	position: relative;
@@ -422,9 +422,6 @@
 	&:last-of-type {
 		margin: 0;
 	}
-}
-.fc-caption {
-	font-style: italic;
 }
 .fc-contact {
 	display: flex;
@@ -542,29 +539,45 @@ a.fc-card:hover {
 	}
 }
 .fc-cutline {
-	text-align: right;
 	margin: .2em 0 0 0;
-	a, a:hover, a:visited, a:focus {
-		white-space: nowrap;
-		text-decoration: none;
+	.fc-caption, .fc-credit {
+		&::after {
+			content: ' ';
+		}
+	}
+	.fc-credit {
+		color: $dark;
+		span:first-child:not(:last-child)::after {
+			content: '/';
+		}
+	}
+	.fc-logo {
 		opacity: .5;
+		white-space: nowrap;
 		transition: opacity 100ms linear;
+		&:first-child {
+			float: right;
+		}
+		&:last-child {
+			margin-left: .25em;
+		}
+		&, &:hover, &:visited &:focus {
+			color: inherit;
+			text-decoration: none;
+		}
+		&:hover {
+			opacity: 1;
+		}
+		&::after {
+			width: 10px;
+			height: 10px;
+			margin: 0 0 -1px 0;
+			display: inline-block;
+			background-image: url(./svg/icon.svg);
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: contain;
+			content: '';
+		}
 	}
-	a:hover {
-		opacity: 1;
-	}
-	a::after {
-		width: 10px;
-		height: 10px;
-		margin: .2em 0 0 0;
-		display: inline-block;
-		background-image: url(./svg/icon.svg);
-		background-repeat: no-repeat;
-		background-position: center;
-		background-size: contain;
-		content: '';
-	}
-}
-.fc-credit {
-	margin-right: .5em;
 }

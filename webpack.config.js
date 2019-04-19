@@ -8,7 +8,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 let mode, devtool, outputJS, outputCSS;
-let fileName = 'four-corners';
+let fileName = 'fourcorners';
 const libraryName = 'FourCorners'
 
 if (env === 'build') {
