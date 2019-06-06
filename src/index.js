@@ -26,6 +26,7 @@ class FourCornersPhoto {
 		};
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
+		this.elems.media = embedMedia(this);
 		this.elems.corners = addCorners(this);
 		this.elems.cutline = addCutline(this);
 		initEmbed(this);
@@ -81,9 +82,7 @@ class FourCornersPhoto {
 		const inst = this;
 		inst.elems.embed.classList.toggle('fc-full');
 	}
-
 }
-
 
 const initEmbed = (inst) => {
 	const embed = inst.elems.embed;
@@ -91,17 +90,17 @@ const initEmbed = (inst) => {
 	if(inst.opts.dark) {
 		embed.classList.add('fc-dark');
 	}
-	if(inst.opts.interactive) {
-		embed.addEventListener('click', function(e) {
-			const onPanels = isChildOf(e.target, inst.getPanel());
-			const onCorners = isChildOf(e.target, inst.elems.corners);
-			const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
-			if(!onPanels && !onCorners && !inCreator) {
-				inst.closePanel();
-				inst.elems.embed.classList.remove('fc-full');
-			}
-		});
-	}
+	// if(inst.opts.interactive) {
+	embed.addEventListener('click', function(e) {
+		const onPanels = isChildOf(e.target, inst.getPanel());
+		const onCorners = isChildOf(e.target, inst.elems.corners);
+		const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
+		if(!onPanels && !onCorners && !inCreator) {
+			inst.closePanel();
+			inst.elems.embed.classList.remove('fc-full');
+		}
+	});
+	// }
 	window.addEventListener('resize', function(e) {
 		resizeEmbed(e, inst);
 	});
@@ -141,18 +140,21 @@ const addPhoto = (inst)  => {
 	// const photoElem = embed.querySelector('.fc-photo');
 	const imgSelector = '.fc-img';
 	img = embed.querySelector(imgSelector);
-	const pseudoImg = new Image();
-	pseudoImg.onload = (e) => {
-		// embed.classList.remove('fc-loading');
+	// const pseudoImg = new Image();
+	// pseudoImg.onload = (e) => {
+	// 	// embed.classList.remove('fc-loading');
 		
-	}
-	pseudoImg.onerror = (e) => {
-		embed.classList.add('fc-empty');
-		console.warn(e);
-	}
-	if(img && img.src) {
-		pseudoImg.src = img.src;
-	} else {
+	// }
+	// pseudoImg.onerror = (e) => {
+	// 	embed.classList.add('fc-empty');
+	// 	console.warn(e);
+	// }
+	// if(img && img.src) {
+	// 	pseudoImg.src = img.src;
+	// } else {
+	// 	embed.classList.add('fc-empty');
+	// }
+	if(!img || !img.src) {
 		embed.classList.add('fc-empty');
 	}
 	return img;
@@ -167,7 +169,7 @@ const addPanels = (inst) => {
 		let panel = inst.getPanel(slug);
 		if(!panel) {
 			let panelInner = '';
-			if(inst.content&&inst.content[slug]) {
+			if(inst.content && inst.content[slug]) {
 				const panelContent = inst.content[slug];
 				switch(slug) {
 					case 'authorship':
@@ -186,7 +188,9 @@ const addPanels = (inst) => {
 			}
 			const panelTile = inst.cornerTitles[i];
 			let panelClass = 'fc-panel fc-'+slug;
-			if(slug==active) {panelClass+=' fc-active'}
+			if(slug==active) {
+				panelClass += ' fc-active'
+			}
 			const panelHTML =
 				`<div data-fc-slug="${slug}" class="${panelClass}">
 					<div class="fc-panel-title">
@@ -333,29 +337,27 @@ const buildBackstory = (inst, panelContent) => {
 			${wrapParagraphs(panelContent['text'])}
 		</div>`:''}
 		${panelContent.media?
-			panelContent.media.map((obj,i) => {
+			panelContent.media.map((obj, i) => {
 			embedIframe(inst,obj,'backstory',i);
 			return `<div class="fc-row">
-				<div class="fc-media" data-fc-source="${obj.source}">
-				</div>
-				${obj.caption?
+				<div class="fc-media" data-fc-source="${obj.source}"></div>
+				${obj.caption ?
 				`<div class="fc-sub-caption">${obj.caption}</div>`
-				:''}
-				${obj.credit?
+				: ''}
+				${obj.credit ?
 				`<div class="fc-sub-credit">${obj.credit}</div>`
-				:''}
+				: ''}
 			</div>`
 		}).join(''):''}`
 	return html;
 }
 
 const buildImagery = (inst, panelContent) => {
-	if(!panelContent.media){return}
-
+	if(!panelContent.media){
+		return;
+	}
 	let html = 
-		`${panelContent.media.map((obj,i) => {
-			obj.source=='image'||!obj.source?
-			embedImage(inst,obj,'imagery',i):embedIframe(inst,obj,'imagery',i);
+		`${panelContent.media.map((obj, i) => {
 			return `<div class="fc-row">
 				<div class="fc-media" data-fc-source="${obj.source}">
 				</div>
@@ -371,9 +373,13 @@ const buildImagery = (inst, panelContent) => {
 }
 
 const buildLinks = (inst, panelContent) => {
-	if(!panelContent.links){return}
+	if(!panelContent.links){
+		return
+	}
 	let html = panelContent.links.map(obj => {
-		if(!obj||!obj.url){return null}
+		if(!obj || !obj.url){
+			return null
+		}
 		let rootUrl = extractRootDomain(obj.url);
 		let text = obj.url ?
 			`${obj.title?obj.title:rootUrl}
@@ -383,6 +389,22 @@ const buildLinks = (inst, panelContent) => {
 	return html;
 }
 
+
+const embedMedia = (inst) => {
+	const media = inst.content.imagery.media;
+	const mediaKeys = Object.keys(media);
+	mediaKeys.forEach(function(key, i) {
+		const obj = media[key];
+		if(obj.source == 'image' || !obj.source) {
+			embedImage(inst, obj, 'imagery', i);
+		} else {
+			embedIframe(inst, obj, 'imagery', i);
+		}
+	});
+	// panelContent.media.map((obj, i) => {
+	// 	obj.source == 'image' || !obj.source ? embedImage(inst, obj, 'imagery', i) : embedIframe(inst, obj, 'imagery', i);
+	// });
+}
 
 const embedImage = (inst, obj, panelKey, index) => {
 	if(!obj.url){ return }
@@ -394,7 +416,11 @@ const embedImage = (inst, obj, panelKey, index) => {
 		media.innerHTML += img;
 	}
 	pseudoImg.onerror = (e) => {
-		console.warn('Four Corners cannot load this as an image: '+obj.url, e);
+		// console.warn('Four Corners cannot load this as an image: '+obj.url, e);
+		// const img = `<img src="${obj.url}"/>`;
+		// const panel = inst.elems.panels[panelKey];
+		// let media = panel.querySelectorAll('.fc-media')[index];
+		// media.innerHTML += img;
 	}
 	pseudoImg.src = obj.url;
 	return;
@@ -502,21 +528,15 @@ const addCutline = (inst) => {
 		`<div class="fc-cutline">
 			${caption+credit+logo}
 		</div>`;
-	// console.log(typeof cutline);
 	embed.insertAdjacentHTML('afterend', cutline);
-	// inst.elems.embed.innerHTML += cutline;
 	return cutline;
 }
 
 const parseData = (inst) => {
-	//extracts data string stored in attribute
 	if(!inst.elems||!inst.elems.embed) {return}
 	let stringData = inst.elems.embed.dataset.fc;
 	if(!stringData){return}
-	stringData = stringData;
-	//removes attribute from DOM
 	delete inst.elems.embed.dataset.fc;
-	//parses data string to JSON object
 	return JSON.parse(stringData);
 }
 
