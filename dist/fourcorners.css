@@ -1,10 +1,10 @@
 .fc-embed {
-  max-width: 100%;
+  width: 100%;
   display: block;
   position: relative;
   overflow: hidden;
   background-color: #f4f4f6;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5em; }
   .fc-embed * {
     text-rendering: optimizeLegibility;
@@ -19,7 +19,7 @@
   .fc-embed:empty, .fc-embed.fc-empty {
     padding-bottom: 60%; }
   .fc-embed img {
-    max-width: 100%;
+    width: 100%;
     height: auto;
     display: table;
     transition: opacity 200ms ease-in-out; }
@@ -46,6 +46,9 @@
   .fc-corner:hover {
     cursor: pointer;
     opacity: 1; }
+    .fc-static .fc-corner:hover {
+      cursor: unset;
+      opacity: unset; }
   .fc-corner.fc-empty {
     opacity: .5; }
   .fc-corner.fc-active {
@@ -104,16 +107,16 @@
       height: 10px;
       right: 10px;
       top: 10px; }
-  .fc-embed:hover:not(.fc-full) .fc-corner.fc-imagery, .fc-embed:not(.fc-init) .fc-corner.fc-imagery {
+  .fc-embed:hover:not(.fc-full) .fc-corner.fc-imagery, .fc-embed:not(.fc-init) .fc-corner.fc-imagery, .fc-embed.fc-static .fc-corner.fc-imagery {
     top: 0;
     left: 0; }
-  .fc-embed:hover:not(.fc-full) .fc-corner.fc-links, .fc-embed:not(.fc-init) .fc-corner.fc-links {
+  .fc-embed:hover:not(.fc-full) .fc-corner.fc-links, .fc-embed:not(.fc-init) .fc-corner.fc-links, .fc-embed.fc-static .fc-corner.fc-links {
     top: 0;
     right: 0; }
-  .fc-embed:hover:not(.fc-full) .fc-corner.fc-authorship, .fc-embed:not(.fc-init) .fc-corner.fc-authorship {
+  .fc-embed:hover:not(.fc-full) .fc-corner.fc-authorship, .fc-embed:not(.fc-init) .fc-corner.fc-authorship, .fc-embed.fc-static .fc-corner.fc-authorship {
     bottom: 0;
     right: 0; }
-  .fc-embed:hover:not(.fc-full) .fc-corner.fc-backstory, .fc-embed:not(.fc-init) .fc-corner.fc-backstory {
+  .fc-embed:hover:not(.fc-full) .fc-corner.fc-backstory, .fc-embed:not(.fc-init) .fc-corner.fc-backstory, .fc-embed.fc-static .fc-corner.fc-backstory {
     bottom: 0;
     left: 0; }
   .fc-full .fc-corner {
@@ -232,6 +235,8 @@
   background-image: url("data:image/svg+xml,%3C?xml version='1.0' encoding='utf-8'?%3E %3C!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='20px' height='20px' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve'%3E %3Cg id='Layer_2'%3E %3C/g%3E %3Cg id='Layer_1_1_'%3E %3C/g%3E %3Cg id='Layer_3'%3E %3Cpolygon points='20,1.546 18.453,0 10,8.453 1.546,0 0,1.546 8.453,9.999 0,18.453 1.545,20 10,11.546 18.453,20 20,18.453 11.546,9.999 '/%3E %3C/g%3E %3C/svg%3E"); }
   .fc-dark .fc-close {
     background-image: url("data:image/svg+xml,%3C?xml version='1.0' encoding='utf-8'?%3E %3C!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E %3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E %3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='20px' height='20px' viewBox='0 0 20 20' enable-background='new 0 0 20 20' xml:space='preserve'%3E %3Cg id='Layer_2'%3E %3C/g%3E %3Cg id='Layer_1_1_'%3E %3C/g%3E %3Cg id='Layer_3'%3E %3Cpolygon fill='%23FFFFFF' points='20,1.546 18.453,0 10,8.453 1.546,0 0,1.546 8.453,9.999 0,18.453 1.545,20 10,11.546 18.453,20 20,18.453 11.546,9.999 '/%3E %3C/g%3E %3C/svg%3E"); }
+  .fc-static .fc-close {
+    pointer-events: none; }
 
 .fc-scroll {
   width: 100%;
@@ -239,6 +244,14 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch; }
+  .fc-scroll::-webkit-scrollbar {
+    width: 5px; }
+  .fc-scroll::-webkit-scrollbar-track {
+    background: transparent; }
+  .fc-scroll::-webkit-scrollbar-thumb {
+    background: #c4c4c4; }
+  .fc-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5); }
 
 .fc-inner {
   width: 100%;
@@ -387,7 +400,7 @@ a.fc-card:hover {
     padding: .5em 0 0 0; }
 
 [class^='fc-sub-'], .fc-cutline {
-  font-size: .8em;
+  font-size: .85em;
   line-height: 1.2em; }
 
 .fc-sub-url {

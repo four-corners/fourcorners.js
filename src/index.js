@@ -1,4 +1,4 @@
-// require('styles.scss');
+require('styles.scss');
 class FourCornersPhoto {
 
 	constructor(embed, opts) {
@@ -8,8 +8,8 @@ class FourCornersPhoto {
 			embed: embed
 		};
 		const defaultOpts = {
-			selector: '.fc-embed:not(.fc-init)',
-			interactive: true,
+			selector: '.fc-embed',
+			static: false,
 			caption: false,
 			credit: false,
 			logo: false,
@@ -92,17 +92,19 @@ const initEmbed = (inst) => {
 	if(inst.opts.dark) {
 		embed.classList.add('fc-dark');
 	}
-	// if(inst.opts.interactive) {
-	embed.addEventListener('click', function(e) {
-		const onPanels = isChildOf(e.target, inst.getPanel());
-		const onCorners = isChildOf(e.target, inst.elems.corners);
-		const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
-		if(!onPanels && !onCorners && !inCreator) {
-			inst.closePanel();
-			inst.elems.embed.classList.remove('fc-full');
-		}
-	});
-	// }
+	if(inst.opts.static) {
+		embed.classList.add('fc-static');
+	} else {
+		embed.addEventListener('click', function(e) {
+			const onPanels = isChildOf(e.target, inst.getPanel());
+			const onCorners = isChildOf(e.target, inst.elems.corners);
+			const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
+			if(!onPanels && !onCorners && !inCreator) {
+				inst.closePanel();
+				inst.elems.embed.classList.remove('fc-full');
+			}
+		});
+	}
 	window.addEventListener('resize', function(e) {
 		resizeEmbed(e, inst);
 	});
@@ -494,8 +496,7 @@ const addCorners = (inst) => {
 			}
 		}
 
-		if(inst.opts.interactive) {
-
+		if(!inst.opts.static) {
 			corner.addEventListener('mouseenter', function(e) {
 				hoverCorner(e, inst);
 			});
@@ -646,8 +647,8 @@ class FourCorners {
 		} else if(NodeList.prototype.isPrototypeOf(opts.elem)) {
 			embeds = Array.from(opts.elem);
 		} else {
-			const selector = (typeof opts.elem=='string' ? opts.elem : '.fc-embed')+':not(.fc-init)';
-			embeds = Array.from(document.querySelectorAll(selector));
+			const selector = (typeof opts.elem=='string' ? opts.elem : '.fc-embed');
+			embeds = Array.from(document.querySelectorAll(selector+':not(.fc-init)'));
 		}
 		let insts = [];
 		embeds.forEach(function(embed, i) {
