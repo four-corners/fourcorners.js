@@ -1,5 +1,4 @@
-require('styles.scss');
-
+// require('styles.scss');
 class FourCornersPhoto {
 
 	constructor(embed, opts) {
@@ -8,7 +7,6 @@ class FourCornersPhoto {
 		this.elems = {
 			embed: embed
 		};
-		const data = parseData(this);
 		const defaultOpts = {
 			selector: '.fc-embed:not(.fc-init)',
 			interactive: true,
@@ -17,7 +15,11 @@ class FourCornersPhoto {
 			logo: false,
 			active: '',
 		};
-		this.opts = Object.assign(defaultOpts, opts, data.opts);
+		this.opts = Object.assign(defaultOpts, opts);
+		const data = parseData(this);
+		if(data) {
+			this.opts = Object.assign(this.opts, data.opts);
+		}
 		this.content = {
 			authorship: data ? data.authorship : {},
 			backstory: data ? data.backstory : {},
@@ -392,6 +394,7 @@ const buildLinks = (inst, panelContent) => {
 
 const embedMedia = (inst) => {
 	const media = inst.content.imagery.media;
+	if(!media) {return}
 	const mediaKeys = Object.keys(media);
 	mediaKeys.forEach(function(key, i) {
 		const obj = media[key];
@@ -415,13 +418,13 @@ const embedImage = (inst, obj, panelKey, index) => {
 		let media = panel.querySelectorAll('.fc-media')[index];
 		media.innerHTML += img;
 	}
-	pseudoImg.onerror = (e) => {
+	// pseudoImg.onerror = (e) => {
 		// console.warn('Four Corners cannot load this as an image: '+obj.url, e);
 		// const img = `<img src="${obj.url}"/>`;
 		// const panel = inst.elems.panels[panelKey];
 		// let media = panel.querySelectorAll('.fc-media')[index];
 		// media.innerHTML += img;
-	}
+	// }
 	pseudoImg.src = obj.url;
 	return;
 }
@@ -634,27 +637,24 @@ const hasField = (panelContent, fieldKey, subFieldKey) => {
 	return true;
 }
 
+
 class FourCorners {
-
 	constructor(opts = {}) {
-		window.onload = function() {
-			let embeds = [];
-			if(opts.elem instanceof Element) {
-				embeds = [opts.elem];
-			} else if(NodeList.prototype.isPrototypeOf(opts.elem)) {
-				embeds = Array.from(opts.elem);
-			} else {
-				const selector = (typeof opts.elem=='string' ? opts.elem : '.fc-embed')+':not(.fc-init)';
-				embeds = Array.from(document.querySelectorAll(selector));
-			}
-			let insts = []		
-			embeds.forEach(function(embed, i) {
-				const inst = new FourCornersPhoto(embed, opts);
-				insts.push(inst);
-			});
-			return insts;
+		let embeds = [];
+		if(opts.elem instanceof Element) {
+			embeds = [opts.elem];
+		} else if(NodeList.prototype.isPrototypeOf(opts.elem)) {
+			embeds = Array.from(opts.elem);
+		} else {
+			const selector = (typeof opts.elem=='string' ? opts.elem : '.fc-embed')+':not(.fc-init)';
+			embeds = Array.from(document.querySelectorAll(selector));
 		}
+		let insts = [];
+		embeds.forEach(function(embed, i) {
+			const inst = new FourCornersPhoto(embed, opts);
+			insts.push(inst);
+		});
+		return insts;
 	}
-
 }
 module.exports = FourCorners;

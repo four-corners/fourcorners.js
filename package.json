@@ -53,8 +53,8 @@
     "copy-js": "cp dist/*.min.js ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/js",
     "copy-css": "cp dist/*.min.css ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/css",
     "copy": "npm run copy-js & npm run copy-css",
-    "copy-dev-js": "cp dist/four-corners.js ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/js/four-corners.min.js",
-    "copy-dev-css": "cp dist/four-corners.css ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/css/four-corners.min.css",
+    "copy-dev-js": "cp dist/fourcorners.js ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/js/fourcorners.min.js",
+    "copy-dev-css": "cp dist/fourcorners.css ../fourcornersproject.org/wp-content/themes/four-corners-wp/assets/css/fourcorners.min.css",
     "copy-dev": "npm run copy-dev-js & npm run copy-dev-css"
   }
 }
