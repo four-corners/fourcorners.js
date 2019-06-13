@@ -53,7 +53,7 @@
 		content: '';
 		background-color: $light;
 		.fc-dark & {
-			background-color: $dark;
+			background-color: $darken;
 		}
 	}
 	&:not(:hover) {
@@ -195,7 +195,7 @@
 	transition: opacity 150ms ease-in-out;
 	.fc-dark & {
 		color: $lightest;
-		background-color: rgba($dark, .7);
+		background-color: rgba($darkest, .9);
 		border-color: $medium;
 		filter: drop-shadow(0 0 1px $lighten);
 	}
@@ -344,7 +344,7 @@
 	@include shadow;
 	.fc-dark & {
 		color: $lightest;
-		background-color: rgba($dark, .7);
+		background-color: rgba($darkest, .9);
 		// border-color: $medium;
 		// filter: drop-shadow(0 0 1px $lighten);
 	}
@@ -439,13 +439,13 @@
 		display: block;
 	}
 	.fc-dark & {
-		background-color: $dark;
+		background-color: rgba($lighten, .1);
 	}
 }
 a.fc-card:hover {
 	background-color: $lightBlue;
 	.fc-dark &  {
-		background-color: $darken;
+		background-color: rgba($lighten, .05);
 	}
 }
 .fc-card.fc-field:not(:last-child) {
@@ -538,7 +538,7 @@ a.fc-card:hover {
 		}
 	}
 	.fc-logo {
-		opacity: .5;
+		opacity: 1;
 		white-space: nowrap;
 		transition: opacity 100ms linear;
 		&:first-child {
@@ -552,7 +552,7 @@ a.fc-card:hover {
 			text-decoration: none;
 		}
 		&:hover {
-			opacity: 1;
+			opacity: .8;
 		}
 		&::after {
 			width: 10px;
