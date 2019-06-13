@@ -53,7 +53,7 @@
 		content: '';
 		background-color: $light;
 		.fc-dark & {
-			background-color: $darken;
+			background-color: $darkest;
 		}
 	}
 	&:not(:hover) {
