@@ -42,7 +42,7 @@
     content: '';
     background-color: #f4f4f6; }
     .fc-dark .fc-corner::after, .fc-dark .fc-corner::before {
-      background-color: rgba(0, 0, 0, 0.5); }
+      background-color: #000; }
   .fc-corner:hover {
     cursor: pointer;
     opacity: 1; }
@@ -392,7 +392,7 @@ a.fc-card:hover {
     float: left; }
 
 .fc-media {
-  display: table;
+  display: block;
   margin: auto; }
   .fc-media:not([data-fc-source='image']) {
     width: 100%; }

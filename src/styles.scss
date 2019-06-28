@@ -490,7 +490,7 @@ a.fc-card:hover {
 	}
 }
 .fc-media {
-	display: table;
+	display: block;
 	margin: auto;
 	&:not([data-fc-source='image']) {
 		width: 100%;

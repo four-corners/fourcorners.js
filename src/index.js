@@ -400,7 +400,8 @@ const embedMedia = (inst) => {
 	const mediaKeys = Object.keys(media);
 	mediaKeys.forEach(function(key, i) {
 		const obj = media[key];
-		if(obj.source == 'image' || !obj.source) {
+		console.log(obj);
+		if(obj.source == 'image' || obj.source == 'instagram' || !obj.source) {
 			embedImage(inst, obj, 'imagery', i);
 		} else {
 			embedIframe(inst, obj, 'imagery', i);
@@ -436,7 +437,6 @@ const embedIframe = (inst, obj, panelKey, index) => {
 	let req = '';
 	switch(obj.source) {
 		case 'youtube':
-			// req = 'https://www.youtube.com/oembed?url='+obj.url;
 			req = 'https://noembed.com/embed?url='+obj.url;
 			break;
 		case 'vimeo':
@@ -449,28 +449,29 @@ const embedIframe = (inst, obj, panelKey, index) => {
 			return false;
 			break;
 	}
+	const headers = new Headers();
 	fetch(req, {
 			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
-			},
+			headers: headers
 		})
 		.then(res => {
 			if (!res.ok) {throw Error(res.statusText)}
 			return res.json();
 		})
 		.then(res => {
+			console.log(res);
 			const panel = inst.elems.panels[panelKey];
-			let subMedia = panel.querySelectorAll('.fc-media')[index];
-			if(Number.isInteger(res.width,res.height)) {
+			let subMedia = panel.querySelectorAll('.fc-media')[index],
+					html = res.html;
+			if(Number.isInteger(res.width, res.height)) {
 				const ratio = res.height/res.width;
 				subMedia.classList.add('fc-responsive')
 				subMedia.style.paddingBottom = (ratio*100)+'%';
 			}
-			subMedia.innerHTML = res.html;
+			subMedia.innerHTML = html;
 		})
 		.catch(function(err) {
-			console.warn('Four Corners cannot load this media source: '+src, err);
+			console.warn('Four Corners cannot load this media source: '+obj.url, err);
 		});
 }
 
