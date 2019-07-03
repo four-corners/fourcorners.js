@@ -3,7 +3,7 @@
   display: block;
   position: relative;
   overflow: hidden;
-  background-color: #f4f4f6;
+  background-color: #f9f9fb;
   font-size: 14px;
   line-height: 1.5em; }
   .fc-embed * {
@@ -16,14 +16,14 @@
     text-decoration: none;
     border: none;
     transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out; }
-  .fc-embed:empty, .fc-embed.fc-empty {
-    padding-bottom: 60%; }
   .fc-embed img {
     width: 100%;
     height: auto;
     display: table;
     transition: opacity 200ms ease-in-out; }
-  .fc-embed.fc-empty img.fc-img {
+  .fc-embed:empty, .fc-embed.fc-empty {
+    padding-bottom: 66%; }
+  .fc-embed.fc-empty img.fc-img, .fc-embed.fc-loading img.fc-img {
     display: none; }
 
 .fc-corner {

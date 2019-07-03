@@ -4,7 +4,7 @@
 	display: block;
 	position: relative;
 	overflow: hidden;
-	background-color: $light;
+	background-color: $lighter;
 	@include medText;
 	* {
 		text-rendering: optimizeLegibility;
@@ -20,20 +20,19 @@
 								background-color 200ms ease-in-out,
 								border-color 200ms ease-in-out;
 	}
-	&:empty, &.fc-empty {
-		padding-bottom: 60%;
-	}
 	img {
 		width: 100%;
 		height: auto;
 		display: table;
 		transition: opacity 200ms ease-in-out;
 	}
-	img.fc-img {
-
+	&:empty, &.fc-empty {
+		padding-bottom: 66%;
 	}
-	&.fc-empty img.fc-img {
-		display: none;
+	&.fc-empty, &.fc-loading {
+		img.fc-img {
+			display: none;
+		}
 	}
 }
 .fc-corner {

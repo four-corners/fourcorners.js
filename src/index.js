@@ -15,17 +15,19 @@ class FourCornersPhoto {
 			logo: false,
 			active: '',
 		};
-		this.opts = Object.assign(defaultOpts, opts);
 		const data = parseData(this);
-		if(data) {
-			this.opts = Object.assign(this.opts, data.opts);
-		}
+		this.photo = data ? data.photo : {};
+		this.opts = Object.assign(defaultOpts, opts);
+		this.opts = data ? Object.assign(this.opts, data.opts) : {};
 		this.content = {
 			authorship: data ? data.authorship : {},
 			backstory: data ? data.backstory : {},
 			imagery: data ? data.imagery : {},
 			links: data ? data.links : {}
 		};
+
+		this.onImgLoad = new Event('onImgLoad');
+		this.onImgFail = new Event('onImgFail');
 		this.elems.photo = addPhoto(this);
 		this.elems.panels = addPanels(this);
 		this.elems.media = embedMedia(this);
@@ -131,36 +133,34 @@ const resizePanel = (panel) => {
 }
 
 const addPhoto = (inst)  => {
-	let embed = inst.elems.embed;
-	let photo, img;
-	// embed.classList.add('fc-loading');
-	// const photoSelector = '.fc-photo';
-	// if(embed.querySelector(photoSelector)) {
-		// photo = embed.querySelector(photoSelector);
-	// } else {
-		// photo = `<div class="fc-photo"></div>`;
-		// embed.innerHTML += photo;
-	// }
-	// const photoElem = embed.querySelector('.fc-photo');
-	const imgSelector = '.fc-img';
+	let photo, img,
+			embed = inst.elems.embed,
+			width = inst.photo.width,
+			height = inst.photo.height,
+			ratio = width/height,
+			imgSelector = '.fc-img';
+
+	embed.style.paddingBottom = 100/ratio+'%';
 	img = embed.querySelector(imgSelector);
-	// const pseudoImg = new Image();
-	// pseudoImg.onload = (e) => {
-	// 	// embed.classList.remove('fc-loading');
-		
-	// }
-	// pseudoImg.onerror = (e) => {
-	// 	embed.classList.add('fc-empty');
-	// 	console.warn(e);
-	// }
-	// if(img && img.src) {
-	// 	pseudoImg.src = img.src;
-	// } else {
-	// 	embed.classList.add('fc-empty');
-	// }
-	if(!img || !img.src) {
+	if(!img) {
 		embed.classList.add('fc-empty');
 	}
+
+	let pseudoImg = new Image;
+	embed.classList.add('fc-loading');
+
+	pseudoImg.onload = (e) => {
+		embed.style.paddingBottom = '';
+		embed.classList.remove('fc-loading');
+		embed.dispatchEvent(inst.onImgLoad);
+	}
+	pseudoImg.onerror = (e) => {
+		embed.classList.remove('fc-loading');
+		embed.classList.add('fc-empty');
+		embed.dispatchEvent(inst.onImgFail);
+	}
+	pseudoImg.src = img ? img.src : null;
+
 	return img;
 }
 
@@ -400,7 +400,6 @@ const embedMedia = (inst) => {
 	const mediaKeys = Object.keys(media);
 	mediaKeys.forEach(function(key, i) {
 		const obj = media[key];
-		console.log(obj);
 		if(obj.source == 'image' || obj.source == 'instagram' || !obj.source) {
 			embedImage(inst, obj, 'imagery', i);
 		} else {
@@ -459,7 +458,6 @@ const embedIframe = (inst, obj, panelKey, index) => {
 			return res.json();
 		})
 		.then(res => {
-			console.log(res);
 			const panel = inst.elems.panels[panelKey];
 			let subMedia = panel.querySelectorAll('.fc-media')[index],
 					html = res.html;
