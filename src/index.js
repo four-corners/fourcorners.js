@@ -3,7 +3,6 @@ class FourCornersPhoto {
 
 	constructor(embed, opts) {
 		this.corners = ['authorship','backstory','imagery','links'];
-		this.cornerTitles = ['Authorship','Backstory','Related Imagery','Links'];
 		this.elems = {
 			embed: embed
 		};
@@ -16,6 +15,8 @@ class FourCornersPhoto {
 			active: '',
 		};
 		const data = parseData(this);
+		this.lang = data ? data.lang : 'en';
+		this.strings = translations[this.lang];
 		this.photo = data ? data.photo : {};
 		this.opts = Object.assign(defaultOpts, opts);
 		this.opts = data ? Object.assign(this.opts, data.opts) : {};
@@ -25,7 +26,6 @@ class FourCornersPhoto {
 			imagery: data ? data.imagery : {},
 			links: data ? data.links : {}
 		};
-
 		this.onImgLoad = new Event('onImgLoad');
 		this.onImgFail = new Event('onImgFail');
 		this.elems.photo = addPhoto(this);
@@ -107,6 +107,11 @@ const initEmbed = (inst) => {
 			}
 		});
 	}
+	embed.lang = inst.lang;
+	if(['ar'].includes(inst.lang)) {
+		embed.dir = 'rtl';
+	}
+
 	window.addEventListener('resize', function(e) {
 		resizeEmbed(e, inst);
 	});
@@ -190,7 +195,7 @@ const addPanels = (inst) => {
 						break;
 				}
 			}
-			const panelTile = inst.cornerTitles[i];
+			const panelTile = inst.strings[slug];
 			let panelClass = 'fc-panel fc-'+slug;
 			if(slug==active) {
 				panelClass += ' fc-active'
@@ -278,7 +283,7 @@ const buildAuthorship = (inst, panelContent) => {
 		panelContent.license.label &&
 		panelContent.license.type=='commons' ?
 			`<div class="fc-field" data-fc-field="license">
-				<span class="fc-label">License</span>
+				<span class="fc-label">${inst.strings.license}</span>
 				<span class="fc-content">
 					${panelContent.license.url ?
 					`<a href="${panelContent.license.url}" target="_blank">
@@ -292,14 +297,14 @@ const buildAuthorship = (inst, panelContent) => {
 		panelContent.ethics &&
 		panelContent.ethics.desc ?
 			`<div class="fc-field" data-fc-field="ethics">
-				<span class="fc-label">Code of ethics</span>
+				<span class="fc-label">${inst.strings.cod}</span>
 				<span class="fc-content">${panelContent.ethics.desc}</span>
 			</div>` : '';
 	
 	innerHtml +=
 		panelContent['bio'] ?
 		`<div class="fc-field">
-			<span class="fc-label">Bio</span>
+			<span class="fc-label">${inst.strings.bio}</span>
 			${panelContent['bio']}
 		</div>` : '';
 
@@ -310,19 +315,19 @@ const buildAuthorship = (inst, panelContent) => {
 
 			${panelContent['website'] ?
 			`<div class="fc-field fc-card">
-				<div class="fc-label">Website</div>
+				<div class="fc-label">${inst.strings.website}</div>
 				${createLink(panelContent['website'])}
 			</div>`: ''}
 
 			${panelContent['0-contact'] ?
 			`<div class="fc-field fc-card">
-				<div class="fc-label">For more info contact</div>
+				<div class="fc-label">${inst.strings.info}</div>
 				${createLink(panelContent['0-contact'])}
 			</div>`: ''}
 
 			${panelContent['1-contact'] ?
 			`<div class="fc-field fc-card">
-				<div class="fc-label">For reproduction rights contact</div>
+				<div class="fc-label">${inst.strings.rights}</div>
 				${createLink(panelContent['1-contact'])}
 			</div>` : ''}
 
@@ -637,6 +642,33 @@ const hasField = (panelContent, fieldKey, subFieldKey) => {
 	return true;
 }
 
+const translations = {
+	en: {
+		authorship: 'Authorship',
+		backstory: 'Backstory',
+		imagery: 'Related Imagery',
+		links: 'Links',
+		license: 'License',
+		cod: 'Code of ethics',
+		bio: 'Bio',
+		website: 'Website',
+		info: 'For more info',
+		rights: 'للحصول على حقوق النسخ',
+	},
+	ar: {
+		authorship: 'التأليف',
+		backstory: 'القصة وراء الصورة ',
+		imagery: 'الصور ذات الصلة',
+		links: 'الروابط',
+		license: 'الترخيص',
+		cod: 'ميثاق أخلاقيات',
+		bio: 'السيرة الذاتية',
+		website: 'الموقع الكتروني',
+		info: 'لمزيد من المعلومات',
+		rights: 'للحصول على حقوق النسخ',
+	}
+}
+
 
 class FourCorners {
 	constructor(opts = {}) {
@@ -657,4 +689,5 @@ class FourCorners {
 		return insts;
 	}
 }
+
 module.exports = FourCorners;

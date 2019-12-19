@@ -34,6 +34,9 @@
 			display: none;
 		}
 	}
+	&[dir="rtl"] {
+		text-align: right;
+	}
 }
 .fc-corner {
 	width: $corner-size;
@@ -245,8 +248,6 @@
 	width: 1em;
 	height: 1em;
 	padding: 3px;
-	// display: inline-block;
-	margin-left: .5em;
 	position: absolute;
 	top: .5em;
 	background-repeat: no-repeat;
@@ -290,6 +291,10 @@
 			transform: rotate(90deg);
 		}
 	}
+	.fc-embed[dir="rtl"] & {
+		right: unset;
+		left: 2rem;
+	}
 }
 
 .fc-close {
@@ -300,6 +305,10 @@
 	}
 	.fc-static & {
 		pointer-events: none;
+	}
+	.fc-embed[dir="rtl"] & {
+		right: unset;
+		left: .5rem;
 	}
 }
 .fc-scroll {
@@ -332,7 +341,7 @@
 }
 .fc-panel-title {
 	width: 100%;
-	padding: .325em 0 .325em .4em;
+	padding: .325em .4rem;
 	position: absolute;
 	left: 0;
 	top: 0;
