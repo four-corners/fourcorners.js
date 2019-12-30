@@ -25,7 +25,9 @@
     padding-bottom: 66%; }
   .fc-embed.fc-empty img.fc-img, .fc-embed.fc-loading img.fc-img {
     display: none; }
-  .fc-embed[dir="rtl"] {
+  .fc-embed[dir="ltr"], .fc-embed[dir="ltr"] * {
+    text-align: left; }
+  .fc-embed[dir="rtl"], .fc-embed[dir="rtl"] * {
     text-align: right; }
 
 .fc-corner {

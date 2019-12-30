@@ -34,7 +34,10 @@
 			display: none;
 		}
 	}
-	&[dir="rtl"] {
+	&[dir="ltr"], &[dir="ltr"] * {
+		text-align: left;
+	}
+	&[dir="rtl"], &[dir="rtl"] * {
 		text-align: right;
 	}
 }

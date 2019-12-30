@@ -1,39 +1,84 @@
 require('styles.scss');
+
+class FourCorners {
+	constructor(opts = {}) {
+		let embeds = [];
+		if(opts.elem instanceof Element) {
+			embeds = [opts.elem];
+		} else if(NodeList.prototype.isPrototypeOf(opts.elem)) {
+			embeds = Array.from(opts.elem);
+		} else {
+			const selector = (typeof opts.elem=='string' ? opts.elem : '.fc-embed');
+			// embeds = Array.from(document.querySelectorAll(selector+':not(.fc-init)'));
+			embeds = Array.from(document.querySelectorAll(selector));
+		}
+		let insts = [];
+		embeds.forEach(function(embed, i) {
+			const inst = new FourCornersPhoto(embed, opts);
+			insts.push(inst);
+		});
+		return insts;
+	}
+}
+
+
 class FourCornersPhoto {
 
 	constructor(embed, opts) {
-		this.corners = ['authorship','backstory','imagery','links'];
+		this.cornerSlugs = ['authorship','backstory','imagery','links'];
 		this.elems = {
 			embed: embed
 		};
-		const defaultOpts = {
-			selector: '.fc-embed',
-			static: false,
-			caption: false,
-			credit: false,
-			logo: false,
-			active: '',
-		};
 		const data = parseData(this);
-		this.lang = data ? data.lang : 'en';
-		this.strings = translations[this.lang];
-		this.photo = data ? data.photo : {};
-		this.opts = Object.assign(defaultOpts, opts);
-		this.opts = data ? Object.assign(this.opts, data.opts) : {};
-		this.content = {
+		this.setUpData(data);
+		this.onImgLoad = new Event('onImgLoad');
+		this.onImgFail = new Event('onImgFail');
+		initEmbed(this);
+	}
+
+	setUpData(data) {
+		const inst = this;
+		inst.lang = data ? data.lang : 'en';
+		inst.strings = translations[inst.lang];
+		inst.photo = data ? data.photo : {};
+		inst.opts = Object.assign(defaultOpts, inst.opts);
+		inst.opts = data ? Object.assign(inst.opts, data.opts) : {};
+		inst.content = {
 			authorship: data ? data.authorship : {},
 			backstory: data ? data.backstory : {},
 			imagery: data ? data.imagery : {},
 			links: data ? data.links : {}
 		};
-		this.onImgLoad = new Event('onImgLoad');
-		this.onImgFail = new Event('onImgFail');
-		this.elems.photo = addPhoto(this);
-		this.elems.panels = addPanels(this);
-		this.elems.media = embedMedia(this);
-		this.elems.corners = addCorners(this);
-		this.elems.cutline = addCutline(this);
+		inst.elems.photo = addPhoto(inst);
+		inst.elems.panels = addPanels(inst);
+		inst.elems.media = embedMedia(inst);
+		inst.elems.corners = addCorners(inst);
+		inst.elems.cutline = addCutline(inst);
+
+		Object.keys(inst.elems.corners).forEach(function(cornerSlug, i) {
+			const cornerElem = inst.elems.corners[cornerSlug];
+			if(inst.opts.static) {
+				return;
+			}
+			cornerElem.addEventListener('mouseenter', function(e) {
+				hoverCorner(e, inst);
+			});
+			cornerElem.addEventListener('mouseleave', function(e) {
+				unhoverCorner(e, inst);
+			});
+			cornerElem.addEventListener('click', function(e) {
+				clickCorner(e, inst);
+			});
+		});
+
+		return inst;
+	}
+
+	updateModule() {
+		const data = parseData(this);
+		this.setUpData(data);
 		initEmbed(this);
+		return this;
 	}
 
 	getPanel(slug) {
@@ -49,7 +94,7 @@ class FourCornersPhoto {
 
 	openPanel(slug) {
 		const inst = this;
-		const corners = inst.corners;
+		const corners = inst.cornerSlugs;
 		const embed = inst.elems.embed;
 		const corner = inst.elems.corners[slug];
 		let panel = inst.getPanel(slug);
@@ -110,6 +155,8 @@ const initEmbed = (inst) => {
 	embed.lang = inst.lang;
 	if(['ar'].includes(inst.lang)) {
 		embed.dir = 'rtl';
+	} else {
+		embed.dir = 'ltr';
 	}
 
 	window.addEventListener('resize', function(e) {
@@ -173,55 +220,56 @@ const addPanels = (inst) => {
 	let data, panels = {};
 	let embed = inst.elems.embed;
 	if(!embed){return}
-	inst.corners.forEach(function(slug, i) {
-		const active = inst.opts.active;
-		let panel = inst.getPanel(slug);
-		if(!panel) {
-			let panelInner = '';
-			if(inst.content && inst.content[slug]) {
-				const panelContent = inst.content[slug];
-				switch(slug) {
-					case 'authorship':
-						panelInner = buildAuthorship(inst, panelContent);
-						break;
-					case 'backstory':
-						panelInner = buildBackstory(inst, panelContent);
-						break;
-					case 'imagery':
-						panelInner = buildImagery(inst, panelContent);
-						break;
-					case 'links':
-						panelInner = buildLinks(inst, panelContent);
-						break;
-				}
-			}
-			const panelTile = inst.strings[slug];
-			let panelClass = 'fc-panel fc-'+slug;
-			if(slug==active) {
-				panelClass += ' fc-active'
-			}
-			const panelHTML =
-				`<div data-fc-slug="${slug}" class="${panelClass}">
-					<div class="fc-panel-title">
-						<span>${panelTile}</span>
-						<div class="fc-icon fc-expand" title="Expand this panel"></div>
-						<div class="fc-icon fc-close" title="Close this panel"></div>
-					</div>
-					<div class="fc-panel-title fc-pseudo">
-						<span>${inst.corners.indexOf(slug)}</span>
-					</div>
-					${panelInner ?
-					`<div class="fc-scroll">
-						<div class="fc-inner">
-							${panelInner}
-						</div>
-					</div>` : ''}
-				</div>`;
-			inst.elems.embed.innerHTML += panelHTML;
+	inst.cornerSlugs.forEach(function(slug, i) {
+		const active = inst.opts.active,
+					panel = inst.getPanel(slug);
+		if(panel) {
+			panel.remove();
 		}
+		let panelInner = '';
+		if(inst.content && inst.content[slug]) {
+			const panelContent = inst.content[slug];
+			switch(slug) {
+				case 'authorship':
+					panelInner = buildAuthorship(inst, panelContent);
+					break;
+				case 'backstory':
+					panelInner = buildBackstory(inst, panelContent);
+					break;
+				case 'imagery':
+					panelInner = buildImagery(inst, panelContent);
+					break;
+				case 'links':
+					panelInner = buildLinks(inst, panelContent);
+					break;
+			}
+		}
+		const panelTile = inst.strings[slug];
+		let panelClass = 'fc-panel fc-'+slug;
+		if(slug==active) {
+			panelClass += ' fc-active'
+		}
+		const panelHTML =
+			`<div data-fc-slug="${slug}" class="${panelClass}">
+				<div class="fc-panel-title">
+					<span>${panelTile}</span>
+					<div class="fc-icon fc-expand" title="Expand this panel"></div>
+					<div class="fc-icon fc-close" title="Close this panel"></div>
+				</div>
+				<div class="fc-panel-title fc-pseudo">
+					<span>${inst.cornerSlugs.indexOf(slug)}</span>
+				</div>
+				${panelInner ?
+				`<div class="fc-scroll">
+					<div class="fc-inner">
+						${panelInner}
+					</div>
+				</div>` : ''}
+			</div>`;
+		inst.elems.embed.innerHTML += panelHTML;
 	});
 
-	inst.corners.forEach(function(slug, i) {
+	inst.cornerSlugs.forEach(function(slug, i) {
 		const panel = inst.getPanel(slug);
 		panels[slug] = panel;
 		const panelExpand = panel.querySelector('.fc-expand');
@@ -483,37 +531,27 @@ const addCorners = (inst) => {
 	let embed = inst.elems.embed;
 	let photo = inst.elems.photo;
 	const active = inst.opts.active;
-	inst.corners.forEach(function(slug, i) {
+	inst.cornerSlugs.forEach(function(slug, i) {
 		const cornerSelector = '.fc-corner[data-fc-slug="'+slug+'"]';
-		if(embed.querySelector(cornerSelector)) {return}
-		let corner = document.createElement('div');
-		corner.dataset.fcSlug = slug;
-		corner.title = 'View '+slug;
-		corner.classList.add('fc-corner');
-		corner.classList.add('fc-'+slug);
+		let cornerElem = embed.querySelector(cornerSelector);
+		if(cornerElem) {
+			cornerElem.remove();
+		}
+		cornerElem = document.createElement('div');
+		cornerElem.dataset.fcSlug = slug;
+		cornerElem.title = 'View '+translations[inst.lang][slug];
+		cornerElem.classList.add('fc-corner');
+		cornerElem.classList.add('fc-'+slug);
 
-		if(slug==active) {corner.classList.add('fc-active')}
+		if(slug==active) {cornerElem.classList.add('fc-active')}
 		if(inst.content) {
 			data = inst.content[slug];
 			if(!data||!Object.keys(data).length) {
-				corner.classList.add('fc-empty');
+				cornerElem.classList.add('fc-empty');
 			}
 		}
-
-		if(!inst.opts.static) {
-			corner.addEventListener('mouseenter', function(e) {
-				hoverCorner(e, inst);
-			});
-			corner.addEventListener('mouseleave', function(e) {
-				unhoverCorner(e, inst);
-			});
-			corner.addEventListener('click', function(e) {
-				clickCorner(e, inst);
-			});
-
-		}
-		corners[slug] = corner;
-		embed.appendChild(corner);
+		corners[slug] = cornerElem;
+		embed.appendChild(cornerElem);
 	});
 
 	return corners;
@@ -544,23 +582,23 @@ const parseData = (inst) => {
 	if(!inst.elems||!inst.elems.embed) {return}
 	let stringData = inst.elems.embed.dataset.fc;
 	if(!stringData){return}
-	delete inst.elems.embed.dataset.fc;
+	// delete inst.elems.embed.dataset.fc;
 	return JSON.parse(stringData);
 }
 
 const hoverCorner = (e, inst) => {
-	let corner = e.target;
-	corner.classList.add('fc-hover');
+	let cornerElem = e.target;
+	cornerElem.classList.add('fc-hover');
 }
 
 const unhoverCorner = (e, inst) => {
-	let corner = e.target;
-	corner.classList.remove('fc-hover');
+	let cornerElem = e.target;
+	cornerElem.classList.remove('fc-hover');
 }
 
 const clickCorner = (e, inst) => {
-	let corner = e.target;
-	let slug = corner.dataset.fcSlug;
+	let cornerElem = e.target;
+	let slug = cornerElem.dataset.fcSlug;
 	const active = inst.elems.embed.dataset.fcActive;
 	if(!slug) {return}	
 	if(slug==active) {
@@ -669,25 +707,14 @@ const translations = {
 	}
 }
 
+const defaultOpts = {
+	selector: '.fc-embed',
+	static: false,
+	caption: false,
+	credit: false,
+	logo: false,
+	active: '',
+};
 
-class FourCorners {
-	constructor(opts = {}) {
-		let embeds = [];
-		if(opts.elem instanceof Element) {
-			embeds = [opts.elem];
-		} else if(NodeList.prototype.isPrototypeOf(opts.elem)) {
-			embeds = Array.from(opts.elem);
-		} else {
-			const selector = (typeof opts.elem=='string' ? opts.elem : '.fc-embed');
-			embeds = Array.from(document.querySelectorAll(selector+':not(.fc-init)'));
-		}
-		let insts = [];
-		embeds.forEach(function(embed, i) {
-			const inst = new FourCornersPhoto(embed, opts);
-			insts.push(inst);
-		});
-		return insts;
-	}
-}
 
 module.exports = FourCorners;
