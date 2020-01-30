@@ -270,6 +270,8 @@
   overflow-y: hidden;
   overflow-x: hidden;
   position: relative; }
+  .fc-inner:empty {
+    display: none; }
 
 .fc-panel-title {
   width: 100%;

@@ -8,7 +8,7 @@ class FourCorners {
 		} else if(NodeList.prototype.isPrototypeOf(opts.elem)) {
 			embeds = Array.from(opts.elem);
 		} else {
-			const selector = (typeof opts.elem=='string' ? opts.elem : '.fc-embed');
+			const selector = (typeof opts.selector == 'string' ? opts.selector : '.fc-embed');
 			// embeds = Array.from(document.querySelectorAll(selector+':not(.fc-init)'));
 			embeds = Array.from(document.querySelectorAll(selector));
 		}
@@ -30,96 +30,126 @@ class FourCornersPhoto {
 			embed: embed
 		};
 		const data = parseData(this);
+		this.strings = {};
 		this.setUpData(data);
 		this.onImgLoad = new Event('onImgLoad');
 		this.onImgFail = new Event('onImgFail');
-		initEmbed(this);
+		this.initModule();
 	}
 
 	setUpData(data) {
-		const inst = this;
-		inst.lang = data ? data.lang : 'en';
-		inst.strings = translations[inst.lang];
-		inst.photo = data ? data.photo : {};
-		inst.opts = Object.assign(defaultOpts, inst.opts);
-		inst.opts = data ? Object.assign(inst.opts, data.opts) : {};
-		inst.content = {
+		this.lang = data && data.lang ? data.lang : 'en';
+		this.strings = translations[this.lang];
+		this.photo = getPhoto(this, data);
+		this.opts = Object.assign(defaultOpts, this.opts);
+		this.opts = data ? Object.assign(this.opts, data.opts) : {};
+		this.content = {
 			authorship: data ? data.authorship : {},
 			backstory: data ? data.backstory : {},
 			imagery: data ? data.imagery : {},
-			links: data ? data.links : {}
+			links: data ? data.links : {},
 		};
-		inst.elems.photo = addPhoto(inst);
-		inst.elems.panels = addPanels(inst);
-		inst.elems.media = embedMedia(inst);
-		inst.elems.corners = addCorners(inst);
-		inst.elems.cutline = addCutline(inst);
+		this.elems.photo = this.addPhoto();
+		this.elems.panels = this.addPanels();
+		this.elems.corners = this.addCorners();
+		this.elems.media = this.embedMedia();
+		this.elems.cutline = this.addCutline();
 
-		Object.keys(inst.elems.corners).forEach(function(cornerSlug, i) {
-			const cornerElem = inst.elems.corners[cornerSlug];
-			if(inst.opts.static) {
+		const inst = this;
+		Object.keys(this.elems.corners).forEach(function(cornerSlug, i) {
+			let cornerElem = inst.elems.corners[cornerSlug];
+			if(inst.opts.static || cornerElem.classList.contains('fc-interactive')) {
 				return;
 			}
-			cornerElem.addEventListener('mouseenter', function(e) {
-				hoverCorner(e, inst);
-			});
-			cornerElem.addEventListener('mouseleave', function(e) {
-				unhoverCorner(e, inst);
-			});
-			cornerElem.addEventListener('click', function(e) {
-				clickCorner(e, inst);
-			});
+			cornerElem.addEventListener('mouseenter', inst.hoverCorner.bind(inst) );
+			cornerElem.addEventListener('mouseleave', inst.unhoverCorner.bind(inst) );
+			cornerElem.addEventListener('click', inst.clickCorner.bind(inst) );
+			cornerElem.classList.add("fc-interactive");
 		});
 
-		return inst;
-	}
-
-	updateModule() {
-		const data = parseData(this);
-		this.setUpData(data);
-		initEmbed(this);
 		return this;
 	}
 
-	getPanel(slug) {
+
+	initModule() {
+		const self = this,
+					embed = this.elems.embed;
+		embed.classList.add('fc-init');
+		if(this.opts.dark) {
+			embed.classList.add('fc-dark');
+		}
+		if(this.opts.static) {
+			embed.classList.add('fc-static');
+		} else {
+			embed.addEventListener('click', function(e) {
+				const onPanels = isChildOf(e.target, self.getPanel());
+				const onCorners = isChildOf(e.target, self.elems.corners);
+				const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
+				if(!onPanels && !onCorners && !inCreator) {
+					self.closePanel();
+					self.elems.embed.classList.remove('fc-full');
+				}
+			});
+		}
+		embed.lang = this.lang;
+		if(['ar'].includes(this.lang)) {
+			embed.dir = 'rtl';
+		} else {
+			embed.dir = 'ltr';
+		}
+
+		window.addEventListener('resize', this.resizeModule.bind(this));
+		this.resizeModule();
+	}
+
+	updateModule(data) {
+		if(!data) {
+			const data = parseData(this);
+		}
+		this.setUpData(data);
+		this.initModule();
+		return this;
+	}
+
+	getPanel(cornerSlug) {
 		const embed = this.elems.embed;
 		if(!embed){return}
 		let panelSelector = '.fc-panel';
-		if(slug) {
-			panelSelector += '[data-fc-slug="'+slug+'"]';
+		if(cornerSlug) {
+			panelSelector += '[data-fc-slug="'+cornerSlug+'"]';
 			return embed.querySelector(panelSelector);
 		}
 		return embed.querySelectorAll(panelSelector);
 	}
 
-	openPanel(slug) {
+	openPanel(cornerSlug) {
 		const inst = this;
 		const corners = inst.cornerSlugs;
 		const embed = inst.elems.embed;
-		const corner = inst.elems.corners[slug];
-		let panel = inst.getPanel(slug);
+		const corner = inst.elems.corners[cornerSlug];
+		let panel = inst.getPanel(cornerSlug);
 		embed.classList.remove('fc-full');
 		if(embed && corner && panel) {
-			embed.dataset.fcActive = slug;
+			embed.dataset.fcActive = cornerSlug;
 			embed.classList.add('fc-active');
 			corner.classList.add('fc-active');
 			panel.classList.add('fc-active');
 		}
-		corners.forEach(function(_slug, i) {
-			if(_slug!=slug) {
-				inst.closePanel(_slug);
+		corners.forEach(function(_cornerSlug, i) {
+			if(_cornerSlug!=cornerSlug) {
+				inst.closePanel(_cornerSlug);
 			}
 		});
 	}
 
-	closePanel(slug) {
+	closePanel(cornerSlug) {
 		const inst = this;
 		const embed = inst.elems.embed;
-		if(!slug) {slug = embed.dataset.fcActive}
-		if(!slug) {return}
-		const corner = inst.elems.corners[slug];
-		const panel = inst.getPanel(slug);
-		if(slug==embed.dataset.fcActive) {
+		if(!cornerSlug) {cornerSlug = embed.dataset.fcActive}
+		if(!cornerSlug) {return}
+		const corner = inst.elems.corners[cornerSlug];
+		const panel = inst.getPanel(cornerSlug);
+		if(cornerSlug==embed.dataset.fcActive) {
 			embed.dataset.fcActive = '';
 			embed.classList.remove('fc-active');
 		}
@@ -131,46 +161,227 @@ class FourCornersPhoto {
 		const inst = this;
 		inst.elems.embed.classList.toggle('fc-full');
 	}
-}
 
-const initEmbed = (inst) => {
-	const embed = inst.elems.embed;
-	embed.classList.add('fc-init');
-	if(inst.opts.dark) {
-		embed.classList.add('fc-dark');
+	hoverCorner(e) {
+		let cornerElem = e.target;
+		cornerElem.classList.add('fc-hover');
 	}
-	if(inst.opts.static) {
-		embed.classList.add('fc-static');
-	} else {
-		embed.addEventListener('click', function(e) {
-			const onPanels = isChildOf(e.target, inst.getPanel());
-			const onCorners = isChildOf(e.target, inst.elems.corners);
-			const inCreator = isChildOf(e.target, Array.from(document.querySelectorAll('#creator')));
-			if(!onPanels && !onCorners && !inCreator) {
-				inst.closePanel();
-				inst.elems.embed.classList.remove('fc-full');
+
+	unhoverCorner(e) {
+		let cornerElem = e.target;
+		cornerElem.classList.remove('fc-hover');
+	}
+
+	clickCorner(e) {
+		let cornerElem = e.target,
+				cornerSlug = cornerElem.dataset.fcSlug;
+		const active = this.elems.embed.dataset.fcActive;
+		if(!cornerSlug) {return}	
+		if(cornerSlug==active) {
+			this.closePanel(cornerSlug);	
+		} else {
+			this.openPanel(cornerSlug);
+		}	
+	}
+
+	addCorners() {
+		let data, self = this, corners = {};
+		let embed = this.elems.embed,
+				photo = this.elems.photo;
+		const active = this.opts.active,
+					langTrans = translations[this.lang];
+		this.cornerSlugs.forEach(function(cornerSlug, i) {
+			const cornerSelector = '.fc-corner[data-fc-slug="'+cornerSlug+'"]',
+						cornerTitle = langTrans ? langTrans[cornerSlug] : null;
+			let cornerElem = embed.querySelector(cornerSelector),
+					cornerExists = cornerElem ? true : false;
+			if(!cornerElem) {
+				cornerElem = document.createElement('div');
+			}
+			cornerElem.dataset.fcSlug = cornerSlug;
+			cornerElem.title = cornerTitle ? 'View '+cornerTitle : null;
+			cornerElem.classList.add('fc-corner');
+			cornerElem.classList.add('fc-'+cornerSlug);
+
+			if(cornerSlug==active) {cornerElem.classList.add('fc-active')}
+			if(self.content) {
+				data = self.content[cornerSlug];
+				if(!data||!Object.keys(data).length) {
+					cornerElem.classList.add('fc-empty');
+				}
+			}
+			corners[cornerSlug] = cornerElem;
+			if(!cornerExists) {
+				embed.appendChild(cornerElem);
 			}
 		});
-	}
-	embed.lang = inst.lang;
-	if(['ar'].includes(inst.lang)) {
-		embed.dir = 'rtl';
-	} else {
-		embed.dir = 'ltr';
+
+		return corners;
 	}
 
-	window.addEventListener('resize', function(e) {
-		resizeEmbed(e, inst);
-	});
-	resizeEmbed(null, inst);
+	addPanels() {	
+		let data, self = this, panels = {};
+		let embed = this.elems.embed;
+		if(!embed){return}
+		this.cornerSlugs.forEach(function(cornerSlug, i) {
+			const active = self.opts.active,
+						panel = self.getPanel(cornerSlug);
+			if(panel) {
+				// return;
+				panel.remove();
+			}
+			let panelInner = '';
+			if(self.content && self.content[cornerSlug]) {
+				const panelContent = self.content[cornerSlug];
+				switch(cornerSlug) {
+					case 'authorship':
+						panelInner = buildAuthorship(self, panelContent);
+						break;
+					case 'backstory':
+						panelInner = buildBackstory(self, panelContent);
+						break;
+					case 'imagery':
+						panelInner = buildImagery(self, panelContent);
+						break;
+					case 'links':
+						panelInner = buildLinks(self, panelContent);
+						break;
+				}
+			}
+			const panelTile = self.strings[cornerSlug];
+			let panelClass = 'fc-panel fc-'+cornerSlug;
+			if(cornerSlug==active) {
+				panelClass += ' fc-active'
+			}
+			const panelHTML =
+				`<div data-fc-slug="${cornerSlug}" class="${panelClass}">
+					<div class="fc-panel-title">
+						<span>${panelTile}</span>
+						<div class="fc-icon fc-expand" title="Expand this panel"></div>
+						<div class="fc-icon fc-close" title="Close this panel"></div>
+					</div>
+					<div class="fc-panel-title fc-pseudo">
+						<span>${self.cornerSlugs.indexOf(cornerSlug)}</span>
+					</div>
+					${panelInner ?
+					`<div class="fc-scroll">
+						<div class="fc-inner">
+							${panelInner}
+						</div>
+					</div>` : ''}
+				</div>`;
+			self.elems.embed.innerHTML += panelHTML;
+		});
+
+		this.cornerSlugs.forEach(function(cornerSlug, i) {
+			const panel = self.getPanel(cornerSlug);
+			panels[cornerSlug] = panel;
+			const panelExpand = panel.querySelector('.fc-expand');
+			panelExpand.addEventListener('click', function(e) {
+				self.toggleExpandPanel();
+			});
+			const panelClose = panel.querySelector('.fc-close');
+			panelClose.addEventListener('click', function(e) {
+				self.closePanel(cornerSlug);
+				self.elems.embed.classList.remove('fc-full');
+			});
+		});
+		return panels;
+	}
+
+	addPhoto() {
+		let photo, img,
+				self = this,
+				embed = this.elems.embed,
+				width = this.photo ? this.photo.width : null,
+				height = this.photo ? this.photo.height : null,
+				ratio = width/height,
+				imgSelector = '.fc-img';
+
+		embed.style.paddingBottom = 100/ratio+'%';
+		img = embed.querySelector(imgSelector);
+		if(!img) {
+			embed.classList.add('fc-empty');
+		}
+
+		let pseudoImg = new Image;
+		embed.classList.add('fc-loading');
+
+		pseudoImg.onload = (e) => {
+			embed.style.paddingBottom = '';
+			embed.classList.remove('fc-loading');
+			embed.dispatchEvent(self.onImgLoad);
+		}
+		pseudoImg.onerror = (e) => {
+			embed.classList.remove('fc-loading');
+			embed.classList.add('fc-empty');
+			embed.dispatchEvent(self.onImgFail);
+		}
+		pseudoImg.src = img ? img.src : null;
+
+		return img;
+	}
+
+	addCutline() {
+		const content = this.content.authorship;
+		if(!content&&!this.opts.caption&&!this.opts.credit&&!this.opts.logo) {return}
+		const data = this.content['authorship'];
+		if(!data) {return}
+		const embed = this.elems.embed;
+		const caption = this.opts.caption && content.caption ? `<span class="fc-caption">${content.caption}</span>`:'';
+		const credit = this.opts.credit && (content.credit||content.license.holder) ?
+			`<span class="fc-credit">
+				${(content.credit ? `<span>${content.credit}</span>` : '')+(content.license.holder ? `<span>${content.license.holder}</span>` : '')}
+			</span>`
+		: '';
+		const logo = this.opts.logo ? `<a href="https://fourcornersproject.org" target="_blank" class="fc-logo" title="This is a Four Corners photo"></a>`:'';
+		const cutline =
+			`<div class="fc-cutline">
+				${caption+credit+logo}
+			</div>`;
+		embed.insertAdjacentHTML('afterend', cutline);
+		return cutline;
+	}
+
+	embedMedia() {
+		const self = this,
+					imageryContent = this.content.imagery;
+		if(!imageryContent) {return}
+		const media = imageryContent.media;
+		if(!media) {return}
+		const mediaKeys = Object.keys(media);
+		mediaKeys.forEach(function(key, i) {
+			const obj = media[key];
+			if(obj.source == 'image' || !obj.source) {
+				embedImage(self, obj, 'imagery', i);
+			} else {
+				embedExternal(self, obj, 'imagery', i);
+			}
+		});
+		// panelContent.media.map((obj, i) => {
+		// 	obj.source == 'image' || !obj.source ? embedImage(inst, obj, 'imagery', i) : embedExternal(inst, obj, 'imagery', i);
+		// });
+	}
+
+	resizeModule(e) {
+		const panels = this.getPanel();
+		if(!panels){return}
+		Object.keys(panels).forEach(function(cornerSlug, i) {
+			resizePanel(panels[cornerSlug]);
+		});
+	}
+
 }
 
-const resizeEmbed = (e, inst) => {
-	const panels = inst.getPanel();
-	if(!panels){return}
-	Object.keys(panels).forEach(function(slug, i) {
-		resizePanel(panels[slug]);
-	});
+const getPhoto = (inst, data) => {
+	if(data && data.photo && data.photo.src) {
+		return data.photo;
+	}
+	const img = inst.elems.embed ? inst.elems.embed.querySelector('img') : null,
+				imgSrc = img ? img.src : null;
+	return {
+		src: imgSrc
+	}
 }
 
 const resizePanel = (panel) => {
@@ -182,107 +393,6 @@ const resizePanel = (panel) => {
 	} else {
 		panel.classList.remove('fc-overflow');
 	}
-}
-
-const addPhoto = (inst)  => {
-	let photo, img,
-			embed = inst.elems.embed,
-			width = inst.photo.width,
-			height = inst.photo.height,
-			ratio = width/height,
-			imgSelector = '.fc-img';
-
-	embed.style.paddingBottom = 100/ratio+'%';
-	img = embed.querySelector(imgSelector);
-	if(!img) {
-		embed.classList.add('fc-empty');
-	}
-
-	let pseudoImg = new Image;
-	embed.classList.add('fc-loading');
-
-	pseudoImg.onload = (e) => {
-		embed.style.paddingBottom = '';
-		embed.classList.remove('fc-loading');
-		embed.dispatchEvent(inst.onImgLoad);
-	}
-	pseudoImg.onerror = (e) => {
-		embed.classList.remove('fc-loading');
-		embed.classList.add('fc-empty');
-		embed.dispatchEvent(inst.onImgFail);
-	}
-	pseudoImg.src = img ? img.src : null;
-
-	return img;
-}
-
-const addPanels = (inst) => {	
-	let data, panels = {};
-	let embed = inst.elems.embed;
-	if(!embed){return}
-	inst.cornerSlugs.forEach(function(slug, i) {
-		const active = inst.opts.active,
-					panel = inst.getPanel(slug);
-		if(panel) {
-			panel.remove();
-		}
-		let panelInner = '';
-		if(inst.content && inst.content[slug]) {
-			const panelContent = inst.content[slug];
-			switch(slug) {
-				case 'authorship':
-					panelInner = buildAuthorship(inst, panelContent);
-					break;
-				case 'backstory':
-					panelInner = buildBackstory(inst, panelContent);
-					break;
-				case 'imagery':
-					panelInner = buildImagery(inst, panelContent);
-					break;
-				case 'links':
-					panelInner = buildLinks(inst, panelContent);
-					break;
-			}
-		}
-		const panelTile = inst.strings[slug];
-		let panelClass = 'fc-panel fc-'+slug;
-		if(slug==active) {
-			panelClass += ' fc-active'
-		}
-		const panelHTML =
-			`<div data-fc-slug="${slug}" class="${panelClass}">
-				<div class="fc-panel-title">
-					<span>${panelTile}</span>
-					<div class="fc-icon fc-expand" title="Expand this panel"></div>
-					<div class="fc-icon fc-close" title="Close this panel"></div>
-				</div>
-				<div class="fc-panel-title fc-pseudo">
-					<span>${inst.cornerSlugs.indexOf(slug)}</span>
-				</div>
-				${panelInner ?
-				`<div class="fc-scroll">
-					<div class="fc-inner">
-						${panelInner}
-					</div>
-				</div>` : ''}
-			</div>`;
-		inst.elems.embed.innerHTML += panelHTML;
-	});
-
-	inst.cornerSlugs.forEach(function(slug, i) {
-		const panel = inst.getPanel(slug);
-		panels[slug] = panel;
-		const panelExpand = panel.querySelector('.fc-expand');
-		panelExpand.addEventListener('click', function(e) {
-			inst.toggleExpandPanel();
-		});
-		const panelClose = panel.querySelector('.fc-close');
-		panelClose.addEventListener('click', function(e) {
-			inst.closePanel(slug);
-			inst.elems.embed.classList.remove('fc-full');
-		});
-	});
-	return panels;
 }
 
 const createRow = (panelContent, obj, includeLabel) => {
@@ -395,7 +505,7 @@ const buildBackstory = (inst, panelContent) => {
 		</div>`:''}
 		${panelContent.media?
 			panelContent.media.map((obj, i) => {
-			embedIframe(inst,obj,'backstory',i);
+			embedExternal(inst,obj,'backstory',i);
 			return `<div class="fc-row">
 				<div class="fc-media" data-fc-source="${obj.source}"></div>
 				${obj.caption ?
@@ -447,23 +557,6 @@ const buildLinks = (inst, panelContent) => {
 }
 
 
-const embedMedia = (inst) => {
-	const media = inst.content.imagery.media;
-	if(!media) {return}
-	const mediaKeys = Object.keys(media);
-	mediaKeys.forEach(function(key, i) {
-		const obj = media[key];
-		if(obj.source == 'image' || obj.source == 'instagram' || !obj.source) {
-			embedImage(inst, obj, 'imagery', i);
-		} else {
-			embedIframe(inst, obj, 'imagery', i);
-		}
-	});
-	// panelContent.media.map((obj, i) => {
-	// 	obj.source == 'image' || !obj.source ? embedImage(inst, obj, 'imagery', i) : embedIframe(inst, obj, 'imagery', i);
-	// });
-}
-
 const embedImage = (inst, obj, panelKey, index) => {
 	if(!obj.url){ return }
 	const pseudoImg = new Image();
@@ -484,7 +577,7 @@ const embedImage = (inst, obj, panelKey, index) => {
 	return;
 }
 
-const embedIframe = (inst, obj, panelKey, index) => {
+const embedExternal = (inst, obj, panelKey, index) => {
 	//requests third party APIs to retrieve embed data
 	let req = '';
 	switch(obj.source) {
@@ -496,6 +589,9 @@ const embedIframe = (inst, obj, panelKey, index) => {
 			break;
 		case 'soundcloud':
 			req = 'https://soundcloud.com/oembed?format=json&url='+obj.url;
+			break;
+		case 'instagram':
+			req = 'https://api.instagram.com/oembed/?url='+obj.url;
 			break;
 		default:
 			return false;
@@ -511,9 +607,16 @@ const embedIframe = (inst, obj, panelKey, index) => {
 			return res.json();
 		})
 		.then(res => {
+			console.log(res);
 			const panel = inst.elems.panels[panelKey];
 			let subMedia = panel.querySelectorAll('.fc-media')[index],
-					html = res.html;
+					html = '';
+			if(obj.source == 'instagram') {
+				html = `<img src="${res.thumbnail_url}"/>`
+			} else {
+				html = res.html;
+			}
+
 			if(Number.isInteger(res.width, res.height)) {
 				const ratio = res.height/res.width;
 				subMedia.classList.add('fc-responsive')
@@ -526,86 +629,12 @@ const embedIframe = (inst, obj, panelKey, index) => {
 		});
 }
 
-const addCorners = (inst) => {
-	let data, corners = {};
-	let embed = inst.elems.embed;
-	let photo = inst.elems.photo;
-	const active = inst.opts.active;
-	inst.cornerSlugs.forEach(function(slug, i) {
-		const cornerSelector = '.fc-corner[data-fc-slug="'+slug+'"]';
-		let cornerElem = embed.querySelector(cornerSelector);
-		if(cornerElem) {
-			cornerElem.remove();
-		}
-		cornerElem = document.createElement('div');
-		cornerElem.dataset.fcSlug = slug;
-		cornerElem.title = 'View '+translations[inst.lang][slug];
-		cornerElem.classList.add('fc-corner');
-		cornerElem.classList.add('fc-'+slug);
-
-		if(slug==active) {cornerElem.classList.add('fc-active')}
-		if(inst.content) {
-			data = inst.content[slug];
-			if(!data||!Object.keys(data).length) {
-				cornerElem.classList.add('fc-empty');
-			}
-		}
-		corners[slug] = cornerElem;
-		embed.appendChild(cornerElem);
-	});
-
-	return corners;
-}
-
-const addCutline = (inst) => {
-	const content = inst.content.authorship;
-	if(!content&&!inst.opts.caption&&!inst.opts.credit&&!inst.opts.logo) {return}
-	const data = inst.content['authorship'];
-	if(!data) {return}
-	const embed = inst.elems.embed;
-	const caption = inst.opts.caption && content.caption ? `<span class="fc-caption">${content.caption}</span>`:'';
-	const credit = inst.opts.credit && (content.credit||content.license.holder) ?
-		`<span class="fc-credit">
-			${(content.credit ? `<span>${content.credit}</span>` : '')+(content.license.holder ? `<span>${content.license.holder}</span>` : '')}
-		</span>`
-	: '';
-	const logo = inst.opts.logo ? `<a href="https://fourcornersproject.org" target="_blank" class="fc-logo" title="This is a Four Corners photo"></a>`:'';
-	const cutline =
-		`<div class="fc-cutline">
-			${caption+credit+logo}
-		</div>`;
-	embed.insertAdjacentHTML('afterend', cutline);
-	return cutline;
-}
-
 const parseData = (inst) => {
 	if(!inst.elems||!inst.elems.embed) {return}
 	let stringData = inst.elems.embed.dataset.fc;
 	if(!stringData){return}
-	// delete inst.elems.embed.dataset.fc;
+	delete inst.elems.embed.dataset.fc;
 	return JSON.parse(stringData);
-}
-
-const hoverCorner = (e, inst) => {
-	let cornerElem = e.target;
-	cornerElem.classList.add('fc-hover');
-}
-
-const unhoverCorner = (e, inst) => {
-	let cornerElem = e.target;
-	cornerElem.classList.remove('fc-hover');
-}
-
-const clickCorner = (e, inst) => {
-	let cornerElem = e.target;
-	let slug = cornerElem.dataset.fcSlug;
-	const active = inst.elems.embed.dataset.fcActive;
-	if(!slug) {return}	
-	if(slug==active) {
-		inst.closePanel(slug);	
-	} else {
-		inst.openPanel(slug);
-	}	
 }
 
 const isChildOf = (target, ref) => {
