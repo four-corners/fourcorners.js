@@ -328,13 +328,13 @@ class FourCornersPhoto {
 		const data = this.content['authorship'];
 		if(!data) {return}
 		const embed = this.elems.embed;
-		const caption = this.opts.caption && content.caption ? `<span class="fc-caption">${content.caption}</span>`:'';
+		const caption = this.opts.caption && content.caption ? `<span class="fc-caption">${content.caption}</span>`: '';
 		const credit = this.opts.credit && (content.credit||content.license.holder) ?
-			`<span class="fc-credit">
+			`<div class="fc-credit">
 				${(content.credit ? `<span>${content.credit}</span>` : '')+(content.license.holder ? `<span>${content.license.holder}</span>` : '')}
-			</span>`
+			</div>`
 		: '';
-		const logo = this.opts.logo ? `<a href="https://fourcornersproject.org" target="_blank" class="fc-logo" title="This is a Four Corners photo"></a>`:'';
+		const logo = this.opts.logo ? `<a href="https://fourcornersproject.org" target="_blank" class="fc-logo" title="This is a Four Corners photo"></a>`: '';
 		const cutline =
 			`<div class="fc-cutline">
 				${caption+credit+logo}
@@ -502,7 +502,7 @@ const buildBackstory = (inst, panelContent) => {
 		`${panelContent['text'] ?
 		`<div class="fc-row">
 			${wrapParagraphs(panelContent['text'])}
-		</div>`:''}
+		</div>`: ''}
 		${panelContent.media?
 			panelContent.media.map((obj, i) => {
 			embedExternal(inst,obj,'backstory',i);
@@ -515,7 +515,7 @@ const buildBackstory = (inst, panelContent) => {
 				`<div class="fc-sub-credit">${obj.credit}</div>`
 				: ''}
 			</div>`
-		}).join(''):''}`
+		}).join(''): ''}`
 	return html;
 }
 
@@ -525,15 +525,20 @@ const buildImagery = (inst, panelContent) => {
 	}
 	let html = 
 		`${panelContent.media.map((obj, i) => {
+			const isExternal = ['instagram', 'youtube', 'vimeo'].includes(obj.source);
 			return `<div class="fc-row">
 				<div class="fc-media" data-fc-source="${obj.source}">
 				</div>
-				${obj.caption?
+				${obj.caption ?
 				`<div class="fc-sub-caption">${obj.caption}</div>`
-				:''}
-				${obj.credit?
-				`<div class="fc-sub-credit">${obj.credit}</div>`
-				:''}
+				: ''}
+				${obj.credit || isExternal ?
+					`<div class="fc-sub-credit">
+						${isExternal ? `<a href="${obj.url}" target="_blank">` : ''}
+							${obj.credit || 'View on '+extractRootDomain(obj.url)}
+						${isExternal ? `</a>` : ''}
+					</div>`
+				: ''}
 			</div>`
 		}).join('')}`;
 	return html;
@@ -607,12 +612,11 @@ const embedExternal = (inst, obj, panelKey, index) => {
 			return res.json();
 		})
 		.then(res => {
-			console.log(res);
 			const panel = inst.elems.panels[panelKey];
 			let subMedia = panel.querySelectorAll('.fc-media')[index],
 					html = '';
 			if(obj.source == 'instagram') {
-				html = `<img src="${res.thumbnail_url}"/>`
+				html = `<img src="${res.thumbnail_url}"/>`;
 			} else {
 				html = res.html;
 			}
