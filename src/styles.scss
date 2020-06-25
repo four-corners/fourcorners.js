@@ -424,9 +424,6 @@
 	}
 }
 .fc-contact {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
 	&:not(:first-of-type) {
 		margin-top: 1em;
 	}
@@ -539,7 +536,7 @@ a.fc-card:hover {
 	}
 }
 .fc-cutline {
-	margin: .2em 0 0 0;
+	margin: .5em 0 0 0;
 	.fc-caption, .fc-credit {
 		&::after {
 			content: ' ';

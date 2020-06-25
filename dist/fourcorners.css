@@ -332,12 +332,8 @@
   .fc-field:last-of-type {
     margin: 0; }
 
-.fc-contact {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap; }
-  .fc-contact:not(:first-of-type) {
-    margin-top: 1em; }
+.fc-contact:not(:first-of-type) {
+  margin-top: 1em; }
 
 .fc-copyright span {
   margin-right: .25em; }
@@ -433,7 +429,7 @@ a.fc-card:hover {
     top: 0; }
 
 .fc-cutline {
-  margin: .2em 0 0 0; }
+  margin: .5em 0 0 0; }
   .fc-cutline .fc-caption::after, .fc-cutline .fc-credit::after {
     content: ' '; }
   .fc-cutline .fc-credit {

@@ -1,6 +1,6 @@
 {
   "name": "@four-corners/fourcorners.js",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "author": "Corey Tegeler",
   "license": "ISC",
   "description": "fourcorners.js allows specific information to be embedded in each of the photograph’s four corners, where it is available for an interested reader to explore. This increased contextualization strengthens both the authorship of the photographer and the credibility of the image.",

@@ -534,7 +534,7 @@ const buildImagery = (inst, panelContent) => {
 				: ''}
 				${obj.credit || isExternal ?
 					`<div class="fc-sub-credit">
-						${isExternal ? `<a href="${obj.url}" target="_blank">` : ''}
+						${isExternal && obj.url ? `<a href="${obj.url}" target="_blank">` : ''}
 							${obj.credit || 'View on '+extractRootDomain(obj.url)}
 						${isExternal ? `</a>` : ''}
 					</div>`
@@ -671,7 +671,7 @@ const createLink = (href, text, classes = []) => {
 
 const extractHostname = (url) => {
 	let hostname;
-	if(!url){return false}
+	if(!url){return null}
 	if(url.indexOf('//') > -1) {
 		hostname = url.split('/')[2];
 	} else {
@@ -683,7 +683,7 @@ const extractHostname = (url) => {
 }
 
 const extractRootDomain = (url)  => {
-	if(!url){return false}
+	if(!url){return null}
 	let domain = extractHostname(url);
 	let splitArr = domain.split('.');
 	let arrLen = splitArr.length;
