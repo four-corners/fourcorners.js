@@ -29,6 +29,7 @@ class FourCornersPhoto {
 		this.elems = {
 			embed: embed
 		};
+		this.opts = opts;
 		const data = parseData(this);
 		this.strings = {};
 		this.setUpData(data);
@@ -635,9 +636,19 @@ const embedExternal = (inst, obj, panelKey, index) => {
 
 const parseData = (inst) => {
 	if(!inst.elems||!inst.elems.embed) {return}
-	let stringData = inst.elems.embed.dataset.fc;
+	const embed = inst.elems.embed,
+				scriptTag = embed.querySelector("script");
+	let stringData;
+	if(scriptTag) {
+		//If embed JSON is stored in child script tag (NEW)
+		stringData = scriptTag.innerHTML;
+		scriptTag.remove();
+	} else if(embed.hasAttribute("data-fc")) {
+		//If embed JSON is stored in data-fc attributte (OLD)
+		stringData = embed.dataset.fc;
+		delete embed.dataset.fc;
+	}
 	if(!stringData){return}
-	delete inst.elems.embed.dataset.fc;
 	return JSON.parse(stringData);
 }
 

@@ -61,9 +61,6 @@
 			background-color: $darkest;
 		}
 	}
-	&:not(:hover) {
-		// transition: all 100ms linear, opacity 0;
-	}
 	&:hover {
 		cursor: pointer;
 		opacity: 1;
