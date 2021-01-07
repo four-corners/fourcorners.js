@@ -572,13 +572,6 @@ const embedImage = (inst, obj, panelKey, index) => {
 		let media = panel.querySelectorAll('.fc-media')[index];
 		media.innerHTML += img;
 	}
-	// pseudoImg.onerror = (e) => {
-		// console.warn('Four Corners cannot load this as an image: '+obj.url, e);
-		// const img = `<img src="${obj.url}"/>`;
-		// const panel = inst.elems.panels[panelKey];
-		// let media = panel.querySelectorAll('.fc-media')[index];
-		// media.innerHTML += img;
-	// }
 	pseudoImg.src = obj.url;
 	return;
 }
