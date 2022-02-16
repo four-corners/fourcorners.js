@@ -3,15 +3,14 @@ require("styles.scss");
 
 class FourCorners {
 
-	constructor(img, opts, c2pa) {
-		// this.c2pa = this.getC2paData(c2pa);
-		this.data = c2pa ? this.parseC2paData(c2pa) : this.parseData();
+	constructor(elem, opts, c2pa) {
 		this.lang = opts.lang || "en";
 		this.strings = STRINGS[this.lang];
 		this.opts = { ...DEFAULT_OPTS, ...opts };
 		this.elems = {};
-		this.elems.img = img;
-		this.elems.embed = this.addWrapper();
+		this.elems.img = this.addImg(elem);
+		this.elems.embed = this.addWrapper(elem);
+		this.data = c2pa ? this.parseC2paData(c2pa) : this.parseData();
 		this.elems.panels = this.addPanels();
 		this.elems.corners = this.addCorners();
 		this.elems.cutline = this.addCutline();
@@ -24,7 +23,19 @@ class FourCorners {
 	//DATA HANDLING
 
 	parseData() {
-		
+		const { embed } = this.elems;
+		const script = embed.querySelector("script");
+		if(script) {
+		//If embed JSON is stored in child script tag
+			stringData = script.innerHTML;
+			script.remove();
+		} else if(embed.hasAttribute("data-fc")) {
+		//If embed JSON is stored in data-fc attributte
+			stringData = embed.dataset.fc;
+			delete embed.dataset.fc;
+		}
+		if(!stringData) return;
+		return JSON.parse(stringData);
 	}
 
 	parseC2paData(rawC2pa) {
@@ -103,15 +114,27 @@ class FourCorners {
 	}
 
 	//BUILDING DOM ELEMENTS
+	addImg(elem) {
+		if(elem.tagName === "IMAGE") {
+			return elem;
+		} else {
+			return elem.querySelector("img");
+		}
+	}
 
-	addWrapper() {
-		const embed = document.createElement("div");
-		const {width, height} = this.elems.img.getBoundingClientRect();
-		embed.style.width = `${width}px`;
-		embed.style.height = `${height}px`;
-		this.elems.img.parentNode.insertBefore(embed, this.elems.img);
-		embed.appendChild(this.elems.img);
-		embed.classList.add("fc-embed");
+	addWrapper(elem) {
+		let embed;
+		if(elem.tagName === "IMG") {
+			embed = document.createElement("div");
+			const { width, height } = elem.getBoundingClientRect();
+			embed.style.width = `${width}px`;
+			embed.style.height = `${height}px`;
+			elem.parentNode.insertBefore(embed, elem);
+			embed.appendChild(elem);
+			embed.classList.add("fc-embed");
+		} else {
+			embed = elem;
+		}
 		if(this.opts.dark) embed.classList.add("fc-dark");
 		if(this.opts.static) embed.classList.add("fc-static");
 		return embed;
@@ -231,7 +254,7 @@ class FourCorners {
 							${this.strings.caption}:
 						</span>
 						<span class="fc-content">
-							<em>${panelData.caption}</em>
+							${panelData.caption}
 						</span>
 					</div>`
 				: ""}
@@ -333,7 +356,7 @@ class FourCorners {
 
 		let html = 
 			`${panelData.media ? panelData.media.map((obj, index) => {
-				const isExternal = ["selfagram", "youtube", "vimeo"].includes(obj.source);
+				const isExternal = ["instagram", "youtube", "vimeo"].includes(obj.source);
 				return (
 					`<div class="fc-row">
 						<div class="fc-media">
@@ -472,14 +495,15 @@ class FourCorners {
 			case "soundcloud":
 				req = "https://soundcloud.com/oembed?format=json&url="+obj.url;
 				break;
-			case "selfagram":
-				req = "https://api.selfagram.com/oembed/?url="+obj.url;
+			case "instagram":
+				req = "https://api.instagram.com/oembed/?url="+obj.url;
 				break;
 			default:
 				return false;
 				break;
 		}
 		const headers = new Headers();
+		console.log(req);
 		fetch(req, {
 			method: "GET",
 			headers: headers
@@ -491,7 +515,7 @@ class FourCorners {
 						subMedia = panel.querySelectorAll(".fc-media-embed")[obj.index];
 			let html = "";
 
-			if(obj.source == "selfagram") {
+			if(obj.source == "instagram") {
 				html = `<img src="${res.thumbnail_url}"/>`;
 			} else {
 				html = res.html;
