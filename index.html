@@ -3,18 +3,24 @@
 
 	<head>
 		<meta charset="utf-8">
-		<title>fourcorners.js demos</title>
+
+		<title>fourcorners.js demo</title>
+		<link type="text/css" href="./style.css" rel="stylesheet" />
 		<link type="text/css" href="./dist/fourcorners.css" rel="stylesheet" />
 		<script type="text/javascript" src="./dist/fourcorners.js"></script>
 
 		<script type="text/javascript">
-			const jsonImg = document.querySelector("#fc-json");
-			new FourCorners(jsonImg, {
-				caption: true,
-				credit: true,
-				logo: true,
-				dark: false,
-				static: false
+			window.addEventListener('load', function() {
+				const embeds = document.querySelectorAll(".fc-embed");
+				embeds.forEach((embed) => {
+					new FourCorners(embed, {
+						caption: true,
+						credit: true,
+						logo: true,
+						dark: false,
+						static: false
+					});
+				});
 			});
 		</script>
 
@@ -26,63 +32,59 @@
 			const wasmSrc = "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/assets/wasm/toolkit_bg.wasm";
 			const workerSrc = "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.worker.min.js";
 
-			const c2paImg = document.querySelector("#fc-c2pa");
+			const imgs = document.querySelectorAll("img");
 
-			const imgSrc = c2paImg.src;
-			const sdk = new ContentAuth({
-				wasmSrc,
-				workerSrc,
+			imgs.forEach(async (img) => {
+				const imgSrc = img.src;
+				const sdk = new ContentAuth({
+					wasmSrc,
+					workerSrc,
+				});
+				const provenance = await sdk.processImage(imgSrc);
+				await new FourCorners(img, {
+					caption: true,
+					credit: true,
+					logo: true,
+					dark: false,
+					static: false
+				}, provenance);
 			});
-			const provenance = await sdk.processImage(imgSrc);
-			await new FourCorners(c2paImg, {
-				caption: true,
-				credit: true,
-				logo: true,
-				dark: false,
-				static: false
-			}, provenance);
 
 		</script>
 
 	</head>
 
 	<body>
+
 		<main>
 
 			<h1>
 				fourcorners.js demos
 			</h1>
 
-			<h2>
-				embed generated from <a href="https://fourcornersproject.org/create" target="_blank">fourcornersproject.org/create</a>
-			</h2>
-
-			<div class="fc-embed" id="fc-json"><script type="application/json">{"authorship":{"credit":"REUTERS/Muyi Xiao","license":{"type":"copyright","holder":"","year":"2017"},"ethics":{"desc":"My photography abides by the Standards and Values set by Reuters."},"caption":"Wang Quanming's mother Nong Xiurong greets Zhao Yuqing when she arrived in Wang's hometown, in Anxi, Fujian province, China, January 27, 2017.","bio":"Muyi Xiao is currently the Visuals Editor at ChinaFile, an online magazine published by the Center on U.S.-China Relations at Asia Society, dedicated to broaden its readers’ understanding of China and to spark new conversations about China’s place in the world.","website":"http://muyixiao.com"},"backstory":{"text":"According to the Reuters code of ethics, when I report a story I need to represent my true identity to subjects, which means I need to tell everyone that I am a photographer with Reuters. I am also not allowed to lie about what I was there for. But in this case, it is a little bit different because the story is about a couple fabricating a story and hiding the truth from the family. As a journalist, I shouldn’t interfere with the story by revealing the truth to the family. So after internal editorial discussion, we decided that when I approach the family, I should tell them the partial truth, which is “I am here to photograph the couple going back to Wang Quanming’s home for Spring Festival.”"},"imagery":{"media":[{"source":"image","url":"https://www.exhibit.fourcornersproject.org/wp-content/uploads/2019/07/clean_room.jpg","caption":"Nong Xiurong, Wang Quanming's mother, cleaned a very messy storage room so that Zhao Yuqing doesn’t have a bad impression of the family.","credit":"REUTERS/Muyi Xiao","index":0}]},"links":{"links":[{"source":"link","url":"https://widerimage.reuters.com/story/hopes-and-expectations-the-journey-of-a-fake-girlfriend","title":"Hopes and expectations: the journey of a fake girlfriend","index":0}]},"opts":{"caption":true,"credit":true,"logo":true},"photo":{},"lang":"en"}</script><img src="./json/muyi-xiao.jpeg"></div>
+			<br /><br />
 
 			<h2>
-				embed generated with <a href="https://c2pa.org/" target="_blank">C2PA</a> metadata
+				embed generated from <a href="https://fourcornersproject.org" target="_blank">fourcornersproject.org</a>
 			</h2>
+			(<a href="./json/index.html">view more</a>)
 
-			<img id="fc-c2pa" src="./c2pa/paul-ninson/paul-ninson-c2pa.jpeg" />
+			<br /><br />
+
+			<div class="fc-embed"><script type="application/json">{"authorship":{"credit":"REUTERS/Muyi Xiao","license":{"type":"copyright","holder":"","year":"2017"},"ethics":{"desc":"My photography abides by the Standards and Values set by Reuters."},"caption":"Wang Quanming's mother Nong Xiurong greets Zhao Yuqing when she arrived in Wang's hometown, in Anxi, Fujian province, China, January 27, 2017.","bio":"Muyi Xiao is currently the Visuals Editor at ChinaFile, an online magazine published by the Center on U.S.-China Relations at Asia Society, dedicated to broaden its readers’ understanding of China and to spark new conversations about China’s place in the world.","website":"http://muyixiao.com"},"backstory":{"text":"According to the Reuters code of ethics, when I report a story I need to represent my true identity to subjects, which means I need to tell everyone that I am a photographer with Reuters. I am also not allowed to lie about what I was there for. But in this case, it is a little bit different because the story is about a couple fabricating a story and hiding the truth from the family. As a journalist, I shouldn’t interfere with the story by revealing the truth to the family. So after internal editorial discussion, we decided that when I approach the family, I should tell them the partial truth, which is “I am here to photograph the couple going back to Wang Quanming’s home for Spring Festival.”"},"imagery":{"media":[{"source":"image","url":"https://www.exhibit.fourcornersproject.org/wp-content/uploads/2019/07/clean_room.jpg","caption":"Nong Xiurong, Wang Quanming's mother, cleaned a very messy storage room so that Zhao Yuqing doesn’t have a bad impression of the family.","credit":"REUTERS/Muyi Xiao","index":0}]},"links":{"links":[{"source":"link","url":"https://widerimage.reuters.com/story/hopes-and-expectations-the-journey-of-a-fake-girlfriend","title":"Hopes and expectations: the journey of a fake girlfriend","index":0}]},"opts":{"caption":true,"credit":true,"logo":true},"photo":{},"lang":"en"}</script><img src="./json/muyi-xiao.jpeg"></div>
+
+			<br /><br /><br /><br />
+
+			<h2>
+				embed generated with <a href="https://c2pa.org" target="_blank">C2PA</a> metadata
+			</h2>
+			(<a href="./c2pa/index.html">view more</a>)
+
+			<br /><br />
+
+			<img src="./c2pa/yonas-tadesse/yonas-tadesse-c2pa.jpeg" />
 
 		</div>
 	</body>
-
-	<style>
-		html, body {
-			font-family: sans-serif;
-		}
-		main {
-			max-width: 700px;
-			padding: 25px;
-			margin: auto;
-		}
-	  .fc-embed {
-			margin: 50px 0 0 0;
-	  }
-	  img {
-	  	width: 100%;
-	  }
-	</style>
 
 </html>
