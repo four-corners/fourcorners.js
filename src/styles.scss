@@ -1,11 +1,11 @@
-@import 'vars.scss';
+@import "./vars.scss";
 .fc-embed {
 	width: 100%;
 	display: block;
 	position: relative;
 	overflow: hidden;
 	background-color: $lighter;
-	@include medText;
+	@include mdText;
 	* {
 		text-rendering: optimizeLegibility;
 		box-sizing: border-box;
@@ -24,6 +24,7 @@
 		width: 100%;
 		height: auto;
 		display: table;
+		margin: 0;
 		transition: opacity 200ms ease-in-out;
 	}
 	&:empty, &.fc-empty {
@@ -46,11 +47,28 @@
 	height: $corner-size;
 	position: absolute;
 	z-index: 4;
-	filter: drop-shadow(0 0 1px $darken);
 	transform: translate3d(0,0,0);
+	filter: drop-shadow(0 0 2px $darken);
 	@include fastTrans;
+	// svg {
+	// 	width: calc($corner-size / 2);
+	// 	height: calc($corner-size / 2);
+	// 	margin: calc($corner-size / 4);
+	// 	fill: $lightest;
+	// 	stroke: $darken;
+	// 	stroke-width: 10px;
+	// 	pointer-events: none;
+	// 	.fc-dark & {
+	// 		fill: $darkest;
+	// 		stroke: $lighten;
+	// 	}
+	// }
 	.fc-dark & {
-		filter: none;
+		filter: drop-shadow(0 0 2px $lighten);
+	}
+	&::before, .fc-shadow::before,
+	&::after, .fc-shadow::after {
+		border-radius: 2px;
 	}
 	&::after, &::before {
 		position: absolute;
@@ -78,6 +96,9 @@
 		@include noTrans;
 	}
 	&.fc-authorship {
+		// svg {
+		// 	transform: rotate(90deg);
+		// }
 		bottom: -#{$corner-size};
 		right: -#{$corner-size};
 		&::before, .fc-shadow::before {
@@ -94,6 +115,9 @@
 		}
 	}
 	&.fc-backstory {
+		// svg {
+		// 	transform: rotate(180deg);
+		// }
 		bottom: -#{$corner-size};
 		left: -#{$corner-size};
 		&::before, .fc-shadow::before {
@@ -110,6 +134,9 @@
 		}
 	}
 	&.fc-imagery {
+		// svg {
+		// 	transform: rotate(270deg);
+		// }
 		top: -#{$corner-size};
 		left: -#{$corner-size};
 		&::before, .fc-shadow::before {
@@ -141,7 +168,9 @@
 			top: $corner-gap;
 		}
 	}
-	.fc-embed:hover:not(.fc-full) &, .fc-embed:not(.fc-init) &, .fc-embed.fc-static & {
+	.fc-embed:hover:not(.fc-full) &,
+	.fc-embed:not(.fc-init) &,
+	.fc-embed.fc-static & {
 		&.fc-imagery {
 			top: 0;
 			left: 0;
@@ -228,8 +257,8 @@
 	.fc-full & {
 		transition-delay: 3000ms;
 		transition: all 0ms linear; 
-		width: calc(100% - 1em);
-		height: calc(100% - 1em);
+		width: calc(100% - 1rem);
+		height: calc(100% - 1rem);
 		max-height: unset;
 	}
 	p {
@@ -245,11 +274,11 @@
 	}
 }
 .fc-icon {
-	width: 1em;
-	height: 1em;
+	width: 1rem;
+	height: 1rem;
 	padding: 3px;
 	position: absolute;
-	top: .5em;
+	top: .5rem;
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: 12px;
@@ -258,14 +287,14 @@
 	transition: border-color 200ms ease-in-out;
 	&:hover {
 		cursor: pointer;
-		border-color: $dark;
+		border-color: $darker;
 		.fc-dark & {
 			border-color: $light;
 		}
 	}
 }
 .fc-expand {
-	right: 2em;
+	right: 2rem;
 	background-image: url(./svg/expand.svg);
 	.fc-dark & {
 		background-image: url(./svg/expand-light.svg);
@@ -298,7 +327,7 @@
 }
 
 .fc-close {
-	right: .5em;
+	right: .5rem;
 	background-image: url(./svg/close.svg);
 	.fc-dark & {
 		background-image: url(./svg/close-light.svg);
@@ -321,10 +350,10 @@
 	  width: 5px;
 	}
 	&::-webkit-scrollbar-track {
-	  background: transparent; 
+	  background: $medium; 
 	}
 	&::-webkit-scrollbar-thumb {
-	  background: $medium; 
+	  background: $darker; 
 	}
 	&::-webkit-scrollbar-thumb:hover {
 	  background: $darken; 
@@ -332,7 +361,7 @@
 }
 .fc-inner {
 	width: 100%;
-	margin: .5em 0;
+	margin: .15rem 0;
 	height: auto;
 	overflow: hidden;
 	overflow-y: hidden;
@@ -341,16 +370,22 @@
 	&:empty {
 		display: none;
 	}
+	.fc-embed.fc-full &.fc-grid {
+		margin: .5rem .25rem;
+		padding-right: .5rem;
+		column-count: 2;
+		column-gap: 0;
+	}
 }
 .fc-panel-title {
 	width: 100%;
-	padding: .325em .4rem;
+	padding: .325rem .4rem;
 	position: absolute;
 	left: 0;
 	top: 0;
 	background-color: rgba($lightest, .95);
 	font-weight: bold;
-	font-size: 1.2em;
+	font-size: 1.2rem;
 	z-index: 5;
 	@include shadow;
 	.fc-dark & {
@@ -368,12 +403,7 @@
 	z-index: unset;
 }
 .fc-label {
-	color: $dark;
-	&::after {
-		content: ': ';
-		margin-right: .25em;
-		display: inline-block;
-	}
+	color: $darker;
 	.fc-dark & {
 		color: $light;
 	}
@@ -385,19 +415,21 @@
 // 	}
 // }
 .fc-row {
-	padding: .5em;
+	width: 100%;
+	padding: .5rem;
 	position: relative;
 	// border-top: 1px solid $medium;
 	img, iframe {
 		width: 100%;
 		height: auto;
-		// margin: 0 0 1em 0;
-		border-radius: $radius;
-		border: 1px solid $medium;
+	}
+	.fc-embed.fc-full .fc-grid & {
+		padding: .5rem .25rem;
+		break-inside: avoid;
 	}
 }
 .fc-field {
-	margin-bottom: .5em;
+	margin-bottom: .5rem;
 	a, a:visited {
 		margin: 0;
 		padding: 0;
@@ -422,25 +454,19 @@
 }
 .fc-contact {
 	&:not(:first-of-type) {
-		margin-top: 1em;
+		margin-top: 1rem;
 	}
 }
 .fc-copyright {
-	span {
-		margin-right: .25em;
-	}
-	&::before {
-		display: inline-block;
-		content: '\00a9';
-		margin-right: .25em;
-	}
+	
 }
 .fc-card, a.fc-card {
 	width: 100%;
 	margin: 0;
-	padding: .5em;
-	display: table;
-	background-color: $light;
+	padding: .5rem;
+	display: block;
+	overflow: hidden;
+	background-color: $lighter;
 	border-radius: $radius;
 	@include shadow;
 	.fc-label {
@@ -453,24 +479,24 @@
 a.fc-card:hover {
 	background-color: $lightBlue;
 	.fc-dark &  {
-		background-color: rgba($lighten, .05);
+		background-color: $dark;
 	}
 }
 .fc-card.fc-field:not(:last-child) {
-	margin-bottom: .5em;
+	margin-bottom: .5rem;
 }
 .fc-half {
-	width: calc(50% - .5em);
-	margin-top: 1em;
+	width: calc(50% - .5rem);
+	margin-top: 1rem;
 	display: inline-block;
 	&:nth-child(odd) {
-		margin-right: 1em;
+		margin-right: 1rem;
 	}
 }
 .fc-button {
 	display: inline-block;
 	a, a:visited, a:hover, a:focus {
-		padding: .25em .5em;
+		padding: .25rem .5rem;
 		border-radius: $radius;
 		border: 1px solid $medium;
 		text-decoration: none;
@@ -486,8 +512,8 @@ a.fc-card:hover {
 }
 .fc-sub-row {
 	width: 100%;
-	margin: 0 0 1em;
-	padding: .5em;
+	margin: 0 0 1rem;
+	padding: .5rem;
 	display: block;
 	&:last-of-type {
 		border-bottom: none;
@@ -500,22 +526,56 @@ a.fc-card:hover {
 .fc-media {
 	display: block;
 	margin: auto;
+	overflow: hidden;
+	border-radius: $radius;
+	border: 1px solid $medium;
+	@include shadow;
+	&:not(:last-child) {
+		border-bottom-right-radius: 0;
+		border-bottom-left-radius: 0;
+	}
 	&:not([data-fc-source='image']) {
 		width: 100%;
 	}
-	& + .fc-sub-caption {
-		padding: .5em 0 0 0;
+}
+.fc-media-embed {
+
+}
+.fc-media-info {
+	width: 100%;
+	margin: 0;
+	padding: .5rem;
+	display: block;
+	background-color: $lighter;
+	.fc-dark & {
+		background-color: rgba($lighten, .1);
 	}
 }
-[class^='fc-sub-'], .fc-cutline {
-	@include smallText;
+[class^='fc-sub-'] {
+	@include smText;
 }
 .fc-sub-url {
+	width: 100%;
 	opacity: .8;
 	text-decoration: none;
+	white-space: nowrap;
+	overflow: hidden;
+	position: relative;
+	&::after {
+		content: "";
+		width: 0;
+		height: 100%;
+		position: absolute;
+		right: 0;
+		top: 0;
+		box-shadow: 0 0 1em 1.5em $light;
+		.fc-dark & {
+			box-shadow: 0 0 1em 1.5em $dark;
+		}
+	}
 }
 .fc-sub-credit {
-	color: $dark;
+	color: $darker;
 	&.fc-dark {
 		color: $light;
 	}
@@ -533,27 +593,29 @@ a.fc-card:hover {
 	}
 }
 .fc-cutline {
-	margin: .5em 0 0 0;
+	margin: .5rem 0 0 0;
 	.fc-caption, .fc-credit {
 		&::after {
 			content: ' ';
 		}
 	}
+	.fc-caption {
+		font-style: italic;
+	}
 	.fc-credit {
-		color: $dark;
-		span:first-child:not(:last-child)::after {
-			content: '/';
-		}
+		color: $darker;
+		@include smText;
 	}
 	.fc-logo {
 		opacity: 1;
 		white-space: nowrap;
 		transition: opacity 100ms linear;
+		@include smText;
 		&:first-child {
 			float: right;
 		}
 		&:last-child {
-			margin-left: .25em;
+			margin-left: .25rem;
 		}
 		&, &:hover, &:visited &:focus {
 			color: inherit;
@@ -562,10 +624,10 @@ a.fc-card:hover {
 		&:hover {
 			opacity: .8;
 		}
-		&::after {
+		&::before {
 			width: 10px;
 			height: 10px;
-			margin: 0 0 -1px 0;
+			margin: 0;
 			display: inline-block;
 			background-image: url(./svg/icon.svg);
 			background-repeat: no-repeat;

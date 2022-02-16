@@ -1,0 +1,65 @@
+{
+	"label": "org.fourcorners.context",
+	"data": {
+		"fourcorners:authorship": {
+			"fourcorners:authorshipCaption": "Shimels, an incinerator man, burning medical waste from the COVID-19 treatment center.",
+			"fourcorners:authorshipCredit": "Yonas Tadesse",
+			"fourcorners:authorshipLicense": {
+				"fourcorners:authorshipLicenseType": "copyright",
+				"fourcorners:authorshipLicenseYear": "2020",
+				"fourcorners:authorshipLicenseHolder": "Yonas Tadesse"
+			},
+			"fourcorners:authorshipEthics": {
+				"fourcorners:authorshipEthicsLabel": "Fine Art/Journalism",
+				"fourcorners:authorshipEthicsDescription": "This is an artistic image, allowing me to take liberties in altering the photograph. I do not alter my journalistic imagery."
+			},
+			"fourcorners:authorshipBio": "Yonas Tadesse is a self-taught artist and photographer born and raised in Addis Ababa, Ethiopia. His work focuses on changing the narrative of Africa and showcasing its rich history to the world.\n\nFrom a young age, he has been fascinated by the Fine Arts and curious about the stories of others. His drive as an artist comes from the unique stories of the people in his photographs and being able to tell those stories through his work.\n\nYonas began his journey as a photographer in 2014 exhibiting his work at Addis Foto Fest. His work has been published in the New York Times, Time Magazine, the Washington post, CNN, Al Jazeera, the Guardian, Bloomberg, BBC, Vogue Italia, and Vogue Germany. He has partnered with the United Nations, AFP/Getty Images and various international organizations such as WaterAid and GIZ. He likes to give back to his community by working with Addis Foto Fest, hosting workshops and mentoring other photographers.\n\nFor the last three years, Yonas has been working on an ongoing personal series and book centered around Ethiopian traditional tattoos, the repatriation of Rastafarians, and the Afar people of Ethiopia.",
+			"fourcorners:authorshipWebsite": "https://yonastadesse.com",
+		},
+		"fourcorners:backstory": {
+			"fourcorners:backstoryText": "In the midst of panic and world struggle, emerged a bright force to reckon with. Eka Kotebe Hospital was one of the new and underused hospitals in Addis Ababa with brave hearted and keen minded staffs. The hospital took on the mission of fighting COVID-19 unreservedly, despite numerous challenges. It was late January in the middle of the day when a phone call came from the Ministry of Health to notify that a meeting would be held regarding the emerging pandemic. One of the hospital's physicians leading the hospital’s triage unit was assigned to participate in the meeting, which she referred to as “the wake up call.\" Every hospital was told to prepare a screening area and form a task force which would be involved in managing the unfolding pandemic.",
+		},
+		"fourcorners:imagery": {
+			"fourcorners:imageryMedia": [
+				{
+				  "fourcorners:imageryMediaSource": "image",
+				  "fourcorners:imageryMediaUrl": "https://exhibit.fourcornersproject.org/wp-content/uploads/2020/10/J1000880_RT-1-scaled.jpg",
+				  "fourcorners:imageryMediaCaption": "Frontline workers at the Eka Kotebe hospital."
+				},
+				{
+				  "fourcorners:imageryMediaSource": "image",
+				  "fourcorners:imageryMediaUrl": "https://exhibit.fourcornersproject.org/wp-content/uploads/2020/10/J2180873.jpg",
+				  "fourcorners:imageryMediaCaption": "A spray man fumigating the tomb site after the burial of a deceased COVID-19 patient."
+				},
+				{
+				  "fourcorners:imageryMediaSource": "image",
+				  "fourcorners:imageryMediaUrl": "https://exhibit.fourcornersproject.org/wp-content/uploads/2020/10/J1000705_RT-1-scaled.jpg",
+				  "fourcorners:imageryMediaCaption": "I am Workneh Hora. I am a father of two. I’ve fought in the Ethiopian-Eritrean war. At this time, I’m doing my national duty as a sprayer and hospital guard. I also help bury those who’ve died in the pandemic. I wasn’t scared at all when I started the job. Spraying chemicals is nothing. I’ve gone through wars with bullets. So, I am not at all afraid of death.\""
+				},
+				{
+				  "fourcorners:imageryMediaSource": "image",
+				  "fourcorners:imageryMediaUrl": "https://exhibit.fourcornersproject.org/wp-content/uploads/2020/10/J1010094_RT-1-scaled.jpg",
+				  "fourcorners:imageryMediaCaption": "\"My name is Mare, I am 50 years old. I am married. I have seven children. My husband can’t work because of an injury to his hand so I’m the only one who supports the family. When the hospital where I worked as a janitor was chosen to provide service during the pandemic, I didn’t have a choice but to stay and work. I ask for God to put things back as they were.\""
+				},
+				{
+				  "fourcorners:imageryMediaSource": "image",
+				  "fourcorners:imageryMediaUrl": "https://exhibit.fourcornersproject.org/wp-content/uploads/2020/10/J2280287.jpg"
+				},
+				{
+				  "fourcorners:imageryMediaSource": "image",
+				  "fourcorners:imageryMediaUrl": "https://exhibit.fourcornersproject.org/wp-content/uploads/2020/10/J1030595_RT-1-scaled.jpg",
+				  "fourcorners:imageryMediaCaption": ""
+				}
+			]
+		},
+		"fourcorners:links": {
+			"fourcorners:linksLinks": [
+				{
+					"fourcorners:linksSource": "link",
+					"fourcorners:linksTitle": "Waste Management during the COVID-19 Pandemic",
+					"fourcorners:linksUrl": "https://wedocs.unep.org/bitstream/handle/20.500.11822/33416/WMC-19.pdf?sequence=1&isAllowed=y"
+				}
+			]
+		}
+	}
+}

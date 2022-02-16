@@ -5,7 +5,8 @@ $mediumBlue: #afd5ff;
 $lightBlue: #f4f7fe;
 
 $darkest: #000;
-$dark: #7b7883;
+$darker: #7b7883;
+$dark: #2d2d2e;
 $darken: rgba($darkest,.5);
 
 $medium: #c4c4c4;
@@ -25,14 +26,14 @@ $corner-len: 40px;
 $corner-gap: 10px;
 
 
-@mixin medText {
-	font-size: 14px;
-	line-height: 1.5em;
+@mixin mdText {
+	font-size: 1rem;
+	line-height: 1.15em;
 }
 
-@mixin smallText {
+@mixin smText {
 	font-size: .85em;
-	line-height: 1.2em;
+	line-height: 1.15em;
 }
 
 

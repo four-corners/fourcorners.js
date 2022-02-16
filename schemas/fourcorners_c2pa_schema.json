@@ -1,0 +1,55 @@
+{
+	"label": "org.fourcorners.context",
+	"data": {
+		"fourcorners:authorship": {
+			"fourcorners:authorshipCaption": "Caption of primary image goes here.",
+			"fourcorners:authorshipCredit": "Credit of primary image goes here.",
+			"fourcorners:authorshipLicense": {
+				"fourcorners:authorshipLicenseType": "copyright",
+				"fourcorners:authorshipLicenseYear": "2022",
+				"fourcorners:authorshipLicenseHolder": "Copyright holder goes here",
+				"fourcorners:authorshipLicenseLabel": "Attribution-ShareAlike CC BY-SA",
+				"fourcorners:authorshipLicenseDesc": "This license lets others remix, tweak, and build upon your work even for commercial purposes, as long as they credit you and license their new creations under the identical terms. This license is often compared to “copyleft” free and open source software licenses. All new works based on yours will carry the same license, so any derivatives will also allow commercial use. This is the license used by Wikipedia, and is recommended for materials that would benefit from incorporating content from Wikipedia and similarly licensed projects.",
+				"fourcorners:authorshipLicenseUrl": "https://creativecommons.org/licenses/by-sa/4.0"
+			},
+			"fourcorners:authorshipEthics": {
+				"fourcorners:authorshipEthicsLabel": "Code of ethics label goes here.",
+				"fourcorners:authorshipEthicsDescription": "Code of ethics description goes here."
+			},
+			"fourcorners:authorshipBio": "Bio of image author goes here.",
+			"fourcorners:authorshipWebsite": "https://example.com",
+			"fourcorners:authorshipContactInfo": "Image author contact info goes here.",
+			"fourcorners:authorshipContactRights": "Reproduction rights contact info goes here."
+		},
+		"fourcorners:backstory": {
+			"fourcorners:backstoryText": "Backstory of image goes here.",
+			"fourcorners:backstoryMedia": [
+				{
+					"fourcorners:backstoryMediaSource": "soundcloud",
+					"fourcorners:backstoryMediaUrl": "https://soundcloud.com/example",
+					"fourcorners:backstoryMediaCaption": "Caption of SoundCloud embed goes here.",
+					"fourcorners:backstoryMediaCredit": "Credit of SoundCloud embed goes here."
+				}
+			]
+		},
+		"fourcorners:imagery": {
+			"fourcorners:imageryMedia": [
+				{
+					"fourcorners:imageryMediaSource": "image",
+					"fourcorners:imageryMediaUrl": "https://example.com/photo.jpg",
+					"fourcorners:imageryMediaCaption": "Caption of related image goes here.",
+					"fourcorners:imageryMediaCredit": "Credit of related image goes here."
+				}
+			]
+		},
+		"fourcorners:links": {
+			"fourcorners:linksLinks": [
+				{
+					"fourcorners:linksSource": "link",
+					"fourcorners:linksTitle": "Title of link goes here.",
+					"fourcorners:linksUrl": "https://example.com"
+				}
+			]
+		}
+	}
+}

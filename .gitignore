@@ -1,4 +1,2 @@
 node_modules
-material
-test
-demo
+.DS_Store
