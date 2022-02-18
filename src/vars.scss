@@ -57,6 +57,10 @@ $corner-gap: 10px;
 	box-shadow: 0 0 1px 1px rgba($darkest,.1);
 }
 
+@mixin shadowLight {
+	box-shadow: 0 0 1px 1px rgba($lightest,.1);
+}
+
 @mixin border {
 	border: {
   	width: 1px;

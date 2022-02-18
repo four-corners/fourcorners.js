@@ -4,20 +4,23 @@ require("styles.scss");
 class FourCorners {
 
 	constructor(elem, opts, c2pa) {
-		this.lang = opts.lang || "en";
-		this.strings = STRINGS[this.lang];
-		this.opts = { ...DEFAULT_OPTS, ...opts };
 		this.elems = {};
 		this.elems.img = this.addImg(elem);
 		this.elems.embed = this.addWrapper(elem);
+		this.lang = opts.lang || "en";
+		this.strings = STRINGS[this.lang];
 		this.data = c2pa ? this.parseC2paData(c2pa) : this.parseData();
+		this.opts = { ...DEFAULT_OPTS, ...opts, ...this.data.opts };
 		this.elems.panels = this.addPanels();
 		this.elems.corners = this.addCorners();
 		this.elems.cutline = this.addCutline();
 
 		this.addEmbeddedMedia();
 		this.addInteractivity();
+		if(this.opts.dark) this.elems.embed.classList.add("fc-dark");
+		if(this.opts.static) this.elems.embed.classList.add("fc-static");
 		this.elems.embed.classList.add("fc-init");
+
 	}
 
 	//DATA HANDLING
@@ -135,8 +138,6 @@ class FourCorners {
 		} else {
 			embed = elem;
 		}
-		if(this.opts.dark) embed.classList.add("fc-dark");
-		if(this.opts.static) embed.classList.add("fc-static");
 		return embed;
 	}
 
@@ -196,8 +197,7 @@ class FourCorners {
 					panels = {};
 
 		CORNER_KEYS.forEach(cornerKey => {
-			const cornerTitle = strings[cornerKey] || null,
-						panelData = data[cornerKey];
+			const cornerTitle = strings[cornerKey] || null;
 
 			let panelInner = "";
 
@@ -243,77 +243,112 @@ class FourCorners {
 	}
 
 	buildAuthorship() {
-		const { data } = this,
-					panelData = data.authorship;
+		const {
+			caption,
+			credit,
+			bio,
+			ethics,
+			website,
+			license,
+		} = this.data.authorship;
+
+		const hasInfoCard = credit && ((ethics && ethics.desc) || bio || website);
 
 		let html =
 			`<div class="fc-row">
-				${panelData.caption ? 
+				${caption ? 
 					`<div class="fc-field">
 						<span class="fc-label">
 							${this.strings.caption}:
 						</span>
 						<span class="fc-content">
-							${panelData.caption}
+							${caption}
 						</span>
 					</div>`
 				: ""}
-				${panelData.credit ? 
-					`<div class="fc-field">
+
+				${hasInfoCard ?
+					`<details class="fc-details">
+
+						<summary class="fc-summary">
+							<div class="fc-field">
+								<span class="fc-label">
+									${this.strings.credit}:
+								</span>
+								<span class="fc-content">
+									${credit ? credit : "Unknown"}
+								</span>
+								<div class="fc-icon fc-expand" title="Read more about ${credit}"></div>
+							</div>
+						</summary>
+
+						<div class="fc-card">
+
+							${bio ? 
+								`<div class="fc-field">
+									<span class="fc-label">
+										${this.strings.bio}:
+									</span>
+									<span class="fc-content">
+										${bio}
+									</span>
+								</div>`
+							: ""}
+
+							${ethics && ethics.desc ? 
+								`<div class="fc-field">
+									<span class="fc-label">
+										${this.strings.coe}:
+									</span>
+									<span class="fc-content">
+										${ethics.desc}
+									</span>
+								</div>`
+							: ""}
+
+							${website ? 
+								`<div class="fc-field">
+									<span class="fc-label">
+										${this.strings.website}:
+									</span>
+									<span class="fc-content">
+										${this.createLink(website)}
+									</span>
+								</div>`
+							: ""}
+
+						</div>
+
+					</details>`
+
+				: `<div class="fc-field">
 						<span class="fc-label">
 							${this.strings.credit}:
 						</span>
 						<span class="fc-content">
-							${panelData.credit}
+							${credit ? credit : "Unknown"}
 						</span>
-					</div>`
-				: ""}
-				${panelData.license.type ? 
+					</div>`}
+
+				${license && license.type ? 
 					`<div class="fc-field">
 						<span class="fc-label">
 							${this.strings.license}:
 						</span>
 						<span class="fc-content">
-							${panelData.license.type === "copyright" ?
-								`&#169; ${panelData.license.holder}, ${panelData.license.year}`
+							${license.type === "copyright" ?
+								`&#169;
+								${license.holder ?
+									`${license.holder}${license.year ? `, ${license.year}` : ""}`
+								: `${credit}${license.year ? `, ${license.year}` : ""}`}`
 							: ""}
-							${panelData.license.type === "commons" ?
-								`${panelData.license.url ?
-									`<a href="${panelData.license.url}" target="_blank">
-										${panelData.license.label ? panelData.license.label : ""}
+							${license.type === "commons" ?
+								`${license.url ?
+									`<a href="${license.url}" target="_blank">
+										${license.label ? license.label : ""}
 									</a>`
-								: panelData.license.label ? panelData.license.label : ""}`
+								: license.label ? license.label : ""}`
 							: ""}
-						</span>
-					</div>`
-				: ""}
-				${panelData.ethics && panelData.ethics.desc ? 
-					`<div class="fc-field">
-						<span class="fc-label">
-							${this.strings.coe}:
-						</span>
-						<span class="fc-content">
-							${panelData.ethics.desc}
-						</span>
-					</div>`
-				: ""}
-				${panelData.bio ? 
-					`<div class="fc-field">
-						<span class="fc-label">
-							${this.strings.bio}:
-						</span>
-						<span class="fc-content">
-							${panelData.bio}
-						</span>
-					</div>`
-				: ""}
-				${panelData.website ? 
-					`<div class="fc-field">
-						<span class="fc-label">
-							${this.strings.website}:
-						</span>
-						<span class="fc-content">
-							${this.createLink(panelData.website)}
 						</span>
 					</div>`
 				: ""}
@@ -322,14 +357,17 @@ class FourCorners {
 	}
 
 	buildBackstory() {
-		const { data } = this,
-					panelData = data.backstory;
+		const {
+			text,
+			media,
+		} = this.data.backstory;
+
 		let html = 
-			`${panelData.text ?
+			`${text ?
 			`<div class="fc-row">
-				${this.insertParagraphs(panelData.text)}
+				${this.insertParagraphs(text)}
 			</div>`: ""}
-			${panelData.media ? panelData.media.map((obj, index) => {
+			${media ? media.map((obj, index) => {
 				this.embedExternal(this, obj, "backstory", index);
 				return (
 					`<div class="fc-row">
@@ -350,12 +388,10 @@ class FourCorners {
 	}
 
 	buildImagery() {
-		const { data, elems } = this,
-					{ embed } = elems,
-					panelData = data.imagery;
+		const { media } = this.data.imagery;
 
 		let html = 
-			`${panelData.media ? panelData.media.map((obj, index) => {
+			`${media ? media.map((obj, index) => {
 				const isExternal = ["instagram", "youtube", "vimeo"].includes(obj.source);
 				return (
 					`<div class="fc-row">
@@ -388,13 +424,11 @@ class FourCorners {
 	}
 
 	buildLinks() {
-		const { data, elems } = this,
-					{ embed } = elems,
-					panelData = data.links;
+		const { links } = this.data.links;
 
 		const html = 
-			`${panelData.links ?
-				panelData.links.filter(obj => obj.url).map((obj, index) => {
+			`${links ?
+				links.filter(obj => obj.url).map((obj, index) => {
 					const simpleUrl = this.simplifyUrl(obj.url);
 					const text = `${obj.title ? obj.title : simpleUrl}<div class="fc-sub-url">${simpleUrl}</div>`;
 					return (
