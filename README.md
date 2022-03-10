@@ -1,40 +1,74 @@
+
 # fourcorners.js
 
 The **Four Corners Project** allows specific information to be embedded in each of the photograph’s four corners, where it is available for an interested reader to explore. This increased contextualization strengthens both the authorship of the photographer and the credibility of the image.
 
-**fourcorners.js** is an open source JavaScript library to initiate your Four Corners photographs built on fourcornersproject.org or generated from your CMS. The library is still in development and should not be used in production.
+**fourcorners.js** is an open source JavaScript library that augments your embedded images with the interactive "four corners" and corresponding contextual data and media.
 
 For inquiries about usage or development contribution, please email [fourcornersphotograph@gmail.com](mailto:fourcornersphotograph@gmail.com).
 
+## Setup
 
-
-### Default setup
+### How to initialize an embed
 
 ```js
-var four_corners_modules = new FourCorners();
+new FourCorners(selector, options, provenance);
 ```
 
+#### Default JSON embed
+If you are embedding using HTML generated from the Four Corners Project's "[Create your own](https://fourcornersproject.org/en/create/)" page you can ignore the `provenance` argument. Instead, your HTML will include your contextual data in a JSON object wrapped in a `<script>` tag.
 
-### Setup with options
 ```js
-var four_corners_modules = new FourCorners({
-	selector: '.fc-embed',
+new FourCorners(selector, options);
+```
+
+#### C2PA embed
+If you are using an image file injected with the C2PA and Four Corners metadata, you must first extract the metadata from the image file and then pass as the `provenance` argument.
+
+Add the following in your `<head>` tag:
+
+```html
+<script type="module">
+import { ContentAuth } from "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.esm.min.js";
+import "https://cdn.jsdelivr.net/npm/@contentauth/web-components@0.4.2-alpha.20/dist/index.min.js";
+var wasmSrc = "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/assets/wasm/toolkit_bg.wasm";
+var workerSrc = "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.worker.min.js";
+var sdk = new ContentAuth({wasmSrc, workerSrc});
+var provenance = await sdk.processImage(imgSrc);
+await new FourCorners(selector, options, provenance);
+</script>
+```
+
+### Basic examples
+
+#### Initialize with string selector
+```js
+var fc_image = new FourCorners("img.fc-image");
+```
+
+#### Initialize with DOM element
+```js
+var elem = document.querySelector("img.fc-image");
+var fc_image = new FourCorners(elem);
+```
+
+#### Initialize with options
+```js
+var fc_image = new FourCorners(elem, {
 	caption: true,
 	credit: true,
 	logo: true,
-	active: '',
-	static: false,
+	dark: true
 });
 ```
 
 ### Options
 
-
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
-| **selector** | *string* | `.fc-embed` | Provide a selector to target which elements should be constructed as a Four Corners module |
-| **caption** | *boolean* | `false` | Toggle if the image caption is included under the module |
-| **credit** | *boolean* | `false` | Toggle if the image credit is included under the module |
-| **logo** | *boolean* | `false` | Toggle if the Four Corners Project logo and link to [fourcornersproject.org](https://fourcornersproject.org) is included under the module |
-| **active** | *string* | `''` | Set a corner to be open when the module is constructed (Options available are *authorship*, *backstory*, *imagery*, or *links*)
-| **static** | *boolean* | `false` | Toggle interactive capabilities, if set to `false` the `active` property can control which corner is opened |
+| `caption` | *boolean* | `false` | Decides if the caption shows under the embed* |
+| `credit` | *boolean* | `false` | Decides if the credits show under the embed* |
+| `logo` | *boolean* | `false` | Decides if a hyperlinked Four Corners Project logo shows under the embed |
+| `dark` | *boolean* | `false` | Decides if the embed UI should be in dark mode |
+
+*\*These fields will always show in the Authorship panel regardless of these settings*

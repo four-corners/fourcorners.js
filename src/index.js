@@ -18,7 +18,6 @@ class FourCorners {
 		this.addEmbeddedMedia();
 		this.addInteractivity();
 		if(this.opts.dark) this.elems.embed.classList.add("fc-dark");
-		if(this.opts.static) this.elems.embed.classList.add("fc-static");
 		this.elems.embed.classList.add("fc-init");
 
 	}
@@ -789,13 +788,10 @@ const STRINGS = {
 }
 
 const DEFAULT_OPTS = {
-	selector: "img",
 	caption: false,
 	credit: false,
 	logo: false,
-	static: false,
-	dark: false,
-	active: "",
+	dark: false
 };
 
 module.exports = FourCorners;
