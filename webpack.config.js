@@ -24,14 +24,16 @@ if (argv.mode === "production") {
 
 const config = {
 	mode: mode,
-	entry: {
-		main: path.resolve(`${__dirname}/src/index.js`)
-	},
+	entry: path.resolve(__dirname, "src/index.js"),
 	devtool: devtool,
 	output: {
-		path: path.resolve(`${__dirname}/dist`),
+		path: path.resolve(__dirname, "dist"),
 		filename: outputJS,
-		library: "FourCorners",
+		library: {
+			type: "umd",
+			name: "FourCorners",
+			export: "default",
+		}
 	},
 	module: {
 		rules: [
@@ -40,6 +42,10 @@ const config = {
 				loader: "babel-loader",
 				exclude: /node_modules/,
 			},
+			{
+        resourceQuery: /file/,
+        type: 'asset/resource',
+      },
 			{
 				test: /\.s[ac]ss$/i,
 				use: [

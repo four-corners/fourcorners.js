@@ -1,25 +1,42 @@
 require("regenerator-runtime/runtime");
 require("styles.scss");
 
-class FourCorners {
+import { ContentAuth } from '@contentauth/sdk';
+import wasmSrc from '@contentauth/sdk/dist/assets/wasm/toolkit_bg.wasm?file';
+import workerSrc from '@contentauth/sdk/dist/cai-sdk.worker.min.js?file';
 
+class FourCorners {
 	constructor(elem, opts, c2pa) {
+
+		if(!elem) return;
 		this.elems = {};
 		this.elems.img = this.addImg(elem);
 		this.elems.embed = this.addWrapper(elem);
 		this.lang = opts.lang || "en";
 		this.strings = STRINGS[this.lang];
-		this.data = c2pa ? this.parseC2paData(c2pa) : this.parseData();
-		this.opts = { ...DEFAULT_OPTS, ...opts, ...this.data.opts };
-		this.elems.panels = this.addPanels();
-		this.elems.corners = this.addCorners();
-		this.elems.cutline = this.addCutline();
 
-		this.addEmbeddedMedia();
-		this.addInteractivity();
-		if(this.opts.dark) this.elems.embed.classList.add("fc-dark");
-		this.elems.embed.classList.add("fc-init");
-
+		const sdk = new ContentAuth({
+			wasmSrc,
+			workerSrc,
+		});
+		
+		(async () => {
+			const provenance = await sdk.processImage(elem.src);
+			if(provenance.exists) {
+			  this.data = this.parseC2paData(provenance);
+			} else {
+			  this.data = this.parseData();
+			}
+		})().then(() => {
+			this.opts = { ...DEFAULT_OPTS, ...opts, ...this.data.opts };
+			this.elems.panels = this.addPanels();
+			this.elems.corners = this.addCorners();
+			this.elems.cutline = this.addCutline();
+			this.addEmbeddedMedia();
+			this.addInteractivity();
+			if(this.opts.dark) this.elems.embed.classList.add("fc-dark");
+			this.elems.embed.classList.add("fc-init");
+		});
 	}
 
 	//DATA HANDLING
@@ -27,6 +44,7 @@ class FourCorners {
 	parseData() {
 		const { embed } = this.elems;
 		const script = embed.querySelector("script");
+		let stringData;
 		if(script) {
 		//If embed JSON is stored in child script tag
 			stringData = script.innerHTML;
@@ -794,4 +812,4 @@ const DEFAULT_OPTS = {
 	dark: false
 };
 
-module.exports = FourCorners;
+export default FourCorners;

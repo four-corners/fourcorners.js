@@ -13,11 +13,11 @@
     "url": "https://github.com/four-corners/fourcorners.js/issues"
   },
   "type": "mode",
-  "main": "src/index.js",
+  "main": "dist/fourcorners.js",
   "devDependencies": {
     "@babel/core": "^7.17.2",
     "@babel/eslint-parser": "^7.17.0",
-    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.7.4",
     "@svgr/webpack": "^6.2.1",
     "autoprefixer": "^10.4.2",
@@ -50,6 +50,9 @@
     "build": "webpack --mode=production --progress"
   },
   "dependencies": {
+    "@babel/plugin-transform-classes": "^7.16.7",
+    "@contentauth/sdk": "^0.8.12",
+    "c2pa": "^0.8.12",
     "regenerator-runtime": "^0.13.9"
   }
 }
