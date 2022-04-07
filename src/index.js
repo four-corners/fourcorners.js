@@ -3,13 +3,13 @@ require("styles.scss");
 
 class FourCorners {
 
-	constructor(elem, opts, c2pa) {
+	constructor(elem, opts, metadata) {
 		this.elems = {};
 		this.elems.img = this.addImg(elem);
 		this.elems.embed = this.addWrapper(elem);
 		this.lang = opts.lang || "en";
 		this.strings = STRINGS[this.lang];
-		this.data = c2pa ? this.parseC2paData(c2pa) : this.parseData();
+		this.data = metadata ? this.parseMetaData(metadata) : this.parseJsonData();
 		this.opts = { ...DEFAULT_OPTS, ...opts, ...this.data.opts };
 		this.elems.panels = this.addPanels();
 		this.elems.corners = this.addCorners();
@@ -24,7 +24,7 @@ class FourCorners {
 
 	//DATA HANDLING
 
-	parseData() {
+	parseJsonData() {
 		const { embed } = this.elems;
 		const script = embed.querySelector("script");
 		if(script) {
@@ -40,15 +40,15 @@ class FourCorners {
 		return JSON.parse(stringData);
 	}
 
-	parseC2paData(rawC2pa) {
-		let c2pa;
-		if(rawC2pa) {
-			rawC2pa.claims.forEach((claim, key) => {
-				c2pa = claim.assertions.get("org.fourcorners.context").data;
+	parseMetaData(rawMeta) {
+		let metadata;
+		if(rawMeta) {
+			rawMeta.claims.forEach((claim, key) => {
+				metadata = claim.assertions.get("org.fourcorners.context").data;
 			});
 		}
 
-		const parseC2paArray = (arr) => {
+		const parseMetaArray = (arr) => {
 			if(arr) {
 				arr = arr.map((obj) => {
 					const newObj = {};
@@ -63,7 +63,7 @@ class FourCorners {
 			return arr;
 		};
 
-		const getC2paValue = (key) => {
+		const getMetaValue = (key) => {
 			let value;
 			const searchKeys = (obj, key) => {
 				if(typeof obj !== "object") return;
@@ -76,40 +76,40 @@ class FourCorners {
 					}
 				});
 		 	}
-		 	searchKeys(c2pa, key);
+		 	searchKeys(metadata, key);
 		 	return value;
 		}
 
 		const data = {
 			"authorship": {
-				"caption": getC2paValue("fourcorners:authorshipCaption"),
-				"credit": getC2paValue("fourcorners:authorshipCredit"),
+				"caption": getMetaValue("fourcorners:authorshipCaption"),
+				"credit": getMetaValue("fourcorners:authorshipCredit"),
 				"license": {
-					"type": getC2paValue("fourcorners:authorshipLicenseType"),
-					"year": getC2paValue("fourcorners:authorshipLicenseYear"),
-					"holder": getC2paValue("fourcorners:authorshipLicenseHolder"),
-					"label": getC2paValue("fourcorners:authorshipLicenseLabel"),
-					"desc": getC2paValue("fourcorners:authorshipLicenseDesc"),
-					"url": getC2paValue("fourcorners:authorshipLicenseUrl"),
+					"type": getMetaValue("fourcorners:authorshipLicenseType"),
+					"year": getMetaValue("fourcorners:authorshipLicenseYear"),
+					"holder": getMetaValue("fourcorners:authorshipLicenseHolder"),
+					"label": getMetaValue("fourcorners:authorshipLicenseLabel"),
+					"desc": getMetaValue("fourcorners:authorshipLicenseDesc"),
+					"url": getMetaValue("fourcorners:authorshipLicenseUrl"),
 				},
 				"ethics": {
-					"label": getC2paValue("fourcorners:authorshipEthicsLabel"),
-					"desc": getC2paValue("fourcorners:authorshipEthicsDescription"),
+					"label": getMetaValue("fourcorners:authorshipEthicsLabel"),
+					"desc": getMetaValue("fourcorners:authorshipEthicsDescription"),
 				},
-				"bio": getC2paValue("fourcorners:authorshipBio"),
-				"website": getC2paValue("fourcorners:authorshipWebsite"),
-				"contactInfo": getC2paValue("fourcorners:authorshipContactInfo"),
-				"contactRights": getC2paValue("fourcorners:authorshipContactRights"),
+				"bio": getMetaValue("fourcorners:authorshipBio"),
+				"website": getMetaValue("fourcorners:authorshipWebsite"),
+				"contactInfo": getMetaValue("fourcorners:authorshipContactInfo"),
+				"contactRights": getMetaValue("fourcorners:authorshipContactRights"),
 			},
 			"backstory": {
-				"text": getC2paValue("fourcorners:backstoryText"),
-				"media": parseC2paArray(getC2paValue("fourcorners:backstoryMedia")),
+				"text": getMetaValue("fourcorners:backstoryText"),
+				"media": parseMetaArray(getMetaValue("fourcorners:backstoryMedia")),
 			},
 			"imagery": {
-				"media": parseC2paArray(getC2paValue("fourcorners:imageryMedia")),
+				"media": parseMetaArray(getMetaValue("fourcorners:imageryMedia")),
 			},
 			"links": {
-				"links": parseC2paArray(getC2paValue("fourcorners:linksLinks")),
+				"links": parseMetaArray(getMetaValue("fourcorners:linksLinks")),
 			}
 		};
 		return data;
@@ -117,7 +117,7 @@ class FourCorners {
 
 	//BUILDING DOM ELEMENTS
 	addImg(elem) {
-		if(elem.tagName === "IMAGE") {
+		if(elem.tagName === "IMG") {
 			return elem;
 		} else {
 			return elem.querySelector("img");

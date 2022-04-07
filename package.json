@@ -17,7 +17,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.2",
     "@babel/eslint-parser": "^7.17.0",
-    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.7.4",
     "@svgr/webpack": "^6.2.1",
     "autoprefixer": "^10.4.2",
@@ -45,7 +45,7 @@
     "yargs": "^17.3.1"
   },
   "scripts": {
-    "demo": "npm run watch & browser-sync start --server --no-notify --no-open --files 'src/*.js' 'dist/*.js' '*.html'",
+    "test": "npm run watch & browser-sync start --server --no-notify --no-open --files 'src/*.js' 'dist/*.js' '*.html'",
     "watch": "webpack --mode=development --progress --watch",
     "build": "webpack --mode=production --progress"
   },
