@@ -13,7 +13,7 @@ const fileName = "fourcorners";
 
 if (argv.mode === "production") {
 	mode = "production";
-	devtool = "source-map";
+	// devtool = "source-map";
 	outputJS = `${fileName}.min.js`;
 	outputCSS = `${fileName}.min.css`;
 } else {

@@ -1,56 +1,75 @@
 require("regenerator-runtime/runtime");
 require("styles.scss");
 
-import { ContentAuth } from '@contentauth/sdk';
-import wasmSrc from '@contentauth/sdk/dist/assets/wasm/toolkit_bg.wasm?file';
-import workerSrc from '@contentauth/sdk/dist/cai-sdk.worker.min.js?file';
+import { ContentAuth } from "@contentauth/sdk";
+// import wasmSrc from "@contentauth/sdk/dist/assets/wasm/toolkit_bg.wasm?url";
+// import workerSrc from "@contentauth/sdk/dist/cai-caSdk.worker.min.js?url";
 
 class FourCorners {
-	constructor(elem, opts, c2pa) {
-
+	constructor(elem, opts, caSdkSrcs) {
 		if(!elem) return;
 		this.elems = {};
-		this.elems.img = this.addImg(elem);
-		this.elems.embed = this.addWrapper(elem);
+		this.elems.embed = elem;
+		this.elems.img = this.getImg();
+		this.src = this.elems.img.src;
 		this.lang = opts.lang || "en";
 		this.strings = STRINGS[this.lang];
+		// this.provenance = provenance
+		// this.data = provenance ? this.parseContentAuthData() : this.parseJsonData();
+		// if(!this.data) return;
+		// this.opts = { ...DEFAULT_OPTS, ...opts, ...this.data.opts };
+		// this.elems.cutline = this.addCutline();
+		// this.elems.panels = this.addPanels();
+		// this.elems.corners = this.addCorners();
+		// this.addEmbeddedMedia();
+		// this.addInteractivity();
+		// if(this.opts.dark) this.elems.embed.classList.add("fc-dark");
+		// this.elems.embed.classList.add("fc-init");
 
-		const sdk = new ContentAuth({
-			wasmSrc,
-			workerSrc,
-		});
-		
+		const caSdk = new ContentAuth(caSdkSrcs);
 		(async () => {
-			const provenance = await sdk.processImage(elem.src);
-			if(provenance.exists) {
-			  this.data = this.parseC2paData(provenance);
-			} else {
-			  this.data = this.parseData();
+			this.data = this.parseJsonData();
+			if(!this.data) {
+				const contentAuthData = this.src ? await caSdk.processImage(this.src) : null;	
+				if(contentAuthData && contentAuthData.exists) {
+					this.provenance = contentAuthData;
+					this.data = this.parseContentAuthData();
+				}
 			}
 		})().then(() => {
 			this.opts = { ...DEFAULT_OPTS, ...opts, ...this.data.opts };
+			this.elems.cutline = this.addCutline();
 			this.elems.panels = this.addPanels();
 			this.elems.corners = this.addCorners();
-			this.elems.cutline = this.addCutline();
 			this.addEmbeddedMedia();
+
+			this.handleHoverCorner = this.hoverCorner.bind(this);
+			this.handleUnhoverCorner = this.unhoverCorner.bind(this);
+			this.handleClickCorner = this.clickCorner.bind(this);
+			this.handleClickEmpty = this.clickEmpty.bind(this);
+			this.handleClickClose = this.clickClosePanel.bind(this);
+			this.handleClickExpand = this.clickExpandPanel.bind(this);
+
 			this.addInteractivity();
 			if(this.opts.dark) this.elems.embed.classList.add("fc-dark");
 			this.elems.embed.classList.add("fc-init");
+		}).catch(e => {
+			console.log(e);
 		});
 	}
 
 	//DATA HANDLING
 
-	parseData() {
+	parseJsonData() {
 		const { embed } = this.elems;
 		const script = embed.querySelector("script");
 		let stringData;
 		if(script) {
-		//If embed JSON is stored in child script tag
+			//If embed JSON is stored in child script tag
 			stringData = script.innerHTML;
 			script.remove();
 		} else if(embed.hasAttribute("data-fc")) {
-		//If embed JSON is stored in data-fc attributte
+			//If embed JSON is stored in data-fc attributte
 			stringData = embed.dataset.fc;
 			delete embed.dataset.fc;
 		}
@@ -58,20 +77,20 @@ class FourCorners {
 		return JSON.parse(stringData);
 	}
 
-	parseC2paData(rawC2pa) {
-		let c2pa;
-		if(rawC2pa) {
-			rawC2pa.claims.forEach((claim, key) => {
-				c2pa = claim.assertions.get("org.fourcorners.context").data;
+	parseContentAuthData() {
+		let fourCornersProvenance;
+		if(this.provenance) {
+			this.provenance.claims.forEach((claim, key) => {
+				fourCornersProvenance = claim.assertions.get("org.fourcorners.context").data;
 			});
 		}
 
-		const parseC2paArray = (arr) => {
+		const parseContentAuthArray = (arr) => {
 			if(arr) {
 				arr = arr.map((obj) => {
 					const newObj = {};
 					const keys = Object.keys(obj).map((k, i) => {
-						const splitArr = k.replace("fourcorners:","").split(/(?=[A-Z])/);
+						const splitArr = k.replace("fourcorners:", "").split(/(?=[A-Z])/);
 						const newKey = splitArr[splitArr.length - 1].toLowerCase();
 						newObj[newKey] = obj[k];
 					});
@@ -81,7 +100,7 @@ class FourCorners {
 			return arr;
 		};
 
-		const getC2paValue = (key) => {
+		const getContentAuthValue = (key) => {
 			let value;
 			const searchKeys = (obj, key) => {
 				if(typeof obj !== "object") return;
@@ -94,69 +113,66 @@ class FourCorners {
 					}
 				});
 		 	}
-		 	searchKeys(c2pa, key);
+		 	searchKeys(fourCornersProvenance, key);
 		 	return value;
 		}
 
 		const data = {
 			"authorship": {
-				"caption": getC2paValue("fourcorners:authorshipCaption"),
-				"credit": getC2paValue("fourcorners:authorshipCredit"),
+				"caption": getContentAuthValue("fourcorners:authorshipCaption"),
+				"credit": getContentAuthValue("fourcorners:authorshipCredit"),
 				"license": {
-					"type": getC2paValue("fourcorners:authorshipLicenseType"),
-					"year": getC2paValue("fourcorners:authorshipLicenseYear"),
-					"holder": getC2paValue("fourcorners:authorshipLicenseHolder"),
-					"label": getC2paValue("fourcorners:authorshipLicenseLabel"),
-					"desc": getC2paValue("fourcorners:authorshipLicenseDesc"),
-					"url": getC2paValue("fourcorners:authorshipLicenseUrl"),
+					"type": getContentAuthValue("fourcorners:authorshipLicenseType"),
+					"year": getContentAuthValue("fourcorners:authorshipLicenseYear"),
+					"holder": getContentAuthValue("fourcorners:authorshipLicenseHolder"),
+					"label": getContentAuthValue("fourcorners:authorshipLicenseLabel"),
+					"desc": getContentAuthValue("fourcorners:authorshipLicenseDesc"),
+					"url": getContentAuthValue("fourcorners:authorshipLicenseUrl"),
 				},
 				"ethics": {
-					"label": getC2paValue("fourcorners:authorshipEthicsLabel"),
-					"desc": getC2paValue("fourcorners:authorshipEthicsDescription"),
+					"label": getContentAuthValue("fourcorners:authorshipEthicsLabel"),
+					"desc": getContentAuthValue("fourcorners:authorshipEthicsDescription"),
 				},
-				"bio": getC2paValue("fourcorners:authorshipBio"),
-				"website": getC2paValue("fourcorners:authorshipWebsite"),
-				"contactInfo": getC2paValue("fourcorners:authorshipContactInfo"),
-				"contactRights": getC2paValue("fourcorners:authorshipContactRights"),
+				"bio": getContentAuthValue("fourcorners:authorshipBio"),
+				"website": getContentAuthValue("fourcorners:authorshipWebsite"),
+				"contactInfo": getContentAuthValue("fourcorners:authorshipContactInfo"),
+				"contactRights": getContentAuthValue("fourcorners:authorshipContactRights"),
 			},
 			"backstory": {
-				"text": getC2paValue("fourcorners:backstoryText"),
-				"media": parseC2paArray(getC2paValue("fourcorners:backstoryMedia")),
+				"text": getContentAuthValue("fourcorners:backstoryText"),
+				"media": parseContentAuthArray(getContentAuthValue("fourcorners:backstoryMedia")),
 			},
 			"imagery": {
-				"media": parseC2paArray(getC2paValue("fourcorners:imageryMedia")),
+				"media": parseContentAuthArray(getContentAuthValue("fourcorners:imageryMedia")),
 			},
 			"links": {
-				"links": parseC2paArray(getC2paValue("fourcorners:linksLinks")),
+				"links": parseContentAuthArray(getContentAuthValue("fourcorners:linksLinks")),
 			}
 		};
 		return data;
 	}
 
 	//BUILDING DOM ELEMENTS
-	addImg(elem) {
-		if(elem.tagName === "IMAGE") {
-			return elem;
-		} else {
-			return elem.querySelector("img");
-		}
+	getImg() {
+		return this.elems.embed.querySelector(":scope > img");
 	}
 
-	addWrapper(elem) {
-		let embed;
-		if(elem.tagName === "IMG") {
-			embed = document.createElement("div");
-			const { width, height } = elem.getBoundingClientRect();
-			embed.style.width = `${width}px`;
-			embed.style.height = `${height}px`;
-			elem.parentNode.insertBefore(embed, elem);
-			embed.appendChild(elem);
-			embed.classList.add("fc-embed");
-		} else {
-			embed = elem;
-		}
-		return embed;
-	}
+	// addWrapper(elem) {
+		// let embed;
+		// if(elem.tagName === "IMG") {
+		// 	embed = document.createElement("div");
+		// 	const { width, height } = elem.getBoundingClientRect();
+		// 	embed.style.width = `${width}px`;
+		// 	embed.style.height = `${height}px`;
+		// 	elem.parentNode.insertBefore(embed, elem);
+		// 	embed.appendChild(elem);
+		// 	embed.classList.add("fc-embed");
+		// 	embed.removeAttribute("style");
+		// } else {
+		// 	embed = elem;
+		// }
+		// return embed;
+	// }
 
 	insertCornerSvg() {
 	  const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -177,16 +193,10 @@ class FourCorners {
 		CORNER_KEYS.forEach(cornerKey => {
 			const cornerTitle = strings[cornerKey] || null,
 						cornerElem = document.createElement("div");
-						// cornerSvg = this.insertCornerSvg();
-						// cornerSvg = require("./svg/corner.svg");
-						// cornerSvg = `<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M75 24.75H0.25V0.25H75H99.75V25V99.75H75.25L75.25 25V24.75H75Z" fill="white" stroke="black" stroke-width="0.5"/></svg>`;
-
 
 			cornerElem.setAttribute("data-fc-key", cornerKey);
 			cornerElem.title = `View ${cornerTitle}`;
 			cornerElem.classList.add("fc-corner", `fc-${cornerKey}`);
-
-			// cornerElem.appendChild(cornerSvg);
 
 			const cornerIsEmpty = function() {
 				if(data.hasOwnProperty(cornerKey)) {
@@ -214,9 +224,10 @@ class FourCorners {
 					panels = {};
 
 		CORNER_KEYS.forEach(cornerKey => {
-			const cornerTitle = strings[cornerKey] || null;
-
-			let panelInner = "";
+			const cornerTitle = strings[cornerKey] || null,
+						panelTile = strings[cornerKey] || null;
+			let panelClass = `fc-panel fc-${cornerKey}`,
+					panelInner;
 
 			switch(cornerKey) {
 				case "authorship":
@@ -232,8 +243,6 @@ class FourCorners {
 					panelInner = this.buildLinks();
 					break;
 			}
-			const panelTile = strings[cornerKey];
-			let panelClass = `fc-panel fc-${cornerKey}`;
 		
 			const panelHTML =
 				`<div data-fc-key="${cornerKey}" class="${panelClass}">
@@ -253,7 +262,7 @@ class FourCorners {
 						</div>`
 					: ""}
 				</div>`;
-			elems.embed.innerHTML += panelHTML;
+			elems.embed.insertAdjacentHTML('afterbegin', panelHTML);
 			panels[cornerKey] = this.getPanel(cornerKey);
 		});
 		return panels;
@@ -465,7 +474,10 @@ class FourCorners {
 					showCaption = opts.caption && caption,
 					showCredit = opts.credit && credit,
 					showLicense = opts.license && license.holder && (credit !== license.holder),
-					showLogo = opts.logo;
+					showLogo = opts.logo,
+					showCutline = showCaption || showCredit || showLicense || showLogo;
+
+		if(!showCutline) return false;
 
 		const html = 
 			`${showCaption || showCredit || showLogo ?
@@ -554,7 +566,6 @@ class FourCorners {
 				break;
 		}
 		const headers = new Headers();
-		console.log(req);
 		fetch(req, {
 			method: "GET",
 			headers: headers
@@ -623,30 +634,34 @@ class FourCorners {
 		CORNER_KEYS.forEach(key => {
 			const panel = this.getPanel(key);
 			const corner = this.elems.corners[key];
-			panel.querySelector(".fc-expand").addEventListener("click", () => {
-				this.toggleExpandPanel();
-			});
-
-			panel.querySelector(".fc-close").addEventListener("click", () => {
-				this.closePanel(key);
-				// this.elems.embed.classList.remove("fc-full");
-			});
-
-			corner.addEventListener("mouseenter", this.hoverCorner.bind(this) );
-			corner.addEventListener("mouseleave", this.unhoverCorner.bind(this) );
-			corner.addEventListener("click", this.clickCorner.bind(this));
+			panel.querySelector(".fc-expand").addEventListener("click", this.handleClickExpand);
+			panel.querySelector(".fc-close").addEventListener("click", this.handleClickClose);
+			corner.addEventListener("mouseenter", this.handleHoverCorner);
+			corner.addEventListener("mouseleave", this.handleUnhoverCorner);
+			corner.addEventListener("click", this.handleClickCorner);
 			corner.classList.add("fc-interactive");
 		});
+		this.elems.embed.addEventListener("click", this.handleClickEmpty);
+		this.elems.embed.classList.add("fc-embed");
+	}
 
-		this.elems.embed.addEventListener("click", (e) => {
-			const onPanels = this.isChildOf(e.target, this.getPanels());
-			const onCorners = this.isChildOf(e.target, this.elems.corners);
-			if(!onPanels && !onCorners) {
-				this.closePanels();
+	destroy() {
+		CORNER_KEYS.forEach(key => {
+			const panel = this.getPanel(key);
+			const corner = this.elems.corners[key];
+			if(panel) {
+				panel.querySelector(".fc-expand").removeEventListener("click", this.handleClickExpand);
+				panel.querySelector(".fc-close").removeEventListener("click", this.handleClickClose);
+				panel.remove();
+			}
+			if(corner) {
+				corner.removeEventListener("mouseenter", this.handleHoverCorner);
+				corner.removeEventListener("mouseleave", this.handleUnhoverCorner);
+				corner.removeEventListener("click", this.handleClickCorner);
+				corner.remove();
 			}
 		});
-
-		this.elems.embed
+		this.elems.embed.removeEventListener("click", this.handleClickEmpty);
 	}
 
 	openPanel(cornerKey) {
@@ -680,7 +695,11 @@ class FourCorners {
 		CORNER_KEYS.forEach(cornerKeys => this.closePanel(cornerKeys));
 	}
 
-	toggleExpandPanel() {
+	clickClosePanel(e) {
+		this.closePanels();
+	}
+
+	clickExpandPanel() {
 		this.elems.embed.classList.toggle("fc-full");
 	}
 
@@ -704,6 +723,14 @@ class FourCorners {
 		} else {
 			this.openPanel(cornerKey);
 		}	
+	}
+
+	clickEmpty(e) {
+		const onPanels = this.isChildOf(e.target, this.getPanels());
+		const onCorners = this.isChildOf(e.target, this.elems.corners);
+		if(!onPanels && !onCorners) {
+			this.closePanels();
+		}
 	}
 
 	//HELPERS
@@ -735,7 +762,7 @@ class FourCorners {
 	}
 
 	simplifyUrl(url) {
-		return url.replace("www.", "").replace(/^https?:\/\//, "");
+		return url.replace("www.", "").replace(/^https?:\/\//, "").replace(/\/$/, "");
 	}
 
 	extractHostname(url) {
@@ -809,7 +836,8 @@ const DEFAULT_OPTS = {
 	caption: false,
 	credit: false,
 	logo: false,
-	dark: false
+	dark: false,
+	inherit: false,
 };
 
 export default FourCorners;

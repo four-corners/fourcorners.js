@@ -1,1 +1,0 @@
-module.exports = "<svg viewBox=\"0 0 100 100\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M75 24.75H0.25V0.25H75H99.75V25V99.75H75.25L75.25 25V24.75H75Z\" fill=\"white\" stroke=\"black\" stroke-width=\"0.5\"></path></svg>"
