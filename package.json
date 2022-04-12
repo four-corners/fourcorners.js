@@ -1,6 +1,6 @@
 {
   "name": "@four-corners/fourcorners.js",
-  "version": "0.7.0",
+  "version": "0.7.3",
   "author": "Corey Tegeler",
   "license": "ISC",
   "description": "The fourcorners.js library displays contextual information defined by the Four Corners Project in each of a photograph’s corners. This increased contextualization strengthens both the authorship of the photographer and the credibility of the image.",
@@ -13,7 +13,7 @@
     "url": "https://github.com/four-corners/fourcorners.js/issues"
   },
   "type": "mode",
-  "main": "src/index.js",
+  "main": "dist/fourcorners.js",
   "devDependencies": {
     "@babel/core": "^7.17.2",
     "@babel/eslint-parser": "^7.17.0",
@@ -45,11 +45,15 @@
     "yargs": "^17.3.1"
   },
   "scripts": {
-    "test": "npm run watch & browser-sync start --server --no-notify --no-open --files 'src/*.js' 'dist/*.js' '*.html'",
+    "test": "npm run watch & browser-sync start --server --serveStatic 'test' --no-notify --no-open --files 'src/*.js' 'dist/*.js' '*.html'",
     "watch": "webpack --mode=development --progress --watch",
     "build": "webpack --mode=production --progress"
   },
   "dependencies": {
+    "@babel/plugin-transform-classes": "^7.16.7",
+    "@contentauth/sdk": "^0.8.12",
+    "c2pa": "^0.8.12",
+    "html-webpack-plugin": "^5.5.0",
     "regenerator-runtime": "^0.13.9"
   }
 }

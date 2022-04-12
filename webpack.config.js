@@ -13,7 +13,7 @@ const fileName = "fourcorners";
 
 if (argv.mode === "production") {
 	mode = "production";
-	devtool = "source-map";
+	// devtool = "source-map";
 	outputJsName = `${fileName}.min.js`;
 	outputCssName = `${fileName}.min.css`;
 } else {
@@ -24,16 +24,16 @@ if (argv.mode === "production") {
 
 const config = {
 	mode: mode,
+	entry: path.resolve(__dirname, "src/index.js"),
 	devtool: devtool,
-	entry: {
-		main: path.resolve(`${__dirname}/src/index.js`)
-	},
 	output: {
-		path: path.resolve(`${__dirname}/dist`),
+		path: path.resolve(__dirname, "dist"),
 		filename: outputJsName,
-		library: "FourCorners",
-		// libraryTarget: "commonjs2"
-		libraryTarget: "var",
+		library: {
+			type: "umd",
+			name: "FourCorners",
+			export: "default",
+		}
 	},
 	module: {
 		rules: [
@@ -42,6 +42,10 @@ const config = {
 				loader: "babel-loader",
 				exclude: /node_modules/,
 			},
+			{
+        resourceQuery: /file/,
+        type: 'asset/resource',
+      },
 			{
 				test: /\.s[ac]ss$/i,
 				use: [

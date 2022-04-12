@@ -13,42 +13,19 @@
 			window.addEventListener('load', function() {
 				const embeds = document.querySelectorAll(".fc-embed");
 				embeds.forEach((embed) => {
-					new FourCorners(embed, {
+					const inst = new FourCorners(embed, {
 						caption: true,
 						credit: true,
 						logo: true,
 						dark: false
+					}, {
+						wasmSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/assets/wasm/toolkit_bg.wasm",
+						workerSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.worker.min.js"
 					});
 				});
 			});
 		</script>
 
-		<script type="module">
-
-			import { ContentAuth } from "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.esm.min.js";
-			import "https://cdn.jsdelivr.net/npm/@contentauth/web-components@0.4.2-alpha.20/dist/index.min.js";
-
-			const wasmSrc = "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/assets/wasm/toolkit_bg.wasm";
-			const workerSrc = "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.worker.min.js";
-
-			const imgs = document.querySelectorAll("img");
-
-			imgs.forEach(async (img) => {
-				const imgSrc = img.src;
-				const sdk = new ContentAuth({
-					wasmSrc,
-					workerSrc,
-				});
-				const provenance = await sdk.processImage(imgSrc);
-				await new FourCorners(img, {
-					caption: true,
-					credit: true,
-					logo: true,
-					dark: false
-				}, provenance);
-			});
-
-		</script>
 
 	</head>
 
@@ -80,7 +57,9 @@
 
 			<br /><br />
 
-			<img src="./c2pa/yonas-tadesse/yonas-tadesse-c2pa.jpeg" />
+			<div class="fc-embed">
+				<img src="./c2pa/yonas-tadesse/yonas-tadesse-c2pa.jpeg" />
+			</div>
 
 		</div>
 	</body>
