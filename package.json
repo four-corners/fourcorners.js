@@ -1,6 +1,6 @@
 {
   "name": "@four-corners/fourcorners.js",
-  "version": "0.7.3",
+  "version": "0.7.5",
   "author": "Corey Tegeler",
   "license": "ISC",
   "description": "The fourcorners.js library displays contextual information defined by the Four Corners Project in each of a photograph’s corners. This increased contextualization strengthens both the authorship of the photographer and the credibility of the image.",

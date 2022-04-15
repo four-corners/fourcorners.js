@@ -12,18 +12,16 @@ let mode, devtool, outputJS, outputCSS;
 const fileName = "fourcorners";
 
 if (argv.mode === "production") {
-	mode = "production";
 	// devtool = "source-map";
 	outputJS = `${fileName}.min.js`;
 	outputCSS = `${fileName}.min.css`;
 } else {
-	mode = "development";
 	outputJS = `${fileName}.js`;
 	outputCSS = `${fileName}.css`;
 }
 
 const config = {
-	mode: mode,
+	mode: argv.mode,
 	entry: path.resolve(__dirname, "src/index.js"),
 	devtool: devtool,
 	output: {

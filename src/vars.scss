@@ -15,20 +15,20 @@ $light: #f4f4f6;
 $lighten: rgba($lightest,.5);
 
 $radius: 3px;
-$panel-gap: .5em;
+$panel-gap: 8px;
 
-$corner-size: 5em;
+$corner-size: 40px;
 $corner-width: 10px;
 $corner-len: 40px;
 $corner-gap: 10px;
 
 @mixin mdText {
-	font-size: 1em;
+	font-size: 16px;
 	line-height: 1.3em;
 }
 
 @mixin smText {
-	font-size: .85em;
+	font-size: 14px;
 	line-height: 1.3em;
 }
 
