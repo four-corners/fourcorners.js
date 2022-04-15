@@ -8,27 +8,25 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 // const { fileURLToPath } = require('url');
 // const { dirname } = require('path');
 
-let mode, devtool, outputJsName, outputCssName;
+let mode, devtool, outputJS, outputCSS;
 const fileName = "fourcorners";
 
 if (argv.mode === "production") {
-	mode = "production";
 	// devtool = "source-map";
-	outputJsName = `${fileName}.min.js`;
-	outputCssName = `${fileName}.min.css`;
+	outputJS = `${fileName}.min.js`;
+	outputCSS = `${fileName}.min.css`;
 } else {
-	mode = "development";
-	outputJsName = `${fileName}.js`;
-	outputCssName = `${fileName}.css`;
+	outputJS = `${fileName}.js`;
+	outputCSS = `${fileName}.css`;
 }
 
 const config = {
-	mode: mode,
+	mode: argv.mode,
 	entry: path.resolve(__dirname, "src/index.js"),
 	devtool: devtool,
 	output: {
 		path: path.resolve(__dirname, "dist"),
-		filename: outputJsName,
+		filename: outputJS,
 		library: {
 			type: "umd",
 			name: "FourCorners",
@@ -67,7 +65,7 @@ const config = {
 	},
 	plugins: [
 		new MiniCssExtractPlugin({
-			filename: outputCssName,
+			filename: outputCSS,
 			chunkFilename: '[id].css'
 		}),
 		new ESLintPlugin({

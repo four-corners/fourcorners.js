@@ -10,21 +10,27 @@
 		<script type="text/javascript" src="./../../dist/fourcorners.js"></script>
 
 		<script type="text/javascript">
-			// window.addEventListener('load', function() {
-			// 	const embeds = document.querySelectorAll(".fc-embed");
-			// 	embeds.forEach((embed) => {
-			// 		const inst = new FourCorners(embed, {
-			// 			caption: true,
-			// 			credit: true,
-			// 			logo: true,
-			// 			dark: false
-			// 		}, {
-			// 			wasmSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/assets/wasm/toolkit_bg.wasm",
-			// 			workerSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.worker.min.js"
-			// 		});
-			// 	});
-			// });
+			window.addEventListener('load', function() {
+				const embeds = document.querySelectorAll(".fc-embed");
+				embeds.forEach((embed) => {
+					const inst = new FourCorners(embed, {
+						caption: true,
+						credit: true,
+						logo: true,
+						dark: false
+					}, {
+						wasmSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/assets/wasm/toolkit_bg.wasm",
+						workerSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.worker.min.js"
+					});
+				});
+			});
 		</script>
+
+		<style>
+			.wp-block-fourcorners-block a {
+				color: red;
+			}
+		</style>
 
 	</head>
 
@@ -32,17 +38,23 @@
 		<main>
 
 			<h1>
-				fourcorners.js demoz
+				fourcorners.js demos
 			</h1>
 
 			<br /><br />
 
 			<h2>
-				embeds generated from <a href="https://fourcornersproject.org" target="_blank">fourcornersproject.org</a>
+				embed generated with <a href="https://c2pa.org" target="_blank">C2PA</a> metadata
 			</h2>
 			(<a href="./../index.html">go back</a>)
 
 			<br /><br />
+
+			<div class="fc-embed wp-block-fourcorners-block">
+				<img src="./bcn-c2pa.jpeg" />
+			</div>
+
+			<br /><br /><br /><br />
 
 			<div class="fc-embed">
 				<img src="./yonas-tadesse/yonas-tadesse-c2pa.jpeg" />

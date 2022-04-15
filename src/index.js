@@ -2,6 +2,8 @@ require("regenerator-runtime/runtime");
 require("styles.scss");
 
 import { ContentAuth } from "@contentauth/sdk";
+// import wasmSrc from "@contentauth/sdk/dist/assets/wasm/toolkit_bg.wasm?url";
+// import workerSrc from "@contentauth/sdk/dist/cai-caSdk.worker.min.js?url";
 
 class FourCorners {
 	constructor(elem, opts, caSdkSrcs) {
@@ -9,9 +11,20 @@ class FourCorners {
 		this.elems = {};
 		this.elems.embed = elem;
 		this.elems.img = this.getImg();
-		this.src = this.elems.img.src;
+		this.src = this.elems.img ? this.elems.img.src : null;
 		this.lang = opts.lang || "en";
 		this.strings = STRINGS[this.lang];
+		// this.provenance = provenance
+		// this.data = provenance ? this.parseContentAuthData() : this.parseJsonData();
+		// if(!this.data) return;
+		// this.opts = { ...DEFAULT_OPTS, ...opts, ...this.data.opts };
+		// this.elems.cutline = this.addCutline();
+		// this.elems.panels = this.addPanels();
+		// this.elems.corners = this.addCorners();
+		// this.addEmbeddedMedia();
+		// this.addInteractivity();
+		// if(this.opts.dark) this.elems.embed.classList.add("fc-dark");
+		// this.elems.embed.classList.add("fc-init");
 
 		const caSdk = new ContentAuth(caSdkSrcs);
 		(async () => {
@@ -36,12 +49,12 @@ class FourCorners {
 			this.handleClickEmpty = this.clickEmpty.bind(this);
 			this.handleClickClose = this.clickClosePanel.bind(this);
 			this.handleClickExpand = this.clickExpandPanel.bind(this);
-			this.addInteractivity();
 
+			this.addInteractivity();
 			if(this.opts.dark) this.elems.embed.classList.add("fc-dark");
 			this.elems.embed.classList.add("fc-init");
 		}).catch(e => {
-			console.log(e);
+			console.warn(e);
 		});
 	}
 
@@ -65,13 +78,14 @@ class FourCorners {
 	}
 
 	parseContentAuthData() {
-		let fourCornersProvenance;
+		let fourCornersAssertion;
 		if(this.provenance) {
 			this.provenance.claims.forEach((claim, key) => {
-				fourCornersProvenance = claim.assertions.get("org.fourcorners.context").data;
+				if(claim.assertions.get("org.fourcorners.context")) {
+					fourCornersAssertion = claim.assertions.get("org.fourcorners.context").data;
+				}
 			});
 		}
-
 		const parseContentAuthArray = (arr) => {
 			if(arr) {
 				arr = arr.map((obj) => {
@@ -100,7 +114,7 @@ class FourCorners {
 					}
 				});
 		 	}
-		 	searchKeys(fourCornersProvenance, key);
+		 	searchKeys(fourCornersAssertion, key);
 		 	return value;
 		}
 
@@ -141,7 +155,11 @@ class FourCorners {
 
 	//BUILDING DOM ELEMENTS
 	getImg() {
-		return this.elems.embed.querySelector("img");
+		const img = [...this.elems.embed.querySelectorAll("img")].find(img => {
+			const ext = ((/[.]/.exec(img.src)) ? /[^.]+$/.exec(img.src) : [])[0];
+			return ext && ["jpg", "jpeg", "png", "gif"].includes(ext);
+		});
+		return img;
 	}
 
 	// addWrapper(elem) {
@@ -388,8 +406,8 @@ class FourCorners {
 							<div class="fc-media-embed" data-fc-source="${obj.source}" data-fc-url="${obj.url}" data-fc-index="${index}"></div>
 							${obj.caption || obj.credit ?
 								`<div class="fc-media-info">
-									${obj.caption ? `<div class="fc-sub-caption">${obj.caption}</div>` : ""}
-									${obj.credit ? `<div class="fc-sub-credit">${obj.credit}</div>` : ""}
+									${obj.caption ? `<span class="fc-sub-caption">${obj.caption}</span>` : ""}
+									${obj.credit ? `<span class="fc-sub-credit">${obj.credit}</span>` : ""}
 								</div>`
 							: ""}
 						</div>
@@ -413,19 +431,21 @@ class FourCorners {
 							</div>
 							${obj.caption || obj.credit ?
 								`<div class="fc-media-info">
-									${obj.caption ? `<div class="fc-sub-caption">${obj.caption}</div>` : ""}
-									${obj.credit ? `<div class="fc-sub-credit">${obj.credit}</div>` : ""}
+									${obj.caption ? `<span class="fc-sub-caption">${obj.caption}</span>` : ""}
+									${obj.credit ? `<em class="fc-sub-credit">${obj.credit}</em>` : ""}
+									${!isExternal ?
+										`<span class="fc-sub-source">
+											${obj.url ?
+												`(<a href="${obj.url}" target="_blank">View full image</a>)`
+											: ""}
+										</span>`
+									: ""}
 									${isExternal ?
-										`<div class="fc-sub-credit">
-											${isExternal && obj.url ?
-												`<a href="${obj.url}" target="_blank">
-													View on ${this.extractRootDomain(obj.url)}
-												</a>`
+										`<span class="fc-sub-source">
+											${obj.url ?
+												`(<a href="${obj.url}" target="_blank">View on ${this.extractRootDomain(obj.url)}</a>)`
 											: ""}
-											${isExternal && !obj.url ?
-												`View on ${this.extractRootDomain(obj.url)}`
-											: ""}
-										</div>`
+										</span>`
 									: ""}
 								</div>`
 							: ""}
@@ -518,12 +538,14 @@ class FourCorners {
 					subMedia = panel.querySelectorAll(".fc-media-embed")[obj.index],
 					pseudoImg = new Image();
 		let html = "";
-		pseudoImg.onload = () => {
-			html = `<img src="${obj.url}" />`;
-			subMedia.innerHTML = html;
-		};
+		html = `<img src="${obj.url}" />`;
+		subMedia.innerHTML = html;
+		// pseudoImg.onload = () => {
+		// 	html = `<img src="${obj.url}" />`;
+		// 	subMedia.innerHTML = html;
+		// };
 		pseudoImg.onerror = () => {
-			subMedia.parentNode.remove();
+			subMedia.parentNode.parentNode.remove();
 			console.warn(`Four Corners cannot load this media.`, {
 				url: obj.url,
 				error: `Embedding failed and was removed from the imagery panel`
