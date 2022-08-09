@@ -13,12 +13,12 @@
 			window.addEventListener('load', function() {
 				const embeds = document.querySelectorAll(".fc-embed");
 				embeds.forEach((embed) => {
-					const inst = new FourCorners(embed, {
+					const inst = new FourCorners({
+						container: embed,
 						caption: true,
 						credit: true,
 						logo: true,
-						dark: false
-					}, {
+						dark: false,
 						wasmSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/assets/wasm/toolkit_bg.wasm",
 						workerSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.worker.min.js"
 					});

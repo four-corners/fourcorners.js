@@ -320,16 +320,17 @@
 			padding: 0;
 			display: inline;
 			color: inherit;
-			border-bottom: 1px solid $medium;
-			transition: border 200ms ease-in-out;
-			text-decoration: none;
+			transition: text-decoration-color 200ms ease-in-out;
+			text-decoration: underline;
+			text-decoration-color: $medium;
 			word-break: break-word;
 			&:hover, &:visited, &:focus, & {
 				text-decoration: none;
 			}	
 			&:hover {
 				color: inherit;
-				border-bottom-color: $darken;
+				text-decoration: underline;
+				text-decoration-color: $darken;
 				// opacity: .8;
 			}
 		}
@@ -384,9 +385,6 @@
 		background-color: $lighter;
 		text-decoration: none;
 		@include shadow;
-		.fc-label {
-			display: block;
-		}
 	}
 	a.fc-card:hover {
 		background-color: $lightBlue;
@@ -492,52 +490,6 @@
 			position: absolute;
 			left: 0;
 			top: 0;
-		}
-	}
-	.fc-cutline {
-		margin: 8px 0 0 0;
-		.fc-caption, .fc-credit {
-			&::after {
-				content: ' ';
-			}
-		}
-		.fc-caption {
-			font-style: italic;
-		}
-		.fc-credit {
-			color: $darker;
-			font-style: italic;
-			@include smText;
-		}
-		.fc-logo {
-			opacity: 1;
-			white-space: nowrap;
-			transition: opacity 100ms linear;
-			@include smText;
-			&:first-child {
-				float: right;
-			}
-			&:last-child {
-				margin-left: 4px;
-			}
-			&, &:hover, &:visited &:focus {
-				color: inherit;
-				text-decoration: none;
-			}
-			&:hover {
-				opacity: .8;
-			}
-			&::before {
-				width: 10px;
-				height: 10px;
-				margin: 0;
-				display: inline-block;
-				background-image: url(./svg/logo.svg);
-				background-repeat: no-repeat;
-				background-position: center;
-				background-size: contain;
-				content: '';
-			}
 		}
 	}
 
@@ -659,6 +611,47 @@
 		}
 		.fc-sub-credit, .fc-sub-source {
 			color: $light;
+		}
+	}
+}
+
+.fc-cutline {
+	margin: 8px 0 0 0;
+	.fc-caption, .fc-credit {
+		&::after {
+			content: ' ';
+		}
+	}
+	.fc-caption {
+		
+	}
+	.fc-credit {
+		
+	}
+	.fc-logo {
+		margin-left: 4px;
+		display: inline-block;
+		opacity: 1;
+		white-space: nowrap;
+		transition: opacity 100ms linear;
+		font-size: 12px;
+		&, &:hover, &:visited &:focus {
+			color: inherit;
+			text-decoration: none;
+		}
+		&:hover {
+			opacity: .8;
+		}
+		&::before {
+			width: .8em;
+			height: .8em;
+			margin: 0;
+			display: inline-block;
+			background-image: url(./svg/logo.svg);
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: contain;
+			content: '';
 		}
 	}
 }

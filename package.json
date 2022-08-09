@@ -1,6 +1,6 @@
 {
   "name": "@four-corners/fourcorners.js",
-  "version": "0.7.5",
+  "version": "0.8.0",
   "author": "Corey Tegeler",
   "license": "ISC",
   "description": "The fourcorners.js library displays contextual information defined by the Four Corners Project in each of a photograph’s corners. This increased contextualization strengthens both the authorship of the photographer and the credibility of the image.",
@@ -40,6 +40,7 @@
     "svg-inline-loader": "^0.8.2",
     "svg-url-loader": "^7.1.1",
     "svgo-loader": "^3.0.0",
+    "terser-webpack-plugin": "^5.3.3",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.2",
     "yargs": "^17.3.1"
@@ -47,7 +48,7 @@
   "scripts": {
     "test": "npm run watch & browser-sync start --server --serveStatic 'test' --no-notify --no-open --files 'src/*.js' 'dist/*.js' '*.html'",
     "watch": "webpack --mode=development --progress --watch",
-    "build": "webpack --mode=production --progress"
+    "build": "webpack --mode=production  --progress"
   },
   "dependencies": {
     "@babel/plugin-transform-classes": "^7.16.7",

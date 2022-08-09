@@ -1,18 +1,14 @@
 const path = require("path");
 const argv = require("yargs").argv;
-// const autoprefixer = require("autoprefixer");
-// const svgo = require("svgo-loader");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
-// const { fileURLToPath } = require('url');
-// const { dirname } = require('path');
+const TerserPlugin = require("terser-webpack-plugin");
 
 let mode, devtool, outputJS, outputCSS;
 const fileName = "fourcorners";
 
 if (argv.mode === "production") {
-	// devtool = "source-map";
 	outputJS = `${fileName}.min.js`;
 	outputCSS = `${fileName}.min.css`;
 } else {
@@ -74,8 +70,14 @@ const config = {
 		})
 	],
 	optimization: {
+    minimize: argv.mode === "production",
 		minimizer: [
 			new CssMinimizerPlugin(),
+			new TerserPlugin({
+				terserOptions: {
+					module: true,
+				}
+			}),
 		]
 	},
 };

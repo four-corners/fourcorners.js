@@ -11,14 +11,15 @@
 
 		<script type="text/javascript">
 			window.addEventListener('load', function() {
+				console.log(FourCorners);
 				const embeds = document.querySelectorAll(".fc-embed");
 				embeds.forEach((embed) => {
-					const inst = new FourCorners(embed, {
+					const inst = new FourCorners({
+						container: embed,
 						caption: true,
 						credit: true,
 						logo: true,
-						dark: false
-					}, {
+						dark: false,
 						wasmSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/assets/wasm/toolkit_bg.wasm",
 						workerSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.worker.min.js"
 					});
@@ -51,10 +52,10 @@
 			<br /><br />
 
 			<div class="fc-embed wp-block-fourcorners-block">
-				<img src="./bcn-c2pa.jpeg" />
+				<img src="./bcn-c2pa-2.jpeg" />
 			</div>
 
-			<br /><br /><br /><br />
+			<!-- <br /><br /><br /><br />
 
 			<div class="fc-embed">
 				<img src="./yonas-tadesse/yonas-tadesse-c2pa.jpeg" />
@@ -84,7 +85,7 @@
 				<img src="./cheney-orr/cheney-orr-c2pa.jpeg" />
 			</div>
 			
-			<br /><br /><br /><br />
+			<br /><br /><br /><br /> -->
 
 		</div>
 	</body>
