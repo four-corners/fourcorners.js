@@ -207,12 +207,12 @@
   transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
 }
 .fc-embed .fc-icon {
-  width: 20px;
-  height: 20px;
+  width: 1em;
+  height: 1em;
   padding: 3px;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 12px;
+  background-size: calc(1em - 6px);
   border: 1px solid #c4c4c4;
   border-radius: 3px;
   transition: border-color 200ms ease-in-out;

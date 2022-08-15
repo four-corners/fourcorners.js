@@ -208,12 +208,12 @@
 		}
 	}
 	.fc-icon {
-		width: 20px;
-		height: 20px;
+		width: 1em;
+		height: 1em;
 		padding: 3px;
 		background-repeat: no-repeat;
 		background-position: center;
-		background-size: 12px;
+		background-size: calc(1em - 6px);
 		border: 1px solid $medium;
 		border-radius: $radius;
 		transition: border-color 200ms ease-in-out;

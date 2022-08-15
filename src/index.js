@@ -51,6 +51,7 @@ class FourCorners {
 			const contentAuthData = caSdk && this.src ? await caSdk.processImage(this.src) : null;	
 			if(contentAuthData && contentAuthData.exists) {
 				this.provenance = contentAuthData;
+				// console.log(contentAuthData);
 				this.data = this.parseContentAuthData();
 			}
 		})().then(() => {
@@ -125,12 +126,8 @@ class FourCorners {
 			const searchKeys = (obj, key) => {
 				if(typeof obj !== "object") return;
 				Object.keys(obj).forEach(k => {
-					if(k === key) {
-						return value = obj[k];
-					}
-					if(typeof obj[k] === "object") {
-						return searchKeys(obj[k], key);
-					}
+					if(k === key) return value = obj[k];
+					if(typeof obj[k] === "object") return searchKeys(obj[k], key);
 				});
 		 	}
 		 	let assertionsData = getAssertionData(assertionKey);
@@ -140,17 +137,23 @@ class FourCorners {
 
 		const getIptcLocation = () => {
 			const data = getNestedValue("stds.iptc.photo-metadata", "Iptc4xmpExt:LocationCreated");
+			if(!data) return;
 			const fields = ["Iptc4xmpExt:City", "Iptc4xmpExt:ProvinceState", "Iptc4xmpExt:CountryName"];
-			const str = fields.map(f => data[f]).filter(d => d).join(", ");
-			return str;
+			const locationStr = fields.map(f => data[f]).filter(d => d).join(", ");
+			return locationStr;
 		}
 
 		//https://c2pa.org/specifications/specifications/1.0/specs/C2PA_Specification.html#_exif_information
-		const getC2paTime = () => {
+		const getGpsTime = () => {
 			const data = getNestedValue("stds.exif", "exif:GPSTimeStamp");
-			const dateArr = data.split(/\D/);
-		  const date = new Date(dateArr[0], dateArr[1]-1, dateArr[2], dateArr[3], dateArr[4], dateArr[5]);
-			return date.toLocaleDateString();
+			// console.log(data);
+			if(!data) return;
+			const timeArr = data.split(/\D/);
+		  const timeStr = new Date(timeArr[0], timeArr[1]-1, timeArr[2], timeArr[3], timeArr[4], timeArr[5])
+		  	.toString()
+		  	.split("GMT")[0];
+		  // console.log(timeStr);
+			return timeStr;
 		}
 
 		const getVerifyUrl = () => {
@@ -178,7 +181,7 @@ class FourCorners {
 				"contactInfo": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipContactInfo"),
 				"contactRights": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipContactRights"),
 				"location": getIptcLocation(),
-				"date": getC2paTime(),
+				"time": getGpsTime(),
 				"verify": getVerifyUrl(),
 			},
 			"backstory": {
@@ -311,11 +314,11 @@ class FourCorners {
 			website,
 			license,
 			location,
-			date,
+			time,
 			verify,
 		} = this.data.authorship,
 		strings = FC_STRINGS[this.options.lang],
-		hasAuthorshipContent = caption || credit || bio || ethics || website || license || location || date || verify,
+		hasAuthorshipContent = caption || credit || bio || ethics || website || license || location || time || verify,
 		hasInfoCard = credit && ((ethics && ethics.desc) || bio || website);
 		return(
 			hasAuthorshipContent ?
@@ -419,56 +422,59 @@ class FourCorners {
 						</div>`
 					: ""}
 
-					${location || date ?
-						`<div>
-							<details class="fc-details">
+					${location || time || verify ?
+						`<div class="fc-card">
+							<div class="fc-field">
+								<strong class="fc-label">
+									${strings.auth}
+								</strong>
+							</div>
+							${location  ?
+								`<div class="fc-field">
+									${location ?
+										`<span class="fc-label">
+											${strings.location}:
+										</span>
+										<span class="fc-content">
+											${location}
+										</span>`
+									: ""}
+								</div>`
+							: ""}
 
+							${time  ?
+								`<div class="fc-field">
+									${time ?
+										`<span class="fc-label">
+											${strings.time}:
+										</span>
+										<span class="fc-content">
+											${time}
+										</span>`
+									: ""}
+								</div>`
+							: ""}
+
+							<details class="fc-details">
 								<summary class="fc-summary">
 									<div class="fc-field">
 										<span class="fc-label">
-											${strings.auth}
+											${strings.reg}
 										</span>
-										<div class="fc-icon fc-expand" title="Read more ${strings.auth}"></div>
+										<div class="fc-icon fc-expand" title="Open"></div>
 									</div>
 								</summary>
+								
+							</details>
 
-								<div class="fc-card">
-									${location  ?
-										`<div class="fc-field">
-											${location ?
-												`<span class="fc-label">
-													${strings.location}:
-												</span>
-												<span class="fc-content">
-													${location}
-												</span>`
-											: ""}
-										</div>`
-									: ""}
-
-									${date  ?
-										`<div class="fc-field">
-											${location ?
-												`<span class="fc-label">
-													${strings.date}:
-												</span>
-												<span class="fc-content">
-													${date}
-												</span>`
-											: ""}
-										</div>`
-									: ""}
-
-									${verify  ?
-										`<div class="fc-field fc-sub-source">
-											${this.createLink(verify, strings.verify)}
-										</div>`
-									: ""}
-
+							${verify  ?
+								`<div class="fc-field fc-sub-source">
+									${strings.verify_intro} ${this.createLink(verify, strings.verify_link)}
 								</div>`
 							: ""}
-						</div>
-					</details>
+
+						</div>`
+					: ""}
 				</div>`
 			: ""
 		);
@@ -724,7 +730,7 @@ class FourCorners {
 		if(!text) {
 			text = this.simplifyUrl(href);
 		}
-		if(this.validateEmail(href)) {
+		if(this.valitimeEmail(href)) {
 			href = `mailto:${href}`;
 		}
 		return `<a href="${href}" target="_blank" class="${classes.join(" ")}">${text}</a>`;
@@ -855,7 +861,7 @@ class FourCorners {
 		return answer;
 	}
 
-	validateEmail(string) {
+	valitimeEmail(string) {
 	  return String(string)
 	    .toLowerCase()
 	    .match(
@@ -925,14 +931,14 @@ const FC_DEFAULT_OPTIONS = {
 	logo: false,
 	dark: false,
 	inherit: false,
-	"lang": "en",
+	lang: "en",
 };
 
 const FC_ASSERTION_KEY = "org.fourcorners.context";
 
 const FC_STRINGS = {
 	en: {
-		authorship: "Authorship",
+		authorship: "Authorship & Authentication",
 		backstory: "Backstory",
 		imagery: "Related Imagery",
 		links: "Links",
@@ -944,10 +950,12 @@ const FC_STRINGS = {
 		website: "Website",
 		info: "For more info",
 		rights: "For reproduction rights",
-		auth: "Authenticated data",
-		location: "Location captured",
-		date: "Date captured",
-		verify: "View more authenticated data and credentials via the Content Authenticity Initiative"
+		auth: "Capture certificate",
+		location: "Location",
+		time: "Time of capture",
+		reg: "Registration links",
+		verify_intro: "Explore more authenticated data and credentials",
+		verify_link: "here",
 	},
 	ar: {
 		authorship: "التأليف",
