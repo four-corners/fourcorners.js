@@ -492,6 +492,22 @@
 			top: 0;
 		}
 	}
+	.fc-flex {
+		display: flex;
+	}
+	.fc-indent {
+		padding-left: 16px;
+		// padding-top: 16px;
+	}
+	.fc-underline {
+		text-decoration: underline !important;
+	}
+	.fc-truncate {
+		flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+	}
 
 	//SHOWING CORNERS
 

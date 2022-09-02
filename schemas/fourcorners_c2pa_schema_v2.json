@@ -1,0 +1,61 @@
+{
+	"label": "org.fourcorners.context",
+	"data": {
+		"authorship": {
+			"caption": "Caption of primary image goes here.",
+			"credit": "Credit of primary image goes here.",
+			"license": {
+				"type": "copyright",
+				"year": "2022",
+				"holder": "Copyright holder goes here",
+				"label": "Attribution-ShareAlike CC BY-SA",
+				"desc": "This license lets others remix, tweak, and build upon your work even for commercial purposes, as long as they credit you and license their new creations under the identical terms. This license is often compared to “copyleft” free and open source software licenses. All new works based on yours will carry the same license, so any derivatives will also allow commercial use. This is the license used by Wikipedia, and is recommended for materials that would benefit from incorporating content from Wikipedia and similarly licensed projects.",
+				"url": "https://creativecommons.org/licenses/by-sa/4.0"
+			},
+			"ethics": {
+				"label": "Code of ethics label goes here.",
+				"description": "Code of ethics description goes here."
+			},
+			"bio": "Bio of image author goes here.",
+			"website": "https://example.com",
+			"contactInfo": "Image author contact info goes here.",
+			"contactRights": "Reproduction rights contact info goes here.",
+			"registrationLinks": [
+				{
+					"title": "Title of registration link goes here.",
+					"url": "https://ipfs.io/ipfs/a0b1c2d3e4f5g6h7i8j9"
+				}
+			]
+		},
+		"backstory": {
+			"text": "Backstory of image goes here.",
+			"media": [
+				{
+					"source": "soundcloud",
+					"url": "https://soundcloud.com/example",
+					"caption": "Caption of SoundCloud embed goes here.",
+					"credit": "Credit of SoundCloud embed goes here."
+				}
+			]
+		},
+		"imagery": {
+			"media": [
+				{
+					"source": "image",
+					"url": "https://example.com/photo.jpg",
+					"caption": "Caption of related image goes here.",
+					"credit": "Credit of related image goes here."
+				}
+			]
+		},
+		"links": {
+			"links": [
+				{
+					"source": "link",
+					"title": "Title of link goes here.",
+					"url": "https://example.com"
+				}
+			]
+		}
+	}
+}

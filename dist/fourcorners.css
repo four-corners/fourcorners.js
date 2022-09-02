@@ -483,6 +483,21 @@ details.fc-details[open] .fc-embed summary.fc-summary .fc-icon.fc-expand {
   left: 0;
   top: 0;
 }
+.fc-embed .fc-flex {
+  display: flex;
+}
+.fc-embed .fc-indent {
+  padding-left: 16px;
+}
+.fc-embed .fc-underline {
+  text-decoration: underline !important;
+}
+.fc-embed .fc-truncate {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .fc-embed:hover:not(.fc-full) .fc-corner.fc-imagery, .fc-embed:not(.fc-init) .fc-corner.fc-imagery, .fc-embed.fc-static .fc-corner.fc-imagery {
   top: 0;
   left: 0;

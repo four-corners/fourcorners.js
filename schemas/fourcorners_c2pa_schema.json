@@ -19,7 +19,13 @@
 			"fourcorners:authorshipBio": "Bio of image author goes here.",
 			"fourcorners:authorshipWebsite": "https://example.com",
 			"fourcorners:authorshipContactInfo": "Image author contact info goes here.",
-			"fourcorners:authorshipContactRights": "Reproduction rights contact info goes here."
+			"fourcorners:authorshipContactRights": "Reproduction rights contact info goes here.",
+			"fourcorners:authorshipRegistration": [
+				{
+					"fourcorners:authorshipRegistrationTitle": "Title of registration link goes here.",
+					"fourcorners:authorshipRegistrationUrl": "https://ipfs.io/ipfs/a0b1c2d3e4f5g6h7i8j9"
+				}
+			]
 		},
 		"fourcorners:backstory": {
 			"fourcorners:backstoryText": "Backstory of image goes here.",

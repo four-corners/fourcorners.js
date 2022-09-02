@@ -51,7 +51,6 @@ class FourCorners {
 			const contentAuthData = caSdk && this.src ? await caSdk.processImage(this.src) : null;	
 			if(contentAuthData && contentAuthData.exists) {
 				this.provenance = contentAuthData;
-				// console.log(contentAuthData);
 				this.data = this.parseContentAuthData();
 			}
 		})().then(() => {
@@ -146,13 +145,11 @@ class FourCorners {
 		//https://c2pa.org/specifications/specifications/1.0/specs/C2PA_Specification.html#_exif_information
 		const getGpsTime = () => {
 			const data = getNestedValue("stds.exif", "exif:GPSTimeStamp");
-			// console.log(data);
 			if(!data) return;
 			const timeArr = data.split(/\D/);
 		  const timeStr = new Date(timeArr[0], timeArr[1]-1, timeArr[2], timeArr[3], timeArr[4], timeArr[5])
 		  	.toString()
 		  	.split("GMT")[0];
-		  // console.log(timeStr);
 			return timeStr;
 		}
 
@@ -183,6 +180,7 @@ class FourCorners {
 				"location": getIptcLocation(),
 				"time": getGpsTime(),
 				"verify": getVerifyUrl(),
+				"registration": parseContentAuthArray("fourcorners:", getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipRegistration")),
 			},
 			"backstory": {
 				"text": getNestedValue(FC_ASSERTION_KEY, "fourcorners:backstoryText"),
@@ -316,6 +314,7 @@ class FourCorners {
 			location,
 			time,
 			verify,
+			registration,
 		} = this.data.authorship,
 		strings = FC_STRINGS[this.options.lang],
 		hasAuthorshipContent = caption || credit || bio || ethics || website || license || location || time || verify,
@@ -422,7 +421,7 @@ class FourCorners {
 						</div>`
 					: ""}
 
-					${location || time || verify ?
+					${location || time || (registration && registration.length) ?
 						`<div class="fc-card">
 							<div class="fc-field">
 								<strong class="fc-label">
@@ -455,17 +454,32 @@ class FourCorners {
 								</div>`
 							: ""}
 
-							<details class="fc-details">
-								<summary class="fc-summary">
-									<div class="fc-field">
-										<span class="fc-label">
-											${strings.reg}
-										</span>
-										<div class="fc-icon fc-expand" title="Open"></div>
-									</div>
-								</summary>
-								
-							</details>
+							${registration && registration.length ? 
+								`<details class="fc-details">
+									<summary class="fc-summary">
+										<div class="fc-field">
+											<span class="fc-label">
+												${strings.reg}
+											</span>
+											<div class="fc-icon fc-expand" title="Open"></div>
+										</div>
+										<div>
+									</summary>
+									${registration.map(r => (
+										`<div class="fc-field fc-indent">
+											<div class="fc-content fc-flex">
+												<span class="fc-label">
+													${r.title}:
+												</span>
+												&nbsp;
+												<a href="${r.url}" target="_blank" class="fc-truncate fc-underline">
+													${r.text}
+												</a>
+											</div>
+										</div>`
+									))}								
+								</details>`
+							: ""}
 
 							${verify  ?
 								`<div class="fc-field fc-sub-source">
@@ -495,7 +509,7 @@ class FourCorners {
 				: ""}
 				${media ?
 					media.map((obj, index) => {
-						this.embedExternal(this, obj, "backstory", index);
+						// this.embedExternal(this, obj, "backstory", index);
 						return (
 							`<div class="fc-row">
 								<div class="fc-media">
