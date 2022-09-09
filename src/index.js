@@ -425,7 +425,7 @@ class FourCorners {
 						`<div class="fc-card">
 							<div class="fc-field">
 								<strong class="fc-label">
-									${strings.auth}
+									${strings.cert}
 								</strong>
 							</div>
 							${location  ?
@@ -477,7 +477,8 @@ class FourCorners {
 												</a>
 											</div>
 										</div>`
-									))}								
+									))}
+									<div class="fc-field" />								
 								</details>`
 							: ""}
 
@@ -952,7 +953,7 @@ const FC_ASSERTION_KEY = "org.fourcorners.context";
 
 const FC_STRINGS = {
 	en: {
-		authorship: "Authorship & Authentication",
+		authorship: "Authorship",
 		backstory: "Backstory",
 		imagery: "Related Imagery",
 		links: "Links",
@@ -964,7 +965,8 @@ const FC_STRINGS = {
 		website: "Website",
 		info: "For more info",
 		rights: "For reproduction rights",
-		auth: "Capture certificate",
+		auth: "& Authentication",
+		cert: "Capture Certificate",
 		location: "Location",
 		time: "Time of capture",
 		reg: "Registration links",

@@ -341,6 +341,9 @@
 .fc-embed details.fc-details .fc-card {
   margin-top: 8px;
 }
+.fc-embed details.fc-details[open] .fc-icon.fc-expand {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBmaWxsPSIjMDAwIiBkPSJNMCA0NWgxMDB2MTFIMHoiLz48L3N2Zz4=);
+}
 .fc-embed summary.fc-summary {
   list-style: none;
   cursor: pointer;
@@ -354,9 +357,6 @@
   top: 0.25em;
   left: 0.25em;
   display: inline-block;
-}
-details.fc-details[open] .fc-embed summary.fc-summary .fc-icon.fc-expand {
-  background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBmaWxsPSIjMDAwIiBkPSJNMCA0NWgxMDB2MTFIMHoiLz48L3N2Zz4=);
 }
 .fc-embed summary.fc-summary:hover .fc-icon.fc-expand, .fc-embed summary.fc-summaryfocus .fc-icon.fc-expand {
   border-color: #7b7883;

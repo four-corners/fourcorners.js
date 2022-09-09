@@ -343,6 +343,11 @@
 		.fc-card {
 			margin-top: 8px;
 		}
+		&[open] {
+			.fc-icon.fc-expand {
+				background-image: url(./svg/minus.svg);
+			}
+		}
 	}
 
 	summary.fc-summary {
@@ -357,9 +362,6 @@
 			top: .25em;
 			left: .25em;
 			display: inline-block;
-			details.fc-details[open] & {
-				background-image: url(./svg/minus.svg);
-			}
 		}
 		&:hover, &focus {
 			.fc-icon.fc-expand {
