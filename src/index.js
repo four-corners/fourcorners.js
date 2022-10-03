@@ -6,24 +6,24 @@ import { ContentAuth } from "@contentauth/sdk";
 // import workerSrc from "@contentauth/sdk/dist/cai-caSdk.worker.min.js?url";
 
 class FourCorners {
-	constructor(args) {
-		if(!args.container) return;
-		const {
-			data,
-			container,
-			caption,
-			credit,
-			logo,
-			dark,
-			lang,
-			inherit,
-			wasmSrc,
-			workerSrc
-		} = args;
+	constructor({
+		data,
+		src,
+		container,
+		caption,
+		credit,
+		logo,
+		dark,
+		lang,
+		inherit,
+		wasmSrc,
+		workerSrc,
+	}) {
+		if(!container) return;
 		this.elems = {};
 		this.elems.container = container;
 		this.elems.img = this.getImg();
-		this.src = this.elems.img ? this.elems.img.src : null;
+		this.src = src || (this.elems.img ? this.elems.img.src : null);
 		// this.options = { caption, credit, logo, dark, inherit };
 		// this.options = {
 		// 	...FC_DEFAULT_OPTIONS,
@@ -465,7 +465,7 @@ class FourCorners {
 										</div>
 										<div>
 									</summary>
-									${registration.map(r => (
+									${registration.map(r =>
 										`<div class="fc-field fc-indent">
 											<div class="fc-content fc-flex">
 												<span class="fc-label">
@@ -477,8 +477,8 @@ class FourCorners {
 												</a>
 											</div>
 										</div>`
-									))}
-									<div class="fc-field" />								
+									)}
+									<div class="fc-field" />					
 								</details>`
 							: ""}
 

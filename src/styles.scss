@@ -82,6 +82,10 @@
 				right: $corner-gap;
 				bottom: $corner-gap;
 			}
+			@media(max-width: #{$sm-screen}) {
+				bottom: 0;
+				right: 0;
+			}
 		}
 		&.fc-backstory {
 			bottom: -#{$corner-size};
@@ -97,6 +101,10 @@
 				height: $corner-width;
 				left: $corner-gap;
 				bottom: $corner-gap;
+			}
+			@media(max-width: #{$sm-screen}) {
+				bottom: 0;
+				left: 0;
 			}
 		}
 		&.fc-imagery {
@@ -114,6 +122,10 @@
 				left: $corner-gap;
 				top: $corner-gap;
 			}
+			@media(max-width: #{$sm-screen}) {
+				top: 0;
+				left: 0;
+			}
 		}
 		&.fc-links {
 			top: -#{$corner-size};
@@ -129,6 +141,10 @@
 				height: $corner-width;
 				right: $corner-gap;
 				top: $corner-gap;
+			}
+			@media(max-width: #{$sm-screen}) {
+				top: 0;
+				right: 0;
 			}
 		}
 	}
@@ -164,6 +180,10 @@
 		border: 1px solid $lightest;
 		border-radius: $radius;
 		transition: opacity 150ms ease-in-out;
+		@media(max-width: #{$sm-screen}) {
+			width: calc(100% - #{$panel-gap*2});
+			max-height: calc(100% - #{$panel-gap*2});
+		}
 		@include mdText;
 		&.fc-active {
 			opacity: 1;
@@ -232,7 +252,7 @@
 	.fc-scroll {
 		width: 100%;
 		height: 100%;
-		overflow-y: auto;
+		overflow-y: scroll;
 		overflow-x: hidden;
 		-webkit-overflow-scrolling: touch;
 		&::-webkit-scrollbar {
