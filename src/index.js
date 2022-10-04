@@ -23,7 +23,7 @@ class FourCorners {
 		this.elems = {};
 		this.elems.container = container;
 		this.elems.img = this.getImg();
-		this.src = src || (this.elems.img ? this.elems.img.src : null);
+		this.src = src ? src : (this.elems.img ? this.elems.img.src : null);
 		// this.options = { caption, credit, logo, dark, inherit };
 		// this.options = {
 		// 	...FC_DEFAULT_OPTIONS,
@@ -477,7 +477,7 @@ class FourCorners {
 												</a>
 											</div>
 										</div>`
-									)}
+									).join("")}
 									<div class="fc-field" />					
 								</details>`
 							: ""}
