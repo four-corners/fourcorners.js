@@ -146,11 +146,18 @@ class FourCorners {
 		const getGpsTime = () => {
 			const data = getNestedValue("stds.exif", "exif:GPSTimeStamp");
 			if(!data) return;
-			const timeArr = data.split(/\D/);
-		  const timeStr = new Date(timeArr[0], timeArr[1]-1, timeArr[2], timeArr[3], timeArr[4], timeArr[5])
-		  	.toString()
-		  	.split("GMT")[0];
-			return timeStr;
+
+            // We are parsing the invalid legacy time string used in this project
+            // Not what the C2PA standard tells us
+            // This legacy string looks like: 2022:01:25 01:16:41 +0000
+            // This is unfortunately not a valid timestamp by RFC or ISO and so must be
+            // parsed manually.
+
+            // Convert into real format: 2022-01-25T01:16:41+0000
+			const timeArr = data.split(/[ :]/);
+		    const timeStr = `${timeArr[0]}-${timeArr[1]}-${timeArr[2]}T${timeArr[3]}:${timeArr[4]}:${timeArr[5]}${timeArr[6]}`;
+            // Parse and use that
+			return Date(timeStr).toString();
 		}
 
 		const getVerifyUrl = () => {
