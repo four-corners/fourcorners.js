@@ -156,8 +156,9 @@ class FourCorners {
             // Convert into real format: 2022-01-25T01:16:41+0000
 			const timeArr = data.split(/[ :]/);
 		    const timeStr = `${timeArr[0]}-${timeArr[1]}-${timeArr[2]}T${timeArr[3]}:${timeArr[4]}:${timeArr[5]}${timeArr[6]}`;
-            // Parse and use that
-			return Date(timeStr).toString();
+            // Now that's parsed and converted into a human readable format:
+            // Dec 19, 2012, 10:00:00 PM EST
+			return Date(timeStr).toLocaleString('en-US', {dateStyle: 'medium', timeStyle: 'long'});
 		}
 
 		const getVerifyUrl = () => {
