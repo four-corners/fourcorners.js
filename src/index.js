@@ -6,70 +6,71 @@ import { ContentAuth } from "@contentauth/sdk";
 // import workerSrc from "@contentauth/sdk/dist/cai-caSdk.worker.min.js?url";
 
 class FourCorners {
-	constructor({
-		data,
-		src,
-		container,
-		caption,
-		credit,
-		logo,
-		dark,
-		lang,
-		inherit,
-		wasmSrc,
-		workerSrc,
-	}) {
-		if(!container) return;
+	constructor(arg) {
+		let args = {};
+		if(typeof arg === 'object') {
+			if(arg.tagName !== undefined) {
+				args.container = arg;
+			} else {
+				args = arg;
+			}
+		}
+		if(!args.container) return;
 		this.elems = {};
-		this.elems.container = container;
+		this.elems.container = args.container;
 		this.elems.img = this.getImg();
-		this.src = src ? src : (this.elems.img ? this.elems.img.src : null);
-		// this.options = { caption, credit, logo, dark, inherit };
-		// this.options = {
-		// 	...FC_DEFAULT_OPTIONS,
-		// 	...this.data.options,
-		// 	...this.options
-		// };
-		this.data = FC_DEFAULT_DATA;
-		this.options = FC_DEFAULT_OPTIONS;
+		this.src = args.src ? args.src : (this.elems.img ? this.elems.img.src : null);
 		const jsonData = this.parseJsonData();
+		this.data = {
+			...FC_DEFAULT_DATA,
+			...jsonData
+		};
+		this.options = {
+			...FC_DEFAULT_OPTIONS,
+			...args.opts,
+			...jsonData.opts,
+		};
+
 		let caSdk;
-		if(jsonData) {
-			FC_CORNER_KEYS.forEach(key => jsonData[key] ? this.data[key] = jsonData[key] : false);
-			FC_OPTION_KEYS.forEach(key => jsonData[key] ? this.options[key] = jsonData[key] : false);
-		} else {
-			if(wasmSrc && workerSrc) {
-				try {
-				  caSdk = new ContentAuth({ wasmSrc, workerSrc });
-				} catch (error) {
-				  console.warn(error);
-				}
+		if(!Object.values(jsonData).length && args.wasmSrc && args.workerSrc) {
+			try {
+			  caSdk = new ContentAuth({
+			  	wasmSrc: args.wasmSrc,
+			  	workerSrc: args.workerSrc
+			  });
+			} catch (error) {
+			  console.warn(error);
 			}
 		}
 		
-		(async () => {
-			const contentAuthData = caSdk && this.src ? await caSdk.processImage(this.src) : null;	
-			if(contentAuthData && contentAuthData.exists) {
-				this.provenance = contentAuthData;
-				this.data = this.parseContentAuthData();
-			}
-		})().then(() => {
-			this.elems.cutline = this.addCutline();
-			this.elems.panels = this.addPanels();
-			this.elems.corners = this.addCorners();
-			this.addEmbeddedMedia();
-			this._handleHoverCorner = this.hoverCorner.bind(this);
-			this._handleUnhoverCorner = this.unhoverCorner.bind(this);
-			this._handleClickCorner = this.clickCorner.bind(this);
-			this._handleClickEmpty = this.clickEmpty.bind(this);
-			this._handleClickClose = this.clickClosePanel.bind(this);
-			this._handleClickExpand = this.clickExpandPanel.bind(this);
-			this.addInteractivity();
-			if(this.options.dark) this.elems.container.classList.add("fc-dark");
-			this.elems.container.classList.add("fc-init");
-		}).catch(e => {
-			console.warn(e);
-		});
+		setTimeout(async () => {
+			let contentAuthData;
+			(async () => {
+				// console.log(`Before processImage on ${this.src}`);
+				contentAuthData = caSdk && this.src ? await caSdk.processImage(this.src) : null;
+				// console.log(`After processImage on ${this.src}`);
+				if(contentAuthData && contentAuthData.exists) {
+					this.provenance = contentAuthData;
+					this.data = this.parseContentAuthData();
+				}
+			})().then(() => {
+				this.elems.cutline = this.addCutline();
+				this.elems.panels = this.addPanels();
+				this.elems.corners = this.addCorners();
+				this.addEmbeddedMedia();
+				this._handleHoverCorner = this.hoverCorner.bind(this);
+				this._handleUnhoverCorner = this.unhoverCorner.bind(this);
+				this._handleClickCorner = this.clickCorner.bind(this);
+				this._handleClickEmpty = this.clickEmpty.bind(this);
+				this._handleClickClose = this.clickClosePanel.bind(this);
+				this._handleClickExpand = this.clickExpandPanel.bind(this);
+				this.addInteractivity();
+				if(this.options.dark) this.elems.container.classList.add("fc-dark");
+				this.elems.container.classList.add("fc-init");
+			}).catch(e => {
+				console.warn(e);
+			});
+		}, 0);
 	}
 
 	//DATA HANDLING
@@ -80,14 +81,14 @@ class FourCorners {
 		let stringData;
 		if(script) {
 			//If embed JSON is stored in child script tag
-			stringData = script.innerHTML;
+			stringData = script.innerHTML
 			script.remove();
 		} else if(container.hasAttribute("data-fc")) {
 			//If embed JSON is stored in data-fc attributte
 			stringData = container.dataset.fc;
 			delete container.dataset.fc;
 		}
-		if(!stringData) return;
+		if(!stringData) return {};
 		return JSON.parse(stringData);
 	}
 
@@ -253,11 +254,10 @@ class FourCorners {
 	}
 
 	addPanels() {	
-		const { data, elems, options } = this,
-					{ container } = elems,
-					strings = FC_STRINGS[options.lang],
-					panels = {};
-
+		const { data, elems, options } = this;
+		const { container } = elems;
+		const strings = FC_STRINGS[options.lang];
+		const panels = {};
 		FC_CORNER_KEYS.forEach(cornerKey => {
 			const cornerTitle = strings[cornerKey] || null,
 						panelTile = strings[cornerKey] || null;
@@ -788,27 +788,27 @@ class FourCorners {
 	}
 
 	openPanel(cornerKey) {
-		const { elems } = this,
-					{ container, corners, panels } = elems,
-					corner = elems.corners[cornerKey],
-					panel = this.getPanel(cornerKey);
+		const { elems } = this;
+		const { container } = elems;
+		const corner = this.getCorner(cornerKey);
+		const panel = this.getPanel(cornerKey);
 		container.classList.remove("fc-full");
 		container.classList.add("fc-active");
 		container.setAttribute("data-fc-active", cornerKey);
-		corner.classList.add("fc-active");
-		panel.classList.add("fc-active");
+		if(corner) corner.classList.add("fc-active");
+		if(panel) panel.classList.add("fc-active");
 		FC_CORNER_KEYS.forEach(key => {
 			if(key !== cornerKey) this.closePanel(key);
 		});
 	}
 
 	closePanel(cornerKey) {
-		const { elems } = this,
-					{ container, corners, panels } = elems,
-					corner = corners[cornerKey],
-					panel = this.getPanel(cornerKey);
-		corner.classList.remove("fc-active");
-		panel.classList.remove("fc-active");
+		const { elems } = this;
+		const { container, corners, panels } = elems;
+		const corner = this.getCorner(cornerKey);
+		const panel = this.getPanel(cornerKey);
+		if(corner) corner.classList.remove("fc-active");
+		if(panel) panel.classList.remove("fc-active");
 		container.classList.remove("fc-active");
 		container.setAttribute("data-fc-active", "");
 		setTimeout(() => container.classList.remove("fc-full"));
@@ -857,6 +857,9 @@ class FourCorners {
 	}
 
 	//HELPERS
+	getCorner(cornerKey) {
+		return this.elems.container.querySelector(`.fc-corner[data-fc-key="${cornerKey}"]`);
+	}
 
 	getPanel(cornerKey) {
 		return this.elems.container.querySelector(`.fc-panel[data-fc-key="${cornerKey}"]`);
@@ -917,6 +920,7 @@ class FourCorners {
 
 }
 
+
 const FC_CORNER_KEYS = [
 	"authorship",
 	"backstory",
@@ -937,7 +941,6 @@ const FC_OPTION_KEYS = [
 	"logo",
 	"dark",
 	"inherit",
-	"lang",
 ];
 
 const FC_DEFAULT_OPTIONS = {
