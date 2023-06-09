@@ -28,8 +28,11 @@ class FourCorners {
 		this.options = {
 			...FC_DEFAULT_OPTIONS,
 			...args.opts,
-			...jsonData.opts,
+			...jsonData.options,
 		};
+		if(this.data.authorship.verify) {
+			this.data.authorship.verify = this.getVerifyUrl(false);
+		}
 
 		let caSdk;
 		if(!Object.values(jsonData).length && args.wasmSrc && args.workerSrc) {
@@ -75,6 +78,10 @@ class FourCorners {
 
 	//DATA HANDLING
 
+	getVerifyUrl(beta) {
+		return `https://verify${beta ? '-beta' : ''}.contentauthenticity.org/inspect?source=${this.src}`;
+	}
+
 	parseJsonData() {
 		const { container } = this.elems;
 		const script = container.querySelector("script");
@@ -89,7 +96,8 @@ class FourCorners {
 			delete container.dataset.fc;
 		}
 		if(!stringData) return {};
-		return JSON.parse(stringData);
+		const jsonData = JSON.parse(stringData);
+		return jsonData;
 	}
 
 	parseContentAuthData() {
@@ -162,10 +170,6 @@ class FourCorners {
 			return Date(timeStr).toLocaleString('en-US', {dateStyle: 'medium', timeStyle: 'long'});
 		}
 
-		const getVerifyUrl = () => {
-			return `https://verify-beta.contentauthenticity.org/inspect?source=${this.src}`;
-		}
-
 		const data = {
 			"authorship": {
 				"caption": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipCaption"),
@@ -188,7 +192,7 @@ class FourCorners {
 				"contactRights": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipContactRights"),
 				"location": getIptcLocation(),
 				"time": getGpsTime(),
-				"verify": getVerifyUrl(),
+				"verify": this.getVerifyUrl(true),
 				"registration": parseContentAuthArray("fourcorners:", getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipRegistration")),
 			},
 			"backstory": {
@@ -323,10 +327,12 @@ class FourCorners {
 			time,
 			verify,
 			registration,
-		} = this.data.authorship,
-		strings = FC_STRINGS[this.options.lang],
-		hasAuthorshipContent = caption || credit || bio || ethics || website || license || location || time || verify,
-		hasInfoCard = credit && ((ethics && ethics.desc) || bio || website);
+		} = this.data.authorship;
+		const strings = FC_STRINGS[this.options.lang];
+		const hasAuthorshipContent = Boolean(caption || credit || bio || ethics || website || license || location || time || verify);
+		const hasInfoCard = Boolean(credit && ((ethics && ethics.desc) || bio || website));
+		const hasCertCard = Boolean(location || time || (registration && registration.length));
+
 		return(
 			hasAuthorshipContent ?
 				`<div class="fc-row">
@@ -429,7 +435,7 @@ class FourCorners {
 						</div>`
 					: ""}
 
-					${location || time || (registration && registration.length) ?
+					${hasCertCard ?
 						`<div class="fc-card">
 							<div class="fc-field">
 								<strong class="fc-label">
@@ -496,6 +502,12 @@ class FourCorners {
 								</div>`
 							: ""}
 
+						</div>`
+					: ""}
+
+					${!hasCertCard && verify ?
+						`<div class="fc-field fc-sub-source">
+								${strings.verify_intro} ${this.createLink(verify, strings.verify_link)}
 						</div>`
 					: ""}
 				</div>`
@@ -957,6 +969,7 @@ const FC_DEFAULT_OPTIONS = {
 	logo: false,
 	dark: false,
 	inherit: false,
+	verify: false,
 	lang: "en",
 };
 
