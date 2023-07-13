@@ -1,9 +1,9 @@
-require("regenerator-runtime/runtime");
-require("styles.scss");
+require('regenerator-runtime/runtime');
+require('styles.scss');
 
-import { ContentAuth } from "@contentauth/sdk";
-// import wasmSrc from "@contentauth/sdk/dist/assets/wasm/toolkit_bg.wasm?url";
-// import workerSrc from "@contentauth/sdk/dist/cai-caSdk.worker.min.js?url";
+import { ContentAuth } from '@contentauth/sdk';
+// import wasmSrc from '@contentauth/sdk/dist/assets/wasm/toolkit_bg.wasm?url';
+// import workerSrc from '@contentauth/sdk/dist/cai-caSdk.worker.min.js?url';
 
 class FourCorners {
 	constructor(arg) {
@@ -68,8 +68,8 @@ class FourCorners {
 				this._handleClickClose = this.clickClosePanel.bind(this);
 				this._handleClickExpand = this.clickExpandPanel.bind(this);
 				this.addInteractivity();
-				if(this.options.dark) this.elems.container.classList.add("fc-dark");
-				this.elems.container.classList.add("fc-init");
+				if(this.options.dark) this.elems.container.classList.add('fc-dark');
+				this.elems.container.classList.add('fc-init');
 			}).catch(e => {
 				console.warn(e);
 			});
@@ -84,13 +84,13 @@ class FourCorners {
 
 	parseJsonData() {
 		const { container } = this.elems;
-		const script = container.querySelector("script");
+		const script = container.querySelector('script');
 		let stringData;
 		if(script) {
 			//If embed JSON is stored in child script tag
 			stringData = script.innerHTML
 			script.remove();
-		} else if(container.hasAttribute("data-fc")) {
+		} else if(container.hasAttribute('data-fc')) {
 			//If embed JSON is stored in data-fc attributte
 			stringData = container.dataset.fc;
 			delete container.dataset.fc;
@@ -119,7 +119,7 @@ class FourCorners {
 				arr = arr.map((obj) => {
 					const newObj = {};
 					const keys = Object.keys(obj).map((k, i) => {
-						const splitArr = k.replace(prefix, "").split(/(?=[A-Z])/);
+						const splitArr = k.replace(prefix, '').split(/(?=[A-Z])/);
 						const newKey = splitArr[splitArr.length - 1].toLowerCase();
 						newObj[newKey] = obj[k];
 					});
@@ -132,10 +132,10 @@ class FourCorners {
 		const getNestedValue = (assertionKey, key) => {
 			let value;
 			const searchKeys = (obj, key) => {
-				if(typeof obj !== "object") return;
+				if(typeof obj !== 'object') return;
 				Object.keys(obj).forEach(k => {
 					if(k === key) return value = obj[k];
-					if(typeof obj[k] === "object") return searchKeys(obj[k], key);
+					if(typeof obj[k] === 'object') return searchKeys(obj[k], key);
 				});
 		 	}
 		 	let assertionsData = getAssertionData(assertionKey);
@@ -144,16 +144,16 @@ class FourCorners {
 		}
 
 		const getIptcLocation = () => {
-			const data = getNestedValue("stds.iptc.photo-metadata", "Iptc4xmpExt:LocationCreated");
+			const data = getNestedValue('stds.iptc.photo-metadata', 'Iptc4xmpExt:LocationCreated');
 			if(!data) return;
-			const fields = ["Iptc4xmpExt:City", "Iptc4xmpExt:ProvinceState", "Iptc4xmpExt:CountryName"];
-			const locationStr = fields.map(f => data[f]).filter(d => d).join(", ");
+			const fields = ['Iptc4xmpExt:City', 'Iptc4xmpExt:ProvinceState', 'Iptc4xmpExt:CountryName'];
+			const locationStr = fields.map(f => data[f]).filter(d => d).join(', ');
 			return locationStr;
 		}
 
 		//https://c2pa.org/specifications/specifications/1.0/specs/C2PA_Specification.html#_exif_information
 		const getGpsTime = () => {
-			const data = getNestedValue("stds.exif", "exif:GPSTimeStamp");
+			const data = getNestedValue('stds.exif', 'exif:GPSTimeStamp');
 			if(!data) return;
 
             // We are parsing the invalid legacy time string used in this project
@@ -171,39 +171,41 @@ class FourCorners {
 		}
 
 		const data = {
-			"authorship": {
-				"caption": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipCaption"),
-				"credit": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipCredit"),
-				"license": {
-					"type": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipLicenseType"),
-					"year": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipLicenseYear"),
-					"holder": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipLicenseHolder"),
-					"label": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipLicenseLabel"),
-					"desc": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipLicenseDesc"),
-					"url": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipLicenseUrl"),
+			'authorship': {
+				'caption': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipCaption'),
+				'credit': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipCredit'),
+				'license': {
+					'type': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipLicenseType'),
+					'year': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipLicenseYear'),
+					'holder': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipLicenseHolder'),
+					'label': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipLicenseLabel'),
+					'desc': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipLicenseDesc'),
+					'url': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipLicenseUrl'),
 				},
-				"ethics": {
-					"label": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipEthicsLabel"),
-					"desc": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipEthicsDescription"),
+				'ethics': {
+					'label': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipEthicsLabel'),
+					'desc': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipEthicsDescription'),
 				},
-				"bio": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipBio"),
-				"website": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipWebsite"),
-				"contactInfo": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipContactInfo"),
-				"contactRights": getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipContactRights"),
-				"location": getIptcLocation(),
-				"time": getGpsTime(),
-				"verify": this.getVerifyUrl(true),
-				"registration": parseContentAuthArray("fourcorners:", getNestedValue(FC_ASSERTION_KEY, "fourcorners:authorshipRegistration")),
+				'bio': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipBio'),
+				'website': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipWebsite'),
+				'contact': {
+					'info': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipContactInfo'),
+					'rights': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipContactRights'),
+				},
+				'location': getIptcLocation(),
+				'time': getGpsTime(),
+				'verify': this.getVerifyUrl(true),
+				'registration': parseContentAuthArray('fourcorners:', getNestedValue(FC_ASSERTION_KEY, 'fourcorners:authorshipRegistration')),
 			},
-			"backstory": {
-				"text": getNestedValue(FC_ASSERTION_KEY, "fourcorners:backstoryText"),
-				"media": parseContentAuthArray("fourcorners:", getNestedValue(FC_ASSERTION_KEY, "fourcorners:backstoryMedia")),
+			'backstory': {
+				'text': getNestedValue(FC_ASSERTION_KEY, 'fourcorners:backstoryText'),
+				'media': parseContentAuthArray('fourcorners:', getNestedValue(FC_ASSERTION_KEY, 'fourcorners:backstoryMedia')),
 			},
-			"imagery": {
-				"media": parseContentAuthArray("fourcorners:", getNestedValue(FC_ASSERTION_KEY, "fourcorners:imageryMedia")),
+			'imagery': {
+				'media': parseContentAuthArray('fourcorners:', getNestedValue(FC_ASSERTION_KEY, 'fourcorners:imageryMedia')),
 			},
-			"links": {
-				"links": parseContentAuthArray("fourcorners:", getNestedValue(FC_ASSERTION_KEY, "fourcorners:linksLinks")),
+			'links': {
+				'links': parseContentAuthArray('fourcorners:', getNestedValue(FC_ASSERTION_KEY, 'fourcorners:linksLinks')),
 			}
 		};
 		return data;
@@ -213,19 +215,19 @@ class FourCorners {
 
 	//BUILDING DOM ELEMENTS
 	getImg() {
-		const img = [...this.elems.container.querySelectorAll("img")].find(img => {
+		const img = [...this.elems.container.querySelectorAll('img')].find(img => {
 			const ext = ((/[.]/.exec(img.src)) ? /[^.]+$/.exec(img.src) : [])[0];
-			return ext && ["jpg", "jpeg", "png", "gif"].includes(ext);
+			return ext && ['jpg', 'jpeg', 'png', 'gif'].includes(ext);
 		});
 		return img;
 	}
 
 	insertCornerSvg() {
-	  const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-	  const iconPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+	  const iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	  const iconPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 
-	  iconSvg.setAttribute("viewBox", "0 0 100 100");
-	  iconPath.setAttribute("d", "M75 24.75H0.25V0.25H75H99.75V25V99.75H75.25L75.25 25V24.75H75Z");
+	  iconSvg.setAttribute('viewBox', '0 0 100 100');
+	  iconPath.setAttribute('d', 'M75 24.75H0.25V0.25H75H99.75V25V99.75H75.25L75.25 25V24.75H75Z');
 
 	  iconSvg.appendChild(iconPath);
 	  return iconSvg;
@@ -239,11 +241,11 @@ class FourCorners {
 
 		FC_CORNER_KEYS.forEach(cornerKey => {
 			const cornerTitle = strings[cornerKey] || null,
-						cornerElem = document.createElement("div");
+						cornerElem = document.createElement('div');
 
-			cornerElem.setAttribute("data-fc-key", cornerKey);
+			cornerElem.setAttribute('data-fc-key', cornerKey);
 			cornerElem.title = `View ${cornerTitle}`;
-			cornerElem.classList.add("fc-corner", `fc-${cornerKey}`);
+			cornerElem.classList.add('fc-corner', `fc-${cornerKey}`);
 
 			const cornerIsEmpty = function() {
 				if(data.hasOwnProperty(cornerKey)) {
@@ -255,7 +257,7 @@ class FourCorners {
 			}();
 
 			if(cornerIsEmpty) {
-				cornerElem.classList.add("fc-empty");
+				cornerElem.classList.add('fc-empty');
 			}
 
 			container.appendChild(cornerElem);
@@ -277,37 +279,37 @@ class FourCorners {
 					panelInner;
 
 			switch(cornerKey) {
-				case "authorship":
+				case 'authorship':
 					panelInner = this.buildAuthorship();
 					break;
-				case "backstory":
+				case 'backstory':
 					panelInner = this.buildBackstory();
 					break;
-				case "imagery":
+				case 'imagery':
 					panelInner = this.buildImagery();
 					break;
-				case "links":
+				case 'links':
 					panelInner = this.buildLinks();
 					break;
 			}
 		
 			const panelHTML =
-				`<div data-fc-key="${cornerKey}" class="${panelClass}">
-					<div class="fc-panel-title">
+				`<div data-fc-key='${cornerKey}' class='${panelClass}'>
+					<div class='fc-panel-title'>
 						<span>${panelTile}</span>
-						<div class="fc-icon fc-expand" title="Expand this panel"></div>
-						<div class="fc-icon fc-close" title="Close this panel"></div>
+						<div class='fc-icon fc-expand' title='Expand this panel'></div>
+						<div class='fc-icon fc-close' title='Close this panel'></div>
 					</div>
-					<div class="fc-panel-title fc-pseudo">
+					<div class='fc-panel-title fc-pseudo'>
 						<span>${FC_CORNER_KEYS.indexOf(cornerKey)}</span>
 					</div>
 					${panelInner ?
-						`<div class="fc-scroll">
-							<div class="fc-inner ${cornerKey === "imagery" || cornerKey === "links" ? "fc-grid" : ""}">
+						`<div class='fc-scroll'>
+							<div class='fc-inner ${cornerKey === 'imagery' || cornerKey === 'links' ? 'fc-grid' : ''}'>
 								${panelInner}
 							</div>
 						</div>`
-					: ""}
+					: ''}
 				</div>`;
 			container.insertAdjacentHTML('afterbegin', panelHTML);
 			panels[cornerKey] = this.getPanel(cornerKey);
@@ -322,6 +324,7 @@ class FourCorners {
 			bio,
 			ethics,
 			website,
+			contact,
 			license,
 			location,
 			time,
@@ -329,189 +332,212 @@ class FourCorners {
 			registration,
 		} = this.data.authorship;
 		const strings = FC_STRINGS[this.options.lang];
-		const hasAuthorshipContent = Boolean(caption || credit || bio || ethics || website || license || location || time || verify);
-		const hasInfoCard = Boolean(credit && ((ethics && ethics.desc) || bio || website));
+		const hasContact = Boolean(contact && (contact.info || contact.rights))
+		const hasAuthorshipContent = Boolean(caption || credit || bio || ethics || website || license || location || time || verify || hasContact);
+		const hasInfoCard = Boolean(credit || (ethics && ethics.desc) || bio || website || hasContact);
 		const hasCertCard = Boolean(location || time || (registration && registration.length));
 
 		return(
 			hasAuthorshipContent ?
-				`<div class="fc-row">
+				`<div class='fc-row'>
 					${caption ? 
-						`<div class="fc-field">
-							<span class="fc-label">
+						`<div class='fc-field'>
+							<span class='fc-label'>
 								${strings.caption}:
 							</span>
-							<span class="fc-content">
+							<span class='fc-content'>
 								${caption}
 							</span>
 						</div>`
-					: ""}
+					: ''}
 
 					${hasInfoCard ?
-						`<details class="fc-details">
+						`<details class='fc-details'>
 
-							<summary class="fc-summary">
-								<div class="fc-field">
-									<span class="fc-label">
+							<summary class='fc-summary'>
+								<div class='fc-field'>
+									<span class='fc-label'>
 										${strings.credit}:
 									</span>
-									<span class="fc-content">
-										${credit ? credit : "Unknown"}
+									<span class='fc-content'>
+										${credit ? credit : 'Unknown'}
 									</span>
-									<div class="fc-icon fc-expand" title="Read more about ${credit}"></div>
+									<div class='fc-icon fc-expand' title='Read more ${credit ? `about ${credit}` : ''}'></div>
 								</div>
 							</summary>
 
-							<div class="fc-card">
+							<div class='fc-card'>
 
 								${bio ? 
-									`<div class="fc-field">
-										<span class="fc-label">
+									`<div class='fc-field'>
+										<span class='fc-label'>
 											${strings.bio}:
 										</span>
-										<span class="fc-content">
+										<span class='fc-content'>
 											${bio}
 										</span>
 									</div>`
-								: ""}
+								: ''}
 
 								${ethics && ethics.desc ? 
-									`<div class="fc-field">
-										<span class="fc-label">
+									`<div class='fc-field'>
+										<span class='fc-label'>
 											${strings.coe}:
 										</span>
-										<span class="fc-content">
+										<span class='fc-content'>
 											${ethics.desc}
 										</span>
 									</div>`
-								: ""}
+								: ''}
 
 								${website ? 
-									`<div class="fc-field">
-										<span class="fc-label">
+									`<div class='fc-field'>
+										<span class='fc-label'>
 											${strings.website}:
 										</span>
-										<span class="fc-content">
+										<span class='fc-content'>
 											${this.createLink(website)}
 										</span>
 									</div>`
-								: ""}
+								: ''}
+
+								${hasContact && contact.info ? 
+									`<div class='fc-field'>
+										<span class='fc-label'>
+											${strings.info}:
+										</span>
+										<span class='fc-content'>
+											${this.createLink(contact.info)}
+										</span>
+									</div>`
+								: ''}
+
+								${hasContact && contact.rights ? 
+									`<div class='fc-field'>
+										<span class='fc-label'>
+											${strings.rights}:
+										</span>
+										<span class='fc-content'>
+											${this.createLink(contact.rights)}
+										</span>
+									</div>`
+								: ''}
 
 							</div>
 
 						</details>`
 
 					: credit ?
-						`<div class="fc-field">
-							<span class="fc-label">
+						`<div class='fc-field'>
+							<span class='fc-label'>
 								${strings.credit}:
 							</span>
-							<span class="fc-content">
-								${credit ? credit : "Unknown"}
+							<span class='fc-content'>
+								${credit ? credit : 'Unknown'}
 							</span>
 						</div>`
-					: ""}
+					: ''}
 
 					${license && license.type ? 
-						`<div class="fc-field">
-							<span class="fc-label">
+						`<div class='fc-field'>
+							<span class='fc-label'>
 								${strings.license}:
 							</span>
-							<span class="fc-content">
-								${license.type === "copyright" ?
+							<span class='fc-content'>
+								${license.type === 'copyright' ?
 									`&#169;
 									${license.holder ?
-										`${license.holder}${license.year ? `, ${license.year}` : ""}`
-									: `${credit}${license.year ? `, ${license.year}` : ""}`}`
-								: ""}
-								${license.type === "commons" ?
+										`${license.holder}${license.year ? `, ${license.year}` : ''}`
+									: `${credit}${license.year ? `, ${license.year}` : ''}`}`
+								: ''}
+								${license.type === 'commons' ?
 									`${license.url ?
-										`<a href="${license.url}" target="_blank">
-											${license.label ? license.label : ""}
+										`<a href='${license.url}' target='_blank'>
+											${license.label ? license.label : ''}
 										</a>`
-									: license.label ? license.label : ""}`
-								: ""}
+									: license.label ? license.label : ''}`
+								: ''}
 							</span>
 						</div>`
-					: ""}
+					: ''}
 
 					${hasCertCard ?
-						`<div class="fc-card">
-							<div class="fc-field">
-								<strong class="fc-label">
+						`<div class='fc-card'>
+							<div class='fc-field'>
+								<strong class='fc-label'>
 									${strings.cert}
 								</strong>
 							</div>
 							${location  ?
-								`<div class="fc-field">
+								`<div class='fc-field'>
 									${location ?
-										`<span class="fc-label">
+										`<span class='fc-label'>
 											${strings.location}:
 										</span>
-										<span class="fc-content">
+										<span class='fc-content'>
 											${location}
 										</span>`
-									: ""}
+									: ''}
 								</div>`
-							: ""}
+							: ''}
 
 							${time  ?
-								`<div class="fc-field">
+								`<div class='fc-field'>
 									${time ?
-										`<span class="fc-label">
+										`<span class='fc-label'>
 											${strings.time}:
 										</span>
-										<span class="fc-content">
+										<span class='fc-content'>
 											${time}
 										</span>`
-									: ""}
+									: ''}
 								</div>`
-							: ""}
+							: ''}
 
 							${registration && registration.length ? 
-								`<details class="fc-details">
-									<summary class="fc-summary">
-										<div class="fc-field">
-											<span class="fc-label">
+								`<details class='fc-details'>
+									<summary class='fc-summary'>
+										<div class='fc-field'>
+											<span class='fc-label'>
 												${strings.reg}
 											</span>
-											<div class="fc-icon fc-expand" title="Open"></div>
+											<div class='fc-icon fc-expand' title='Open'></div>
 										</div>
 										<div>
 									</summary>
 									${registration.map(r =>
-										`<div class="fc-field fc-indent">
-											<div class="fc-content fc-flex">
-												<span class="fc-label">
+										`<div class='fc-field fc-indent'>
+											<div class='fc-content fc-flex'>
+												<span class='fc-label'>
 													${r.title}:
 												</span>
 												&nbsp;
-												<a href="${r.url}" target="_blank" class="fc-truncate fc-underline">
+												<a href='${r.url}' target='_blank' class='fc-truncate fc-underline'>
 													${r.text}
 												</a>
 											</div>
 										</div>`
-									).join("")}
-									<div class="fc-field" />					
+									).join('')}
+									<div class='fc-field' />					
 								</details>`
-							: ""}
+							: ''}
 
 							${verify  ?
-								`<div class="fc-field fc-sub-source">
+								`<div class='fc-field fc-sub-source'>
 									${strings.verify_intro} ${this.createLink(verify, strings.verify_link)}
 								</div>`
-							: ""}
+							: ''}
 
 						</div>`
-					: ""}
+					: ''}
 
 					${!hasCertCard && verify ?
-						`<div class="fc-field fc-sub-source">
+						`<div class='fc-field fc-sub-source'>
 								${strings.verify_intro} ${this.createLink(verify, strings.verify_link)}
 						</div>`
-					: ""}
+					: ''}
 				</div>`
-			: ""
+			: ''
 		);
 	}
 
@@ -524,29 +550,29 @@ class FourCorners {
 		return(
 			hasBackstoryContent ?
 				`${text ?
-					`<div class="fc-row">
+					`<div class='fc-row'>
 						${this.insertParagraphs(text)}
 					</div>`
-				: ""}
+				: ''}
 				${media ?
 					media.map((obj, index) => {
-						// this.embedExternal(this, obj, "backstory", index);
+						// this.embedExternal(this, obj, 'backstory', index);
 						return (
-							`<div class="fc-row">
-								<div class="fc-media">
-									<div class="fc-media-embed" data-fc-source="${obj.source}" data-fc-url="${obj.url}" data-fc-index="${index}"></div>
+							`<div class='fc-row'>
+								<div class='fc-media'>
+									<div class='fc-media-embed' data-fc-source='${obj.source}' data-fc-url='${obj.url}' data-fc-index='${index}'></div>
 									${obj.caption || obj.credit ?
-										`<div class="fc-media-info">
-											${obj.caption ? `<span class="fc-sub-caption">${obj.caption}</span>` : ""}
-											${obj.credit ? `<span class="fc-sub-credit">${obj.credit}</span>` : ""}
+										`<div class='fc-media-info'>
+											${obj.caption ? `<span class='fc-sub-caption'>${obj.caption}</span>` : ''}
+											${obj.credit ? `<span class='fc-sub-credit'>${obj.credit}</span>` : ''}
 										</div>`
-									: ""}
+									: ''}
 								</div>
 							</div>`
 						)
-					}).join("")
-				: ""}`
-			: ""
+					}).join('')
+				: ''}`
+			: ''
 		);
 	}
 
@@ -556,37 +582,37 @@ class FourCorners {
 		return (
 			`${media ?
 				media.map((obj, index) => {
-					const isExternal = ["instagram", "youtube", "vimeo"].includes(obj.source);
+					const isExternal = ['instagram', 'youtube', 'vimeo'].includes(obj.source);
 					return(
-						`<div class="fc-row">
-							<div class="fc-media">
-								<div class="fc-media-embed" data-fc-source="${obj.source}" data-fc-url="${obj.url}" data-fc-index="${index}">
+						`<div class='fc-row'>
+							<div class='fc-media'>
+								<div class='fc-media-embed' data-fc-source='${obj.source}' data-fc-url='${obj.url}' data-fc-index='${index}'>
 								</div>
 								${obj.caption || obj.credit ?
-									`<div class="fc-media-info">
-										${obj.caption ? `<span class="fc-sub-caption">${obj.caption}</span>` : ""}
-										${obj.credit ? `<em class="fc-sub-credit">${obj.credit}</em>` : ""}
+									`<div class='fc-media-info'>
+										${obj.caption ? `<span class='fc-sub-caption'>${obj.caption}</span>` : ''}
+										${obj.credit ? `<em class='fc-sub-credit'>${obj.credit}</em>` : ''}
 										${!isExternal ?
-											`<span class="fc-sub-source">
+											`<span class='fc-sub-source'>
 												${obj.url ?
-													`(<a href="${obj.url}" target="_blank">View full image</a>)`
-												: ""}
+													`(<a href='${obj.url}' target='_blank'>View full image</a>)`
+												: ''}
 											</span>`
-										: ""}
+										: ''}
 										${isExternal ?
-											`<span class="fc-sub-source">
+											`<span class='fc-sub-source'>
 												${obj.url ?
-													`(<a href="${obj.url}" target="_blank">View on ${this.extractRootDomain(obj.url)}</a>)`
-												: ""}
+													`(<a href='${obj.url}' target='_blank'>View on ${this.extractRootDomain(obj.url)}</a>)`
+												: ''}
 											</span>`
-										: ""}
+										: ''}
 									</div>`
-								: ""}
+								: ''}
 							</div>
 						</div>`
 					)
-				}).join("")
-			: ""}`
+				}).join('')
+			: ''}`
 		);
 	}
 
@@ -597,14 +623,14 @@ class FourCorners {
 			`${links ?
 				links.filter(obj => obj.url).map((obj, index) => {
 					const simpleUrl = this.simplifyUrl(obj.url);
-					const text = `${obj.title ? obj.title : simpleUrl}<div class="fc-sub-url">${simpleUrl}</div>`;
+					const text = `${obj.title ? obj.title : simpleUrl}<div class='fc-sub-url'>${simpleUrl}</div>`;
 					return (
-						`<div class="fc-row">
-							${this.createLink(obj.url, text, ["fc-card"])}
+						`<div class='fc-row'>
+							${this.createLink(obj.url, text, ['fc-card'])}
 						</div>`
 					)
-				}).join("")
-			: ""}`
+				}).join('')
+			: ''}`
 		);
 	}
 
@@ -622,35 +648,35 @@ class FourCorners {
 
 		const html = 
 			`${showCaption || showCredit || showLogo ?
-				`<div class="fc-cutline">
+				`<div class='fc-cutline'>
 					${showCaption ?
-						`<span class="fc-caption">
-							${showCaption ? `<span>${caption}</span>` : ""}
+						`<span class='fc-caption'>
+							${showCaption ? `<span>${caption}</span>` : ''}
 						</span>`
-					: ""}
+					: ''}
 					${showCredit ?
-						`<span class="fc-credit">
-							${showCredit ? `<span>${credit}</span>` : ""}
-							${showCredit && showLicense ? `/` : ""}
-							${showLicense ? `<span>${license.holder}</span>` : ""}
+						`<span class='fc-credit'>
+							${showCredit ? `<span>${credit}</span>` : ''}
+							${showCredit && showLicense ? `/` : ''}
+							${showLicense ? `<span>${license.holder}</span>` : ''}
 						</span>`
-					: ""}
+					: ''}
 					${showLogo ?
-						`<a href="https://fourcornersproject.org" target="_blank" class="fc-logo" title="This is a Four Corners Project photo">
+						`<a href='https://fourcornersproject.org' target='_blank' class='fc-logo' title='This is a Four Corners Project photo'>
 							<span>Four Corners Project</span>
 						</a>`
-					: ""}
+					: ''}
 				</div>`
-			: ""}`;
+			: ''}`;
 
-		container.insertAdjacentHTML("afterend", html);
-		return container.querySelector(".fc-cutline");
+		container.insertAdjacentHTML('afterend', html);
+		return container.querySelector('.fc-cutline');
 	}
 
 	addEmbeddedMedia() {
-		["imagery", "backstory"].forEach((panelKey) => {
+		['imagery', 'backstory'].forEach((panelKey) => {
 			const panel = this.getPanel(panelKey);
-			const mediaWrappers = panel.querySelectorAll(".fc-media-embed");
+			const mediaWrappers = panel.querySelectorAll('.fc-media-embed');
 			mediaWrappers.forEach((elem) => {
 				const { fcSource, fcUrl, fcIndex } = elem.dataset;
 				const obj = {
@@ -658,7 +684,7 @@ class FourCorners {
 					url: fcUrl,
 					index: fcIndex
 				}
-				if(obj.source === "image") {
+				if(obj.source === 'image') {
 				  this.insertMediaImage(obj, panelKey);
 				} else {
 					this.insertMediaEmbed(obj, panelKey);
@@ -669,13 +695,13 @@ class FourCorners {
 
 	insertMediaImage(obj, panelKey) {
 		const panel = this.getPanel(panelKey),
-					subMedia = panel.querySelectorAll(".fc-media-embed")[obj.index],
+					subMedia = panel.querySelectorAll('.fc-media-embed')[obj.index],
 					pseudoImg = new Image();
-		let html = "";
-		html = `<img src="${obj.url}" />`;
+		let html = '';
+		html = `<img src='${obj.url}' />`;
 		subMedia.innerHTML = html;
 		// pseudoImg.onload = () => {
-		// 	html = `<img src="${obj.url}" />`;
+		// 	html = `<img src='${obj.url}' />`;
 		// 	subMedia.innerHTML = html;
 		// };
 		pseudoImg.onerror = () => {
@@ -690,19 +716,19 @@ class FourCorners {
 
 	insertMediaEmbed(obj, panelKey) {
 		//requests third party APIs to retrieve embed data
-		let req = "";
+		let req = '';
 		switch(obj.source) {
-			case "youtube":
-				req = "https://noembed.com/embed?url="+obj.url;
+			case 'youtube':
+				req = 'https://noembed.com/embed?url='+obj.url;
 				break;
-			case "vimeo":
-				req = "https://vimeo.com/api/oembed.json?url="+obj.url;
+			case 'vimeo':
+				req = 'https://vimeo.com/api/oembed.json?url='+obj.url;
 				break;
-			case "soundcloud":
-				req = "https://soundcloud.com/oembed?format=json&url="+obj.url;
+			case 'soundcloud':
+				req = 'https://soundcloud.com/oembed?format=json&url='+obj.url;
 				break;
-			case "instagram":
-				req = "https://api.instagram.com/oembed/?url="+obj.url;
+			case 'instagram':
+				req = 'https://api.instagram.com/oembed/?url='+obj.url;
 				break;
 			default:
 				return false;
@@ -710,25 +736,25 @@ class FourCorners {
 		}
 		const headers = new Headers();
 		fetch(req, {
-			method: "GET",
+			method: 'GET',
 			headers: headers
 		}).then(res => {
 			if (!res.ok) {throw Error(res.statusText)}
 			return res.json();
 		}).then(res => {
 			const panel = this.getPanel(panelKey),
-						subMedia = panel.querySelectorAll(".fc-media-embed")[obj.index];
-			let html = "";
+						subMedia = panel.querySelectorAll('.fc-media-embed')[obj.index];
+			let html = '';
 
-			if(obj.source == "instagram") {
-				html = `<img src="${res.thumbnail_url}"/>`;
+			if(obj.source == 'instagram') {
+				html = `<img src='${res.thumbnail_url}'/>`;
 			} else {
 				html = res.html;
 			}
 
 			if(Number.isInteger(res.width, res.height)) {
 				const ratio = res.height/res.width;
-				subMedia.classList.add("fc-responsive")
+				subMedia.classList.add('fc-responsive')
 				subMedia.style.paddingBottom = `${ratio * 100}%`;
 			}
 			
@@ -756,8 +782,8 @@ class FourCorners {
 			array ?
 			`${array.map((str,i) => {
 				return str ? `<p>${str}</p>` : `<br/>`
-			}).join("")}`
-			: "";
+			}).join('')}`
+			: ';'
 		return html;
 	}
 
@@ -765,10 +791,10 @@ class FourCorners {
 		if(!text) {
 			text = this.simplifyUrl(href);
 		}
-		if(this.valitimeEmail(href)) {
+		if(this.validateEmail(href)) {
 			href = `mailto:${href}`;
 		}
-		return `<a href="${href}" target="_blank" class="${classes.join(" ")}">${text}</a>`;
+		return `<a href='${href}' target='_blank' class='${classes.join(' ')}'>${text}</a>`;
 	}
 
 	//INTERACTIVITY
@@ -777,15 +803,15 @@ class FourCorners {
 		FC_CORNER_KEYS.forEach(key => {
 			const panel = this.getPanel(key);
 			const corner = this.elems.corners[key];
-			panel.querySelector(".fc-expand").addEventListener("click", this._handleClickExpand);
-			panel.querySelector(".fc-close").addEventListener("click", this._handleClickClose);
-			corner.addEventListener("mouseenter", this._handleHoverCorner);
-			corner.addEventListener("mouseleave", this._handleUnhoverCorner);
-			corner.addEventListener("click", this._handleClickCorner);
-			corner.classList.add("fc-interactive");
+			panel.querySelector('.fc-expand').addEventListener('click', this._handleClickExpand);
+			panel.querySelector('.fc-close').addEventListener('click', this._handleClickClose);
+			corner.addEventListener('mouseenter', this._handleHoverCorner);
+			corner.addEventListener('mouseleave', this._handleUnhoverCorner);
+			corner.addEventListener('click', this._handleClickCorner);
+			corner.classList.add('fc-interactive');
 		});
-		this.elems.container.addEventListener("click", this._handleClickEmpty);
-		this.elems.container.classList.add("fc-embed");
+		this.elems.container.addEventListener('click', this._handleClickEmpty);
+		this.elems.container.classList.add('fc-embed');
 	}
 
 	destroy() {
@@ -793,18 +819,18 @@ class FourCorners {
 			const panel = this.getPanel(key);
 			const corner = this.elems.corners ? this.elems.corners[key] : null;
 			if(panel) {
-				panel.querySelector(".fc-expand").removeEventListener("click", this._handleClickExpand);
-				panel.querySelector(".fc-close").removeEventListener("click", this._handleClickClose);
+				panel.querySelector('.fc-expand').removeEventListener('click', this._handleClickExpand);
+				panel.querySelector('.fc-close').removeEventListener('click', this._handleClickClose);
 				panel.remove();
 			}
 			if(corner) {
-				corner.removeEventListener("mouseenter", this._handleHoverCorner);
-				corner.removeEventListener("mouseleave", this._handleUnhoverCorner);
-				corner.removeEventListener("click", this._handleClickCorner);
+				corner.removeEventListener('mouseenter', this._handleHoverCorner);
+				corner.removeEventListener('mouseleave', this._handleUnhoverCorner);
+				corner.removeEventListener('click', this._handleClickCorner);
 				corner.remove();
 			}
 		});
-		this.elems.container.removeEventListener("click", this._handleClickEmpty);
+		this.elems.container.removeEventListener('click', this._handleClickEmpty);
 	}
 
 	openPanel(cornerKey) {
@@ -812,11 +838,11 @@ class FourCorners {
 		const { container } = elems;
 		const corner = this.getCorner(cornerKey);
 		const panel = this.getPanel(cornerKey);
-		container.classList.remove("fc-full");
-		container.classList.add("fc-active");
-		container.setAttribute("data-fc-active", cornerKey);
-		if(corner) corner.classList.add("fc-active");
-		if(panel) panel.classList.add("fc-active");
+		container.classList.remove('fc-full');
+		container.classList.add('fc-active');
+		container.setAttribute('data-fc-active', cornerKey);
+		if(corner) corner.classList.add('fc-active');
+		if(panel) panel.classList.add('fc-active');
 		FC_CORNER_KEYS.forEach(key => {
 			if(key !== cornerKey) this.closePanel(key);
 		});
@@ -827,11 +853,11 @@ class FourCorners {
 		const { container, corners, panels } = elems;
 		const corner = this.getCorner(cornerKey);
 		const panel = this.getPanel(cornerKey);
-		if(corner) corner.classList.remove("fc-active");
-		if(panel) panel.classList.remove("fc-active");
-		container.classList.remove("fc-active");
-		container.setAttribute("data-fc-active", "");
-		setTimeout(() => container.classList.remove("fc-full"));
+		if(corner) corner.classList.remove('fc-active');
+		if(panel) panel.classList.remove('fc-active');
+		container.classList.remove('fc-active');
+		container.setAttribute('data-fc-active', '');
+		setTimeout(() => container.classList.remove('fc-full'));
 	}
 
 	closePanels() {
@@ -843,23 +869,23 @@ class FourCorners {
 	}
 
 	clickExpandPanel() {
-		this.elems.container.classList.toggle("fc-full");
+		this.elems.container.classList.toggle('fc-full');
 	}
 
 	hoverCorner(e) {
 		let cornerElem = e.target;
-		cornerElem.classList.add("fc-hover");
+		cornerElem.classList.add('fc-hover');
 	}
 
 	unhoverCorner(e) {
 		let cornerElem = e.target;
-		cornerElem.classList.remove("fc-hover");
+		cornerElem.classList.remove('fc-hover');
 	}
 
 	clickCorner(e) {
 		const cornerElem = e.target,
-					cornerKey = cornerElem.getAttribute("data-fc-key"),
-					activeKey = this.elems.container.getAttribute("data-fc-active");
+					cornerKey = cornerElem.getAttribute('data-fc-key'),
+					activeKey = this.elems.container.getAttribute('data-fc-active');
 
 		if(cornerKey === activeKey) {
 			this.closePanel(cornerKey);	
@@ -878,15 +904,15 @@ class FourCorners {
 
 	//HELPERS
 	getCorner(cornerKey) {
-		return this.elems.container.querySelector(`.fc-corner[data-fc-key="${cornerKey}"]`);
+		return this.elems.container.querySelector(`.fc-corner[data-fc-key='${cornerKey}']`);
 	}
 
 	getPanel(cornerKey) {
-		return this.elems.container.querySelector(`.fc-panel[data-fc-key="${cornerKey}"]`);
+		return this.elems.container.querySelector(`.fc-panel[data-fc-key='${cornerKey}']`);
 	}
 
 	getPanels() {
-		return Array.from(this.elems.container.querySelectorAll(".fc-panel"));
+		return Array.from(this.elems.container.querySelectorAll('.fc-panel'));
 	}
 
 	isChildOf(target, ref) {
@@ -899,40 +925,40 @@ class FourCorners {
 		return answer;
 	}
 
-	valitimeEmail(string) {
+	validateEmail(string) {
 	  return String(string)
 	    .toLowerCase()
 	    .match(
-	      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+	      /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 	    );
 	}
 
 	simplifyUrl(url) {
-		return url.replace("www.", "").replace(/^https?:\/\//, "").replace(/\/$/, "");
+		return url.replace('www.', '').replace(/^https?:\/\//, '').replace(/\/$/, '');
 	}
 
 	extractHostname(url) {
 		let hostname;
 		if(!url) return null;
-		if(url.indexOf("//") > -1) {
-			hostname = url.split("/")[2];
+		if(url.indexOf('//') > -1) {
+			hostname = url.split('/')[2];
 		} else {
-			hostname = url.split("/")[0];
+			hostname = url.split('/')[0];
 		}
-		hostname = hostname.split(":")[0];
-		hostname = hostname.split("?")[0];
+		hostname = hostname.split(':')[0];
+		hostname = hostname.split('?')[0];
 		return hostname;
 	}
 
 	extractRootDomain(url) {
 		if(!url) return null;
 		let domain = this.extractHostname(url);
-		let splitArr = domain.split(".");
+		let splitArr = domain.split('.');
 		let arrLen = splitArr.length;
 		if (arrLen > 2) {
-			domain = splitArr[arrLen - 2] + "." + splitArr[arrLen - 1];
+			domain = splitArr[arrLen - 2] + '.' + splitArr[arrLen - 1];
 			if (splitArr[arrLen - 2].length == 2 && splitArr[arrLen - 1].length == 2) {
-				domain = splitArr[arrLen - 3] + "." + domain;
+				domain = splitArr[arrLen - 3] + '.' + domain;
 			}
 		}
 		return domain;
@@ -942,25 +968,25 @@ class FourCorners {
 
 
 const FC_CORNER_KEYS = [
-	"authorship",
-	"backstory",
-	"imagery",
-	"links",
+	'authorship',
+	'backstory',
+	'imagery',
+	'links',
 ];
 
 const FC_DEFAULT_DATA = {
-	"authorship": {},
-	"backstory": {},
-	"imagery": {},
-	"links": {},
+	'authorship': {},
+	'backstory': {},
+	'imagery': {},
+	'links': {},
 };
 
 const FC_OPTION_KEYS = [
-	"caption",
-	"credit",
-	"logo",
-	"dark",
-	"inherit",
+	'caption',
+	'credit',
+	'logo',
+	'dark',
+	'inherit',
 ];
 
 const FC_DEFAULT_OPTIONS = {
@@ -970,46 +996,46 @@ const FC_DEFAULT_OPTIONS = {
 	dark: false,
 	inherit: false,
 	verify: false,
-	lang: "en",
+	lang: 'en',
 };
 
-const FC_ASSERTION_KEY = "org.fourcorners.context";
+const FC_ASSERTION_KEY = 'org.fourcorners.context';
 
 const FC_STRINGS = {
 	en: {
-		authorship: "Authorship",
-		backstory: "Backstory",
-		imagery: "Related Imagery",
-		links: "Links",
-		caption: "Caption",
-		credit: "Credit",
-		license: "License",
-		coe: "Code of ethics",
-		bio: "About the photographer",
-		website: "Website",
-		info: "For more info",
-		rights: "For reproduction rights",
-		auth: "& Authentication",
-		cert: "Capture Certificate",
-		location: "Location",
-		time: "Time of capture",
-		reg: "Registration links",
-		verify_intro: "Explore more authenticated data and credentials",
-		verify_link: "here",
+		authorship: 'Authorship',
+		backstory: 'Backstory',
+		imagery: 'Related Imagery',
+		links: 'Links',
+		caption: 'Caption',
+		credit: 'Credit',
+		license: 'License',
+		coe: 'Code of ethics',
+		bio: 'About the photographer',
+		website: 'Website',
+		info: 'For more info',
+		rights: 'For reproduction rights',
+		auth: '& Authentication',
+		cert: 'Capture Certificate',
+		location: 'Location',
+		time: 'Time of capture',
+		reg: 'Registration links',
+		verify_intro: 'Explore more authenticated data and credentials',
+		verify_link: 'here',
 	},
 	ar: {
-		authorship: "التأليف",
-		backstory: "القصة وراء الصورة ",
-		imagery: "الصور ذات الصلة",
-		links: "الروابط",
-		caption: "Caption",
-		credit: "Credit",
-		license: "الترخيص",
-		coe: "ميثاق أخلاقيات",
-		bio: "السيرة الذاتية",
-		website: "الموقع الكتروني",
-		info: "لمزيد من المعلومات",
-		rights: "للحصول على حقوق النسخ",
+		authorship: 'التأليف',
+		backstory: 'القصة وراء الصورة ',
+		imagery: 'الصور ذات الصلة',
+		links: 'الروابط',
+		caption: 'Caption',
+		credit: 'Credit',
+		license: 'الترخيص',
+		coe: 'ميثاق أخلاقيات',
+		bio: 'السيرة الذاتية',
+		website: 'الموقع الكتروني',
+		info: 'لمزيد من المعلومات',
+		rights: 'للحصول على حقوق النسخ',
 	}
 };
 
