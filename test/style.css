@@ -3,15 +3,23 @@ html, body {
 }
 h1, h2, h3 {
 	margin: 0;
+	margin-top: 2em;
+	margin-bottom: 1em;
+}
+h2 + h3 {
+	margin-top: -1em;
 }
 main {
 	max-width: 700px;
 	padding: 25px;
 	margin: auto;
 }
+a {
+	color: black;
+}
 img {
 	width: 100%;
 }
-a {
-	color: black;
+.fc-embed {
+	margin-top: 2rem;
 }

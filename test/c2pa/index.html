@@ -5,25 +5,14 @@
 		<meta charset="utf-8">
 		<title>fourcorners.js demo w/ C2PA metadata</title>
 
-		<link type="text/css" href="./../style.css" rel="stylesheet" />
-		<link type="text/css" href="./../../dist/fourcorners.css" rel="stylesheet" />
-		<script type="text/javascript" src="./../../dist/fourcorners.js"></script>
+		<link type="text/css" href="/test/style.css" rel="stylesheet" />
+		<link type="text/css" href="/fourcorners.css" rel="stylesheet" />
+		<script type="text/javascript" src="/fourcorners.js"></script>
 
 		<script type="text/javascript">
 			window.addEventListener('load', function() {
-				const embeds = document.querySelectorAll(".fc-embed");
-				embeds.forEach((embed) => {
-					const inst = new FourCorners({
-						container: embed,
-						caption: true,
-						credit: true,
-						logo: true,
-						dark: false,
-						wasmSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/assets/wasm/toolkit_bg.wasm",
-						workerSrc: "https://cdn.jsdelivr.net/npm/@contentauth/sdk@0.8.12-alpha.10/dist/cai-sdk.worker.min.js"
-					});
-				});
-			});
+				FourCorners.init(".fc-embed")
+			})
 		</script>
 
 		<style>
@@ -41,80 +30,64 @@
 				fourcorners.js demos
 			</h1>
 
-			<br /><br />
 
 			<h2>
-				embed generated with <a href="https://c2pa.org" target="_blank">C2PA</a> metadata
+				embeds generated with <a href="https://c2pa.org" target="_blank">C2PA</a> metadata
 			</h2>
-			(<a href="./../index.html">go back</a>)
-
-			<br /><br />
+			<h3>(<a href="./../index.html">go back</a>)</h3>
 
 			<div class="fc-embed wp-block-fourcorners-block">
-				<img src="https://localnewsmatters-starling.newspackstaging.com/wp-content/uploads/2022/04/Harika-Maddala-BCN-20220126-LODIPITCOUNT-2.jpg" />
+				<img src="./assets/adobe-20220124-CAIAIIICAICIICAIICICA.jpg" />
 			</div>
-
-			<br /><br />
 
 			<div class="fc-embed wp-block-fourcorners-block">
-				<img src="./icn-c2pa-2.jpeg" />
+				<img src="./assets/icn-c2pa-2.jpeg" />
 			</div>
 
-			<br /><br />
+
+			<!-- <div class="fc-embed wp-block-fourcorners-block">
+				<img src="./assets/bcn-c2pa-2-test.jpeg" />
+			</div>
+
 
 			<div class="fc-embed wp-block-fourcorners-block">
-				<img src="./bcn-c2pa-2-test.jpeg" />
+				<img src="./assets/pingu-c2pa.jpg" />
 			</div>
 
-			<br /><br />
 
 			<div class="fc-embed wp-block-fourcorners-block">
-				<img src="./pingu-c2pa.jpg" />
+				<img src="./assets/icn-c2pa.jpeg" />
 			</div>
 
-			<br /><br />
 
 			<div class="fc-embed wp-block-fourcorners-block">
-				<img src="./icn-c2pa.jpeg" />
+				<img src="./assets/bcn-c2pa-2.jpeg" />
 			</div>
 
-			<br /><br />
-
-			<div class="fc-embed wp-block-fourcorners-block">
-				<img src="./bcn-c2pa-2.jpeg" />
-			</div>
-
-			<!-- <br /><br /><br /><br />
 
 			<div class="fc-embed">
-				<img src="./yonas-tadesse/yonas-tadesse-c2pa.jpeg" />
+				<img src="./assets/yonas-tadesse/yonas-tadesse-c2pa.jpeg" />
 			</div>
 			
-			<br /><br /><br /><br />
 
 			<div class="fc-embed">
-				<img src="./muyi-xiao/muyi-xiao-c2pa.jpeg" />
+				<img src="./assets/muyi-xiao/muyi-xiao-c2pa.jpeg" />
 			</div>
 			
-			<br /><br /><br /><br />
 
 			<div class="fc-embed">
-				<img src="./paul-ninson/paul-ninson-c2pa.jpeg" />
+				<img src="./assets/paul-ninson/paul-ninson-c2pa.jpeg" />
 			</div>
 			
-			<br /><br /><br /><br />
 
 			<div class="fc-embed">
-				<img src="./nora-savosnick/nora-savosnick-c2pa.jpeg" />
+				<img src="./assets/nora-savosnick/nora-savosnick-c2pa.jpeg" />
 			</div>
 			
-			<br /><br /><br /><br />
 
 			<div class="fc-embed">
-				<img src="./cheney-orr/cheney-orr-c2pa.jpeg" />
-			</div>
-			
-			<br /><br /><br /><br /> -->
+				<img src="./assets/cheney-orr/cheney-orr-c2pa.jpeg" />
+			</div> -->
 
 		</div>
 	</body>

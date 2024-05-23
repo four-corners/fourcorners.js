@@ -14,20 +14,34 @@
   },
   "type": "mode",
   "main": "dist/fourcorners.js",
+  "scripts": {
+    "dev": "npm run watch & npm run test",
+    "watch": "npx webpack watch",
+    "test": "npx webpack serve",
+    "build": "npx webpack"
+  },
+  "dependencies": {
+    "@contentauth/sdk": "^0.8.12",
+    "c2pa": "0.20.0",
+    "copy-webpack-plugin": "^12.0.2",
+    "regenerator-runtime": "^0.13.9"
+  },
   "devDependencies": {
     "@babel/core": "^7.17.2",
     "@babel/eslint-parser": "^7.17.0",
+    "@babel/plugin-transform-classes": "^7.16.7",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.7.4",
     "@svgr/webpack": "^6.2.1",
     "autoprefixer": "^10.4.2",
-    "babel-loader": "^8.0.6",
+    "babel-loader": "^9.1.3",
     "babel-polyfill": "^6.26.0",
     "browser-sync": "^2.27.7",
     "css-loader": "^6.6.0",
     "css-minimizer-webpack-plugin": "^3.4.1",
     "eslint": "^8.8.0",
     "eslint-webpack-plugin": "^2.6.0",
+    "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^2.5.3",
     "node-sass": "^7.0.1",
     "npm": "^8.5.0",
@@ -41,19 +55,9 @@
     "svg-url-loader": "^7.1.1",
     "svgo-loader": "^3.0.0",
     "terser-webpack-plugin": "^5.3.3",
-    "webpack": "^5.65.0",
+    "webpack": "~5.91.0",
     "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.8.1",
     "yargs": "^17.3.1"
-  },
-  "scripts": {
-    "test": "npm run watch & browser-sync start --server --serveStatic 'test' --no-notify --no-open --files 'src/*.js' 'dist/*.js' '*.html'",
-    "watch": "webpack --mode=development --progress --watch",
-    "build": "webpack --mode=production  --progress"
-  },
-  "dependencies": {
-    "@babel/plugin-transform-classes": "^7.16.7",
-    "@contentauth/sdk": "^0.8.12",
-    "html-webpack-plugin": "^5.5.0",
-    "regenerator-runtime": "^0.13.9"
   }
 }
